@@ -41,6 +41,8 @@ class UpdateChecker(private val context: Context) {
      * @property downloadUrl 下载地址
      * @property updateTime 更新时间（可选）
      * @property releaseNotes 发布说明（可选）
+     * @property importantNotice 重要提示（可选）
+     * @property noticeLevel 提示级别（info/warning/critical，默认 info）
      */
     data class UpdateCheckResult(
         val hasUpdate: Boolean,
@@ -48,8 +50,19 @@ class UpdateChecker(private val context: Context) {
         val latestVersion: String,
         val downloadUrl: String,
         val updateTime: String? = null,
-        val releaseNotes: String? = null
+        val releaseNotes: String? = null,
+        val importantNotice: String? = null,
+        val noticeLevel: NoticeLevel = NoticeLevel.INFO
     )
+
+    /**
+     * 提示级别
+     */
+    enum class NoticeLevel {
+        INFO,       // 普通信息（使用 tertiary 颜色）
+        WARNING,    // 警告信息（使用 secondary 颜色）
+        CRITICAL    // 重要信息（使用 error 颜色）
+    }
 
     /**
      * 检查 GitHub Release 更新
@@ -96,7 +109,9 @@ class UpdateChecker(private val context: Context) {
             latestVersion = latestRemote.version,
             downloadUrl = latestRemote.downloadUrl,
             updateTime = latestRemote.updateTime,
-            releaseNotes = latestRemote.releaseNotes
+            releaseNotes = latestRemote.releaseNotes,
+            importantNotice = latestRemote.importantNotice,
+            noticeLevel = latestRemote.noticeLevel
         )
     }
 
@@ -188,10 +203,17 @@ class UpdateChecker(private val context: Context) {
 
             val updateTime = json.optString("update_time", "").ifBlank { null }
             val releaseNotes = json.optString("release_notes", "").ifBlank { null }
+            val importantNotice = json.optString("important_notice", "").ifBlank { null }
+            val noticeLevelStr = json.optString("notice_level", "info").lowercase()
+            val noticeLevel = when (noticeLevelStr) {
+                "warning" -> NoticeLevel.WARNING
+                "critical" -> NoticeLevel.CRITICAL
+                else -> NoticeLevel.INFO
+            }
 
             Log.d(TAG, "Successfully fetched version $version from $url")
 
-            return RemoteVersion(version, downloadUrl, updateTime, releaseNotes)
+            return RemoteVersion(version, downloadUrl, updateTime, releaseNotes, importantNotice, noticeLevel)
         }
     }
 
@@ -251,6 +273,8 @@ class UpdateChecker(private val context: Context) {
         val version: String,
         val downloadUrl: String,
         val updateTime: String?,
-        val releaseNotes: String?
+        val releaseNotes: String?,
+        val importantNotice: String?,
+        val noticeLevel: NoticeLevel
     )
 }

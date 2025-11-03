@@ -3,12 +3,17 @@ package com.brycewg.asrkb.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
@@ -455,6 +460,15 @@ class SettingsActivity : AppCompatActivity() {
             )
         )
 
+        // 添加重要提示（如果有）
+        result.importantNotice?.let { notice ->
+            messageBuilder.append("\n\n")
+            // 使用占位符，稍后替换为带样式的文本
+            messageBuilder.append("{{IMPORTANT_NOTICE_START}}")
+            messageBuilder.append(notice)
+            messageBuilder.append("{{IMPORTANT_NOTICE_END}}")
+        }
+
         // 添加更新时间（如果有）
         result.updateTime?.let { updateTime ->
             messageBuilder.append("\n\n")
@@ -468,9 +482,20 @@ class SettingsActivity : AppCompatActivity() {
             messageBuilder.append(getString(R.string.update_release_notes_label, notes))
         }
 
+        // 创建带样式的文本（如果有重要提示）
+        val messageText = if (result.importantNotice != null) {
+            createStyledMessage(
+                messageBuilder.toString(),
+                result.importantNotice,
+                result.noticeLevel
+            )
+        } else {
+            messageBuilder.toString()
+        }
+
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.update_dialog_title)
-            .setMessage(messageBuilder.toString())
+            .setMessage(messageText)
             .setPositiveButton(R.string.btn_download) { _, _ ->
                 showDownloadSourceDialog(result.downloadUrl, result.latestVersion)
             }
@@ -490,6 +515,79 @@ class SettingsActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.btn_cancel, null)
             .show()
+    }
+
+    /**
+     * 创建带颜色样式的消息文本
+     *
+     * @param message 原始消息文本
+     * @param notice 重要提示内容
+     * @param level 提示级别
+     * @return 带样式的 SpannableString
+     */
+    private fun createStyledMessage(
+        message: String,
+        notice: String,
+        level: UpdateChecker.NoticeLevel
+    ): SpannableString {
+        val spannable = SpannableString(
+            message.replace("{{IMPORTANT_NOTICE_START}}", "")
+                .replace("{{IMPORTANT_NOTICE_END}}", "")
+        )
+
+        // 查找重要提示在文本中的位置
+        val noticeStart = spannable.indexOf(notice)
+        if (noticeStart == -1) return spannable
+
+        val noticeEnd = noticeStart + notice.length
+
+        // 根据级别选择颜色（使用 Material3 动态颜色）
+        val color = when (level) {
+            UpdateChecker.NoticeLevel.INFO -> {
+                // 使用 tertiary 颜色（Monet 第三色）
+                getThemeColor(com.google.android.material.R.attr.colorTertiary, 0xFF6750A4.toInt())
+            }
+            UpdateChecker.NoticeLevel.WARNING -> {
+                // 使用 secondary 颜色（Monet 第二色）
+                getThemeColor(com.google.android.material.R.attr.colorSecondary, 0xFFE8DEF8.toInt())
+            }
+            UpdateChecker.NoticeLevel.CRITICAL -> {
+                // 使用 error 颜色
+                getThemeColor(android.R.attr.colorError, 0xFFB3261E.toInt())
+            }
+        }
+
+        // 应用颜色和加粗样式
+        spannable.setSpan(
+            ForegroundColorSpan(color),
+            noticeStart,
+            noticeEnd,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannable.setSpan(
+            StyleSpan(Typeface.BOLD),
+            noticeStart,
+            noticeEnd,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return spannable
+    }
+
+    /**
+     * 从主题属性获取颜色
+     *
+     * @param attrId 属性 ID
+     * @param defaultColor 默认颜色（如果属性不存在）
+     * @return 颜色值
+     */
+    private fun getThemeColor(attrId: Int, defaultColor: Int): Int {
+        val typedValue = android.util.TypedValue()
+        return if (theme.resolveAttribute(attrId, typedValue, true)) {
+            typedValue.data
+        } else {
+            defaultColor
+        }
     }
 
     /**
