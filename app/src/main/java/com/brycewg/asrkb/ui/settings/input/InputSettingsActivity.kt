@@ -38,6 +38,7 @@ class InputSettingsActivity : AppCompatActivity() {
         val switchMicHaptic = findViewById<MaterialSwitch>(R.id.switchMicHaptic)
         val switchMicTapToggle = findViewById<MaterialSwitch>(R.id.switchMicTapToggle)
         val switchMicSwipeUpAutoEnter = findViewById<MaterialSwitch>(R.id.switchMicSwipeUpAutoEnter)
+        val switchAutoStartRecordingOnShow = findViewById<MaterialSwitch>(R.id.switchAutoStartRecordingOnShow)
         val switchFcitx5ReturnOnSwitcher = findViewById<MaterialSwitch>(R.id.switchFcitx5ReturnOnSwitcher)
         val switchReturnPrevImeOnHide = findViewById<MaterialSwitch>(R.id.switchReturnPrevImeOnHide)
         val switchHideRecentTasks = findViewById<MaterialSwitch>(R.id.switchHideRecentTasks)
@@ -58,6 +59,7 @@ class InputSettingsActivity : AppCompatActivity() {
             switchDuckMediaOnRecord.isChecked = prefs.duckMediaOnRecordEnabled
             switchHeadsetMicPriority.isChecked = prefs.headsetMicPriorityEnabled
             switchMicSwipeUpAutoEnter.isChecked = prefs.micSwipeUpAutoEnterEnabled
+            switchAutoStartRecordingOnShow.isChecked = prefs.autoStartRecordingOnShow
         }
         applyPrefsToUi()
 
@@ -98,12 +100,16 @@ class InputSettingsActivity : AppCompatActivity() {
             hapticTapIfEnabled(btn)
             prefs.micSwipeUpAutoEnterEnabled = isChecked
             if (isChecked) {
-                // 互斥：启用“上滑自动发送”后，关闭点按控制
+                // 互斥：启用"上滑自动发送"后，关闭点按控制
                 if (prefs.micTapToggleEnabled) {
                     prefs.micTapToggleEnabled = false
                     try { switchMicTapToggle.isChecked = false } catch (_: Throwable) { }
                 }
             }
+        }
+        switchAutoStartRecordingOnShow.setOnCheckedChangeListener { btn, isChecked ->
+            hapticTapIfEnabled(btn)
+            prefs.autoStartRecordingOnShow = isChecked
         }
         switchReturnPrevImeOnHide.setOnCheckedChangeListener { btn, isChecked ->
             hapticTapIfEnabled(btn)

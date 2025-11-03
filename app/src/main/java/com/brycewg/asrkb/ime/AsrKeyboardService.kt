@@ -268,6 +268,10 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
         hideAiEditPanel()
         hideNumpadPanel()
         hideNumpadPanel()
+        // 如果此时引擎仍在运行（键盘收起期间继续录音），需要把 UI 恢复为 Listening
+        if (asrManager.isRunning()) {
+            onStateChanged(actionHandler.getCurrentState())
+        }
 
         // Pro：再次注入以覆盖可能被标点标签刷新影响的 UI
         try { rootView?.let { com.brycewg.asrkb.ProUiInjector.injectIntoImeKeyboard(this, it) } } catch (_: Throwable) { }
@@ -287,6 +291,27 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
 
         // 预热耳机路由（键盘显示）
         try { BluetoothRouteManager.setImeActive(this, true) } catch (t: Throwable) { android.util.Log.w("AsrKeyboardService", "BluetoothRouteManager setImeActive(true)", t) }
+
+        // 自动启动录音（如果开启了设置）
+        if (prefs.autoStartRecordingOnShow) {
+            // 与手动开始保持一致的就绪性校验，避免在缺少 Key/模型时进入 Listening 状态
+            if (!checkAsrReady()) {
+                // refreshPermissionUi() 已在校验中处理，这里直接返回
+            } else {
+                // 延迟一小段时间再启动，确保键盘 UI 已完全显示
+                rootView?.postDelayed({
+                    try {
+                        // 再次确认仍然就绪（期间用户可能改了设置/权限）
+                        if (!checkAsrReady()) return@postDelayed
+                        if (!asrManager.isRunning()) {
+                            actionHandler.startAutoRecording()
+                        }
+                    } catch (t: Throwable) {
+                        android.util.Log.w("AsrKeyboardService", "Failed to auto start recording", t)
+                    }
+                }, 100)
+            }
+        }
     }
 
     override fun onUpdateSelection(

@@ -61,6 +61,13 @@
           android:text="@string/label_mic_swipe_up_auto_enter" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchAutoStartRecordingOnShow"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:text="@string/label_auto_start_recording_on_show" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
           android:id="@+id/switchFcitx5ReturnOnSwitcher"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

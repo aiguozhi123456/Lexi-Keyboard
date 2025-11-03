@@ -65,9 +65,11 @@ class KeyboardActionHandler(
     private var dropPendingFinal: Boolean = false
     // 操作序列号：用于取消在途处理（强制停止/新会话开始都会递增）
     private var opSeq: Long = 0L
-    // 长按期间的“按住状态”和自动重启计数（用于应对录音被系统提前中断的设备差异）
+    // 长按期间的"按住状态"和自动重启计数（用于应对录音被系统提前中断的设备差异）
     private var micHoldActive: Boolean = false
     private var micHoldRestartCount: Int = 0
+    // 自动启动录音标志：标识当前录音是否由键盘面板自动启动
+    private var isAutoStartedRecording: Boolean = false
 
     private fun scheduleProcessingTimeout() {
         try { processingTimeoutJob?.cancel() } catch (t: Throwable) { Log.w(TAG, "Cancel previous processingTimeoutJob failed", t) }
@@ -92,6 +94,22 @@ class KeyboardActionHandler(
     fun getCurrentState(): KeyboardState = currentState
 
     /**
+     * 启动自动录音（键盘面板自动启动）
+     * 此录音的停止方式：点按麦克风按钮或VAD自动停止
+     */
+    fun startAutoRecording() {
+        if (currentState !is KeyboardState.Idle) {
+            Log.w(TAG, "startAutoRecording: ignored in non-idle state $currentState")
+            return
+        }
+        isAutoStartedRecording = true
+        startNormalListening()
+        try {
+            DebugLogManager.log("ime", "auto_start_recording", mapOf("opSeq" to opSeq))
+        } catch (_: Throwable) { }
+    }
+
+    /**
      * 处理麦克风点击（点按切换模式）
      */
     fun handleMicTapToggle() {
@@ -102,7 +120,8 @@ class KeyboardActionHandler(
                 data = mapOf(
                     "state" to currentState::class.java.simpleName,
                     "opSeq" to opSeq,
-                    "dropPendingFinal" to dropPendingFinal
+                    "dropPendingFinal" to dropPendingFinal,
+                    "isAutoStarted" to isAutoStartedRecording
                 )
             )
         } catch (_: Throwable) { }
@@ -113,7 +132,9 @@ class KeyboardActionHandler(
                 try { DebugLogManager.log("ime", "mic_tap_action", mapOf("action" to "start_listening", "opSeq" to opSeq)) } catch (_: Throwable) { }
             }
             is KeyboardState.Listening -> {
-                // 停止录音：统一进入 Processing，显示“识别中”直到最终结果（即使未开启后处理）
+                // 停止录音：如果是自动启动的录音，或者正常的点按模式，都执行停止
+                // 统一进入 Processing，显示"识别中"直到最终结果（即使未开启后处理）
+                isAutoStartedRecording = false  // 清除自动启动标志
                 asrManager.stopRecording()
                 transitionToState(KeyboardState.Processing)
                 scheduleProcessingTimeout()
@@ -150,12 +171,17 @@ class KeyboardActionHandler(
                 data = mapOf(
                     "state" to currentState::class.java.simpleName,
                     "opSeq" to opSeq,
-                    "dropPendingFinal" to dropPendingFinal
+                    "dropPendingFinal" to dropPendingFinal,
+                    "isAutoStarted" to isAutoStartedRecording
                 )
             )
         } catch (_: Throwable) { }
         when (currentState) {
             is KeyboardState.Idle -> startNormalListening()
+            is KeyboardState.Listening -> {
+                // 如果正在录音（可能是自动启动的），长按应该停止并重新开始
+                isAutoStartedRecording = false  // 清除自动启动标志
+            }
             is KeyboardState.Processing -> {
                 // 强制停止：根据模式决定后续动作
                 try {
@@ -195,6 +221,7 @@ class KeyboardActionHandler(
     fun handleMicPressUp(autoEnterAfterFinal: Boolean) {
         autoEnterOnce = autoEnterAfterFinal
         micHoldActive = false
+        isAutoStartedRecording = false  // 清除自动启动标志
         try {
             DebugLogManager.log(
                 category = "ime",
@@ -769,6 +796,7 @@ class KeyboardActionHandler(
         try { processingTimeoutJob?.cancel() } catch (t: Throwable) { Log.w(TAG, "Cancel timeout on toIdle failed", t) }
         processingTimeoutJob = null
         autoEnterOnce = false
+        isAutoStartedRecording = false  // 清除自动启动标志
         transitionToState(KeyboardState.Idle)
         if (!keepMessage) {
             uiListener?.onStatusMessage(context.getString(R.string.status_idle))
