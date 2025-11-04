@@ -321,6 +321,14 @@ class AsrSessionManager(
     }
 
     /**
+     * 读取最近一次会话的录音时长（毫秒），不清空。
+     * 用于在 onStopped 等场景下进行早停判断，避免影响后续统计/历史写入。
+     */
+    fun peekLastAudioMsForStats(): Long {
+        return lastAudioMsForStats
+    }
+
+    /**
      * 设置当前状态（用于外部状态变更）
      */
     fun setCurrentState(state: KeyboardState) {

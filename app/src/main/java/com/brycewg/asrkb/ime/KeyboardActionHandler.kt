@@ -704,7 +704,8 @@ class KeyboardActionHandler(
         scope.launch {
             // 若仍在长按且为非点按模式，并且上一轮录音时长极短，则判定为系统提前中断，自动重启一次录音
             // 这样用户的“持续按住说话”不会因为系统打断而直接被判定为取消
-            val earlyMs = try { asrManager.popLastAudioMsForStats() } catch (t: Throwable) { 0L }
+            // 仅用于早停判定：读取但不清空，避免影响后续统计与历史写入
+            val earlyMs = try { asrManager.peekLastAudioMsForStats() } catch (t: Throwable) { 0L }
             if (!prefs.micTapToggleEnabled && micHoldActive && earlyMs in 1..250) {
                 if (micHoldRestartCount < 1) {
                     micHoldRestartCount += 1
@@ -726,7 +727,7 @@ class KeyboardActionHandler(
             // 误触极短录音：直接取消，避免进入“识别中…”阻塞后续长按
             val audioMs = earlyMs
             // 若前面 earlyMs==0（例如未知或异常），再尝试一次以兼容既有逻辑
-            val audioMsVal = if (audioMs != 0L) audioMs else try { asrManager.popLastAudioMsForStats() } catch (t: Throwable) {
+            val audioMsVal = if (audioMs != 0L) audioMs else try { asrManager.peekLastAudioMsForStats() } catch (t: Throwable) {
                 Log.w(TAG, "popLastAudioMsForStats failed", t)
                 0L
             }
