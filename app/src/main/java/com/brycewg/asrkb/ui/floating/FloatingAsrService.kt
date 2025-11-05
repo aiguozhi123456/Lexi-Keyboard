@@ -392,7 +392,7 @@ class FloatingAsrService : Service(),
                 try {
                     val audioMs = asrSessionManager.popLastAudioMsForStats()
                     val procMs = asrSessionManager.getLastRequestDuration() ?: 0L
-                    prefs.recordUsageCommit("floating", prefs.asrVendor, audioMs, text.length, procMs)
+                    prefs.recordUsageCommit("floating", prefs.asrVendor, audioMs, com.brycewg.asrkb.util.TextSanitizer.countEffectiveChars(text), procMs)
                     // 写入历史记录（根据设置判断是否经过 AI 处理）
                     try {
                         val store = com.brycewg.asrkb.store.AsrHistoryStore(this@FloatingAsrService)
@@ -406,7 +406,7 @@ class FloatingAsrService : Service(),
                                 procMs = procMs,
                                 source = "floating",
                                 aiProcessed = ai,
-                                charCount = text.length
+                                charCount = com.brycewg.asrkb.util.TextSanitizer.countEffectiveChars(text)
                             )
                         )
                     } catch (e: Exception) {

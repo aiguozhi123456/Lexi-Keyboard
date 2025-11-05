@@ -534,7 +534,7 @@ class AsrSessionManager(
 
         if (wrote) {
             try {
-                prefs.addAsrChars(text.length)
+                prefs.addAsrChars(TextSanitizer.countEffectiveChars(text))
             } catch (e: Throwable) {
                 Log.e(TAG, "Failed to add ASR chars", e)
             }

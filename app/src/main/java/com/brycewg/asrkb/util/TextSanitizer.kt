@@ -71,4 +71,82 @@ object TextSanitizer {
     }
     return if (end < s.length) s.substring(0, end) else s
   }
+
+  /**
+   * 计算文本的"有效字符数"（智能统计）
+   * 规则：
+   * - CJK 字符（中文、日文、韩文）：每个字符算 1 个字
+   * - 英文单词：连续字母算作 1 个词
+   * - 数字：连续数字算作 1 个数字串
+   * - 标点符号和空白符：不计入统计
+   *
+   * @param text 待统计的文本
+   * @return 有效字符数
+   */
+  fun countEffectiveChars(text: String): Int {
+    if (text.isEmpty()) return 0
+
+    var count = 0
+    var inWord = false      // 是否在英文单词中
+    var inNumber = false    // 是否在数字串中
+
+    var i = 0
+    while (i < text.length) {
+      val codePoint = text.codePointAt(i)
+      val charCount = Character.charCount(codePoint)
+
+      when {
+        // CJK 统一表意文字（中文）
+        isCJK(codePoint) -> {
+          count++
+          inWord = false
+          inNumber = false
+        }
+        // 英文字母
+        Character.isLetter(codePoint) -> {
+          if (!inWord) {
+            count++  // 新单词开始
+            inWord = true
+          }
+          inNumber = false
+        }
+        // 数字
+        Character.isDigit(codePoint) -> {
+          if (!inNumber) {
+            count++  // 新数字串开始
+            inNumber = true
+          }
+          inWord = false
+        }
+        // 其他（标点、空白等）
+        else -> {
+          inWord = false
+          inNumber = false
+        }
+      }
+
+      i += charCount
+    }
+
+    return count
+  }
+
+  /**
+   * 判断是否为 CJK 字符（中文、日文、韩文）
+   */
+  private fun isCJK(codePoint: Int): Boolean {
+    val block = Character.UnicodeBlock.of(codePoint)
+    return block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
+           block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A ||
+           block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B ||
+           block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C ||
+           block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D ||
+           block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E ||
+           block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS ||
+           block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT ||
+           block == Character.UnicodeBlock.HIRAGANA ||
+           block == Character.UnicodeBlock.KATAKANA ||
+           block == Character.UnicodeBlock.HANGUL_SYLLABLES ||
+           block == Character.UnicodeBlock.HANGUL_JAMO
+  }
 }

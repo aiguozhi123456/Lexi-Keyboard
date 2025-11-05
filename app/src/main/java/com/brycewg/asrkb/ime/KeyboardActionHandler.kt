@@ -945,12 +945,12 @@ class KeyboardActionHandler(
 
         // 统计字数 & 记录使用统计/历史
         try {
-            prefs.addAsrChars(finalProcessed.length)
+            prefs.addAsrChars(TextSanitizer.countEffectiveChars(finalProcessed))
             // 记录使用统计（IME）
             try {
                 val audioMs = asrManager.popLastAudioMsForStats()
                 val procMs = asrManager.getLastRequestDuration() ?: 0L
-                prefs.recordUsageCommit("ime", prefs.asrVendor, audioMs, finalProcessed.length, procMs)
+                prefs.recordUsageCommit("ime", prefs.asrVendor, audioMs, TextSanitizer.countEffectiveChars(finalProcessed), procMs)
                 // 写入历史记录（AI 后处理）
                 try {
                     val store = com.brycewg.asrkb.store.AsrHistoryStore(context)
@@ -963,7 +963,7 @@ class KeyboardActionHandler(
                             procMs = procMs,
                             source = "ime",
                             aiProcessed = true,
-                            charCount = finalProcessed.length
+                            charCount = TextSanitizer.countEffectiveChars(finalProcessed)
                         )
                     )
                 } catch (e: Exception) {
@@ -1070,12 +1070,12 @@ class KeyboardActionHandler(
 
         // 统计字数 & 记录使用统计/历史
         try {
-            prefs.addAsrChars(finalText.length)
+            prefs.addAsrChars(TextSanitizer.countEffectiveChars(finalText))
             // 记录使用统计（IME）
             try {
                 val audioMs = asrManager.popLastAudioMsForStats()
                 val procMs = asrManager.getLastRequestDuration() ?: 0L
-                prefs.recordUsageCommit("ime", prefs.asrVendor, audioMs, finalText.length, procMs)
+                prefs.recordUsageCommit("ime", prefs.asrVendor, audioMs, TextSanitizer.countEffectiveChars(finalText), procMs)
                 // 写入历史记录（无 AI 后处理）
                 try {
                     val store = com.brycewg.asrkb.store.AsrHistoryStore(context)
@@ -1088,7 +1088,7 @@ class KeyboardActionHandler(
                             procMs = procMs,
                             source = "ime",
                             aiProcessed = false,
-                            charCount = finalText.length
+                            charCount = TextSanitizer.countEffectiveChars(finalText)
                         )
                     )
                 } catch (e: Exception) {
