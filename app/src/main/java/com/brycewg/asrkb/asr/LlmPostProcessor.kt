@@ -137,6 +137,19 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
   }
 
   /**
+   * 过滤掉 AI 输出中的 <think>...</think> 标签及其内容
+   * 部分模型会将推理内容放在正文中，需要过滤
+   *
+   * @param text 原始文本
+   * @return 过滤后的文本
+   */
+  private fun filterThinkTags(text: String): String {
+    // 使用正则表达式移除 <think>...</think> 标签及其内容
+    // (?s) 表示 DOTALL 模式，让 . 可以匹配换行符
+    return text.replace(Regex("""(?s)<think>.*?</think>"""), "").trim()
+  }
+
+  /**
    * 从响应 JSON 中提取文本内容
    *
    * 支持标准 OpenAI 格式和自定义 output_text 字段
@@ -148,7 +161,7 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
   private fun extractTextFromResponse(responseJson: String, fallback: String): String {
     return try {
       val obj = JSONObject(responseJson)
-      when {
+      val rawText = when {
         obj.has("choices") -> {
           val choices = obj.getJSONArray("choices")
           if (choices.length() > 0) {
@@ -159,6 +172,8 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
         obj.has("output_text") -> obj.optString("output_text", fallback)
         else -> fallback
       }
+      // 过滤掉 think 标签及其内容
+      filterThinkTags(rawText)
     } catch (t: Throwable) {
       Log.e(TAG, "Failed to extract text from response", t)
       fallback
