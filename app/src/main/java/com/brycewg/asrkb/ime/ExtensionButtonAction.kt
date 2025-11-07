@@ -63,8 +63,7 @@ enum class ExtensionButtonAction(
     CLIPBOARD(
         id = "clipboard",
         titleResId = R.string.ext_btn_clipboard,
-        // 复用 copy 图标以表示剪贴板
-        iconResId = R.drawable.copy_toggle
+        iconResId = R.drawable.clipboard_toggle
     ),
 
     /**
@@ -118,7 +117,7 @@ enum class ExtensionButtonAction(
     UNDO(
         id = "undo",
         titleResId = R.string.ext_btn_undo,
-        iconResId = R.drawable.backspace_toggle
+        iconResId = R.drawable.arrow_u_up_left_toggle
     );
 
     companion object {
