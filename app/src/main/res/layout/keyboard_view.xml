@@ -307,6 +307,10 @@
             android:layout_marginEnd="6dp"
             android:background="@drawable/bg_key_rect_button"
             android:contentDescription="@string/desc_extension_center_button_2"
+            android:text="@string/cd_space"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:gravity="center"
             android:clipToOutline="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:stateListAnimator="@animator/key_button_state_list"
@@ -449,8 +453,9 @@
             android:maxLines="3"
             android:ellipsize="end"
             android:text="@string/status_idle"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="14sp"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textFontWeight="500"
             android:includeFontPadding="false"
             android:visibility="gone" />
     </LinearLayout>
