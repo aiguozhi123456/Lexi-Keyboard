@@ -131,9 +131,10 @@ enum class ExtensionButtonAction(
 
         /**
          * 获取默认的4个按钮配置
+         * 默认顺序：数字键盘、全选、复制、剪贴板
          */
         fun getDefaults(): List<ExtensionButtonAction> {
-            return listOf(SELECT, COPY, PASTE, NUMPAD)
+            return listOf(NUMPAD, SELECT_ALL, COPY, CLIPBOARD)
         }
     }
 }

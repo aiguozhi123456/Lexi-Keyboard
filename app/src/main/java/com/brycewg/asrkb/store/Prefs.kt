@@ -729,20 +729,49 @@ class Prefs(context: Context) {
         set(value) = sp.edit { putString(KEY_PUNCT_4, value.trim()) }
 
     // 自定义扩展按钮（4个位置，存储动作类型ID）
+    // 默认值：数字键盘、全选、复制、撤销
     var extBtn1: com.brycewg.asrkb.ime.ExtensionButtonAction
-        get() = com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(sp.getString(KEY_EXT_BTN_1, null))
+        get() {
+            val stored = sp.getString(KEY_EXT_BTN_1, null)
+            return if (stored == null) {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.getDefaults()[0]
+            } else {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(stored)
+            }
+        }
         set(value) = sp.edit { putString(KEY_EXT_BTN_1, value.id) }
 
     var extBtn2: com.brycewg.asrkb.ime.ExtensionButtonAction
-        get() = com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(sp.getString(KEY_EXT_BTN_2, null))
+        get() {
+            val stored = sp.getString(KEY_EXT_BTN_2, null)
+            return if (stored == null) {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.getDefaults()[1]
+            } else {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(stored)
+            }
+        }
         set(value) = sp.edit { putString(KEY_EXT_BTN_2, value.id) }
 
     var extBtn3: com.brycewg.asrkb.ime.ExtensionButtonAction
-        get() = com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(sp.getString(KEY_EXT_BTN_3, null))
+        get() {
+            val stored = sp.getString(KEY_EXT_BTN_3, null)
+            return if (stored == null) {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.getDefaults()[2]
+            } else {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(stored)
+            }
+        }
         set(value) = sp.edit { putString(KEY_EXT_BTN_3, value.id) }
 
     var extBtn4: com.brycewg.asrkb.ime.ExtensionButtonAction
-        get() = com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(sp.getString(KEY_EXT_BTN_4, null))
+        get() {
+            val stored = sp.getString(KEY_EXT_BTN_4, null)
+            return if (stored == null) {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.getDefaults()[3]
+            } else {
+                com.brycewg.asrkb.ime.ExtensionButtonAction.fromId(stored)
+            }
+        }
         set(value) = sp.edit { putString(KEY_EXT_BTN_4, value.id) }
 
     // 历史语音识别总字数（仅统计最终提交到编辑器的识别结果；AI编辑不计入）
