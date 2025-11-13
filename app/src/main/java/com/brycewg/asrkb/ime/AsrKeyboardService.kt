@@ -51,6 +51,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 
 /**
  * ASR 键盘服务
@@ -163,6 +164,8 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
     private var repeatRightRunnable: Runnable? = null
     // 系统导航栏底部高度（用于适配 Android 15 边缘到边缘显示）
     private var systemNavBarBottomInset: Int = 0
+    // 记录最近一次在 IME 内弹出菜单的时间，用于限制“防误收起”逻辑的作用窗口
+    private var lastPopupMenuShownAt: Long = 0L
 
     // ========== 剪贴板面板 ==========
     private var layoutClipboardPanel: View? = null
@@ -1180,9 +1183,32 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
         clipTxtCount?.text = getString(R.string.clip_count_format, list.size)
     }
 
+    /**
+     * 在 IME 窗口内展示 PopupMenu，并在异常情况下尝试保持键盘不被收起。
+     *
+     * 部分机型上，在输入法窗口里弹出菜单偶现触发系统收起软键盘；
+     * 这里在菜单消失时检测输入视图是否已被隐藏，如已隐藏则请求重新显示。
+     */
+    private fun showPopupMenuKeepingIme(popup: PopupMenu) {
+        popup.setOnDismissListener {
+            // 仅在弹出后短时间内发生收起时尝试恢复，避免干扰用户主动收起键盘
+            val now = System.currentTimeMillis()
+            if (now - lastPopupMenuShownAt > 2000L) return@setOnDismissListener
+            if (!isInputViewShown && currentInputEditorInfo != null) {
+                try {
+                    requestShowSelf(0)
+                } catch (t: Throwable) {
+                    android.util.Log.w("AsrKeyboardService", "Failed to re-show IME after popup dismiss", t)
+                }
+            }
+        }
+        lastPopupMenuShownAt = System.currentTimeMillis()
+        popup.show()
+    }
+
     private fun showClipboardDeleteMenu() {
         val anchor = clipBtnDelete ?: return
-        val popup = androidx.appcompat.widget.PopupMenu(anchor.context, anchor)
+        val popup = PopupMenu(anchor.context, anchor)
         popup.menu.add(0, 0, 0, getString(R.string.clip_delete_before_1h))
         popup.menu.add(0, 1, 1, getString(R.string.clip_delete_before_24h))
         popup.menu.add(0, 2, 2, getString(R.string.clip_delete_before_7d))
@@ -1201,7 +1227,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
             refreshClipboardList()
             true
         }
-        popup.show()
+        showPopupMenuKeepingIme(popup)
     }
 
     private fun releaseCursorRepeatCallbacks() {
@@ -1481,7 +1507,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
     private fun showPromptPickerForApply(anchor: View) {
         val presets = prefs.getPromptPresets()
         if (presets.isEmpty()) return
-        val popup = androidx.appcompat.widget.PopupMenu(anchor.context, anchor)
+        val popup = PopupMenu(anchor.context, anchor)
         presets.forEachIndexed { idx, p ->
             popup.menu.add(0, idx, idx, p.title)
         }
@@ -1492,7 +1518,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
             actionHandler.applyPromptToSelectionOrAll(currentInputConnection, promptContent = preset.content)
             true
         }
-        popup.show()
+        showPopupMenuKeepingIme(popup)
     }
 
     private fun setupCursorRepeatHandlers() {
@@ -1891,7 +1917,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
     private fun showPromptPicker(anchor: View) {
         val presets = prefs.getPromptPresets()
         if (presets.isEmpty()) return
-        val popup = androidx.appcompat.widget.PopupMenu(anchor.context, anchor)
+        val popup = PopupMenu(anchor.context, anchor)
         presets.forEachIndexed { idx, p ->
             val item = popup.menu.add(0, idx, idx, p.title)
             item.isCheckable = true
@@ -1906,13 +1932,13 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
             txtStatusText?.text = getString(R.string.switched_preset, preset.title)
             true
         }
-        popup.show()
+        showPopupMenuKeepingIme(popup)
     }
 
     private fun showVendorPicker(anchor: View) {
         val vendors = AsrVendorUi.ordered()
         val names = AsrVendorUi.names(this)
-        val popup = androidx.appcompat.widget.PopupMenu(anchor.context, anchor)
+        val popup = PopupMenu(anchor.context, anchor)
         val cur = prefs.asrVendor
         vendors.forEachIndexed { idx, v ->
             val item = popup.menu.add(0, idx, idx, names[idx])
@@ -1966,7 +1992,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
             }
             true
         }
-        popup.show()
+        showPopupMenuKeepingIme(popup)
     }
 
     private fun tryPreloadLocalModel() {
