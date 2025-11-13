@@ -12,7 +12,6 @@ import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.LocaleHelper
@@ -65,7 +64,7 @@ class ApkDownloadService : Service() {
                 putExtra(EXTRA_URL, url)
                 putExtra(EXTRA_VERSION, version)
             }
-            ContextCompat.startForegroundService(context, intent)
+            context.startService(intent)
         }
 
         /**

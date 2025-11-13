@@ -9,7 +9,6 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.LocaleHelper
 import com.brycewg.asrkb.ui.SettingsActivity
@@ -66,7 +65,7 @@ class ModelDownloadService : Service() {
         putExtra(EXTRA_KEY, key.toSerializedKey())
         putExtra(EXTRA_MODEL_TYPE, "sensevoice")
       }
-      ContextCompat.startForegroundService(context, i)
+      context.startService(i)
     }
 
     fun startDownload(context: Context, url: String, variant: String, modelType: String) {
@@ -78,7 +77,7 @@ class ModelDownloadService : Service() {
         putExtra(EXTRA_KEY, key.toSerializedKey())
         putExtra(EXTRA_MODEL_TYPE, modelType)
       }
-      ContextCompat.startForegroundService(context, i)
+      context.startService(i)
     }
 
     fun startImport(context: Context, uri: android.net.Uri, variant: String) {
@@ -89,7 +88,7 @@ class ModelDownloadService : Service() {
         putExtra(EXTRA_VARIANT, variant)
         putExtra(EXTRA_KEY, key.toSerializedKey())
       }
-      ContextCompat.startForegroundService(context, i)
+      context.startService(i)
     }
   }
 
