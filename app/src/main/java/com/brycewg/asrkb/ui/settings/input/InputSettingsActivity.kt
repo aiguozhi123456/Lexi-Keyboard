@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
-import android.view.MotionEvent
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +18,7 @@ import androidx.core.os.LocaleListCompat
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.ime.AsrKeyboardService
 import com.brycewg.asrkb.store.Prefs
+import com.brycewg.asrkb.ui.installExplainedSwitch
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 
@@ -127,17 +127,18 @@ class InputSettingsActivity : AppCompatActivity() {
         setupExtensionButtonsSelection(prefs, tvExtensionButtons)
 
         // 监听与保存（统一通过触摸拦截 + 弹窗确认）
-        installExplainedSwitch(
-            switch = switchTrimTrailingPunct,
+        switchTrimTrailingPunct.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_trim_trailing_punct,
             offDescRes = R.string.feature_trim_trailing_punct_off_desc,
             onDescRes = R.string.feature_trim_trailing_punct_on_desc,
             preferenceKey = "trim_trailing_punct_explained",
             readPref = { prefs.trimFinalTrailingPunct },
-            writePref = { v -> prefs.trimFinalTrailingPunct = v }
+            writePref = { v -> prefs.trimFinalTrailingPunct = v },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchMicHaptic,
+        switchMicHaptic.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_mic_haptic,
             offDescRes = R.string.feature_mic_haptic_off_desc,
             onDescRes = R.string.feature_mic_haptic_on_desc,
@@ -148,7 +149,8 @@ class InputSettingsActivity : AppCompatActivity() {
                 if (enabled) {
                     switchMicHaptic.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 }
-            }
+            },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
         switchExternalImeAidl.setOnCheckedChangeListener { btn, isChecked ->
             hapticTapIfEnabled(btn)
@@ -159,8 +161,8 @@ class InputSettingsActivity : AppCompatActivity() {
                 showExternalAidlGuide(prefs)
             }
         }
-        installExplainedSwitch(
-            switch = switchMicTapToggle,
+        switchMicTapToggle.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_mic_tap_toggle,
             offDescRes = R.string.feature_mic_tap_toggle_off_desc,
             onDescRes = R.string.feature_mic_tap_toggle_on_desc,
@@ -172,10 +174,11 @@ class InputSettingsActivity : AppCompatActivity() {
                     prefs.micSwipeUpAutoEnterEnabled = false
                     switchMicSwipeUpAutoEnter.isChecked = false
                 }
-            }
+            },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchMicSwipeUpAutoEnter,
+        switchMicSwipeUpAutoEnter.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_mic_swipe_up_auto_enter,
             offDescRes = R.string.feature_mic_swipe_up_auto_enter_off_desc,
             onDescRes = R.string.feature_mic_swipe_up_auto_enter_on_desc,
@@ -187,56 +190,62 @@ class InputSettingsActivity : AppCompatActivity() {
                     prefs.micTapToggleEnabled = false
                     switchMicTapToggle.isChecked = false
                 }
-            }
+            },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchAutoStartRecordingOnShow,
+        switchAutoStartRecordingOnShow.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_auto_start_recording_on_show,
             offDescRes = R.string.feature_auto_start_recording_on_show_off_desc,
             onDescRes = R.string.feature_auto_start_recording_on_show_on_desc,
             preferenceKey = "auto_start_recording_on_show_explained",
             readPref = { prefs.autoStartRecordingOnShow },
-            writePref = { v -> prefs.autoStartRecordingOnShow = v }
+            writePref = { v -> prefs.autoStartRecordingOnShow = v },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchReturnPrevImeOnHide,
+        switchReturnPrevImeOnHide.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_return_prev_ime_on_hide,
             offDescRes = R.string.feature_return_prev_ime_on_hide_off_desc,
             onDescRes = R.string.feature_return_prev_ime_on_hide_on_desc,
             preferenceKey = "return_prev_ime_on_hide_explained",
             readPref = { prefs.returnPrevImeOnHide },
-            writePref = { v -> prefs.returnPrevImeOnHide = v }
+            writePref = { v -> prefs.returnPrevImeOnHide = v },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchFcitx5ReturnOnSwitcher,
+        switchFcitx5ReturnOnSwitcher.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_fcitx5_return_on_switcher,
             offDescRes = R.string.feature_fcitx5_return_on_switcher_off_desc,
             onDescRes = R.string.feature_fcitx5_return_on_switcher_on_desc,
             preferenceKey = "fcitx5_return_on_switcher_explained",
             readPref = { prefs.fcitx5ReturnOnImeSwitch },
-            writePref = { v -> prefs.fcitx5ReturnOnImeSwitch = v }
+            writePref = { v -> prefs.fcitx5ReturnOnImeSwitch = v },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchHideRecentTasks,
+        switchHideRecentTasks.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_hide_recent_task_card,
             offDescRes = R.string.feature_hide_recent_tasks_off_desc,
             onDescRes = R.string.feature_hide_recent_tasks_on_desc,
             preferenceKey = "hide_recent_tasks_explained",
             readPref = { prefs.hideRecentTaskCard },
             writePref = { v -> prefs.hideRecentTaskCard = v },
-            onChanged = { enabled -> applyExcludeFromRecents(enabled) }
+            onChanged = { enabled -> applyExcludeFromRecents(enabled) },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchDuckMediaOnRecord,
+        switchDuckMediaOnRecord.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_audio_ducking_on_record,
             offDescRes = R.string.feature_duck_media_on_record_off_desc,
             onDescRes = R.string.feature_duck_media_on_record_on_desc,
             preferenceKey = "duck_media_on_record_explained",
             readPref = { prefs.duckMediaOnRecordEnabled },
-            writePref = { v -> prefs.duckMediaOnRecordEnabled = v }
+            writePref = { v -> prefs.duckMediaOnRecordEnabled = v },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
-        installExplainedSwitch(
-            switch = switchHeadsetMicPriority,
+        switchHeadsetMicPriority.installExplainedSwitch(
+            context = this,
             titleRes = R.string.label_headset_mic_priority,
             offDescRes = R.string.feature_headset_mic_priority_off_desc,
             onDescRes = R.string.feature_headset_mic_priority_on_desc,
@@ -257,7 +266,8 @@ class InputSettingsActivity : AppCompatActivity() {
                     com.brycewg.asrkb.asr.BluetoothRouteManager.onRecordingStopped(this)
                     com.brycewg.asrkb.asr.BluetoothRouteManager.setImeActive(this, false)
                 }
-            }
+            },
+            hapticFeedback = { hapticTapIfEnabled(it) }
         )
 
         // 初始应用一次"从最近任务中排除"设置
@@ -570,64 +580,6 @@ class InputSettingsActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * 为开关安装“说明弹窗 + 拦截”逻辑：
-     * - 首次点击显示说明弹窗，由弹窗确认决定是否切换
-     * - 勾选“不再提醒”后，后续点击直接切换
-     * - 过程中不出现“先切换再撤回”的闪烁
-     */
-    private fun installExplainedSwitch(
-        switch: MaterialSwitch,
-        titleRes: Int,
-        offDescRes: Int,
-        onDescRes: Int,
-        preferenceKey: String,
-        readPref: () -> Boolean,
-        writePref: (Boolean) -> Unit,
-        onChanged: ((Boolean) -> Unit)? = null,
-        preCheck: ((Boolean) -> Boolean)? = null,
-    ) {
-        // 通过触摸事件拦截系统默认切换，改为由弹窗控制
-        switch.setOnTouchListener { v, event ->
-            if (event?.action == MotionEvent.ACTION_UP) {
-                v?.isPressed = false
-                v?.cancelPendingInputEvents()
-                hapticTapIfEnabled(v)
-
-                val current = readPref()
-                val target = !current
-
-                com.brycewg.asrkb.ui.FeatureExplainerDialog.Builder(this)
-                    .setTitle(titleRes)
-                    .setOffDescription(offDescRes)
-                    .setOnDescription(onDescRes)
-                    .setCurrentState(current)
-                    .setPreferenceKey(preferenceKey)
-                    .setOnConfirm {
-                        // 额外前置校验（如权限）
-                        if (preCheck != null && !preCheck(target)) {
-                            return@setOnConfirm
-                        }
-
-                        // 真正提交：写入偏好并更新 UI
-                        writePref(target)
-                        switch.isChecked = target
-                        switch.isPressed = false
-                        onChanged?.invoke(target)
-                    }
-                    .setOnCancel {
-                        // 取消时不修改当前状态
-                    }
-                    .showIfNeeded()
-
-                // 消耗事件，阻止系统默认切换造成的闪烁
-                return@setOnTouchListener true
-            }
-            // 其他事件不拦截，交给系统用于按压态等效果
-            false
         }
     }
 

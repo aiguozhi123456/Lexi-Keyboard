@@ -2,6 +2,7 @@ package com.brycewg.asrkb.ui
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
@@ -9,6 +10,7 @@ import androidx.annotation.StringRes
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.store.Prefs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.materialswitch.MaterialSwitch
 
 /**
  * 功能说明弹窗工具类
@@ -278,5 +280,91 @@ class FeatureExplainerDialog private constructor(
                 onCancel = onCancel
             )
         }
+    }
+}
+
+/**
+ * MaterialSwitch 扩展函数：为开关安装"说明弹窗 + 拦截"逻辑
+ *
+ * 特性：
+ * - 首次点击显示说明弹窗，由弹窗确认决定是否切换
+ * - 勾选"不再提醒"后，后续点击直接切换
+ * - 过程中不出现"先切换再撤回"的闪烁
+ *
+ * 使用示例：
+ * ```kotlin
+ * switchFeature.installExplainedSwitch(
+ *     context = this,
+ *     titleRes = R.string.label_feature,
+ *     offDescRes = R.string.feature_off_desc,
+ *     onDescRes = R.string.feature_on_desc,
+ *     preferenceKey = "feature_explained",
+ *     readPref = { prefs.featureEnabled },
+ *     writePref = { v -> prefs.featureEnabled = v },
+ *     hapticFeedback = { hapticTapIfEnabled(it) }
+ * )
+ * ```
+ *
+ * @param context Activity 或 Context
+ * @param titleRes 功能标题资源 ID
+ * @param offDescRes 功能关闭时的说明资源 ID
+ * @param onDescRes 功能开启时的说明资源 ID
+ * @param preferenceKey 偏好设置键名，用于记录是否已提示过
+ * @param readPref 读取当前状态的函数
+ * @param writePref 写入新状态的函数
+ * @param onChanged 状态改变后的回调（可选）
+ * @param preCheck 切换前的校验（如权限检查），返回 false 则阻止切换（可选）
+ * @param hapticFeedback 触觉反馈回调（可选）
+ */
+fun MaterialSwitch.installExplainedSwitch(
+    context: Context,
+    @StringRes titleRes: Int,
+    @StringRes offDescRes: Int,
+    @StringRes onDescRes: Int,
+    preferenceKey: String,
+    readPref: () -> Boolean,
+    writePref: (Boolean) -> Unit,
+    onChanged: ((Boolean) -> Unit)? = null,
+    preCheck: ((Boolean) -> Boolean)? = null,
+    hapticFeedback: ((View?) -> Unit)? = null
+) {
+    // 通过触摸事件拦截系统默认切换，改为由弹窗控制
+    this.setOnTouchListener { v, event ->
+        if (event?.action == MotionEvent.ACTION_UP) {
+            v?.isPressed = false
+            v?.cancelPendingInputEvents()
+            hapticFeedback?.invoke(v)
+
+            val current = readPref()
+            val target = !current
+
+            FeatureExplainerDialog.Builder(context)
+                .setTitle(titleRes)
+                .setOffDescription(offDescRes)
+                .setOnDescription(onDescRes)
+                .setCurrentState(current)
+                .setPreferenceKey(preferenceKey)
+                .setOnConfirm {
+                    // 额外前置校验（如权限）
+                    if (preCheck != null && !preCheck(target)) {
+                        return@setOnConfirm
+                    }
+
+                    // 真正提交：写入偏好并更新 UI
+                    writePref(target)
+                    this.isChecked = target
+                    this.isPressed = false
+                    onChanged?.invoke(target)
+                }
+                .setOnCancel {
+                    // 取消时不修改当前状态
+                }
+                .showIfNeeded()
+
+            // 消耗事件，阻止系统默认切换造成的闪烁
+            return@setOnTouchListener true
+        }
+        // 其他事件不拦截，交给系统用于按压态等效果
+        false
     }
 }
