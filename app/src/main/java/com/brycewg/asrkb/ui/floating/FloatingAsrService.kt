@@ -344,6 +344,21 @@ class FloatingAsrService : Service(),
             return
         }
         showBall(src)
+
+        // 常驻模式下：在非交互（无菜单/拖拽保护）、非录音/处理中时，自动恢复半隐
+        if (!prefs.floatingSwitcherOnlyWhenImeVisible &&
+            !stateMachine.isRecording &&
+            !stateMachine.isProcessing &&
+            !stateMachine.isMoveMode &&
+            !completionActive2 &&
+            !forceVisible
+        ) {
+            try {
+                viewManager.animateHideToEdgePartialIfNeeded()
+            } catch (e: Throwable) {
+                Log.w(TAG, "Failed to apply partial hide in updateVisibilityByPref", e)
+            }
+        }
     }
 
     // ==================== ASR 会话控制 ====================
