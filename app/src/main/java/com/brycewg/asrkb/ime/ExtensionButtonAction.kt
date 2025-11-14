@@ -67,6 +67,15 @@ enum class ExtensionButtonAction(
     ),
 
     /**
+     * 收起键盘
+     */
+    HIDE_KEYBOARD(
+        id = "hide_keyboard",
+        titleResId = R.string.ext_btn_hide,
+        iconResId = R.drawable.caret_circle_down_toggle
+    ),
+
+    /**
      * 光标左移一位（长按连发）
      */
     CURSOR_LEFT(
@@ -128,12 +137,12 @@ enum class ExtensionButtonAction(
             return values().firstOrNull { it.id == id } ?: NONE
         }
 
-    /**
-     * 获取默认的4个按钮配置
-     * 默认顺序调整为：撤销、全选、复制、剪贴板
-     */
-    fun getDefaults(): List<ExtensionButtonAction> {
-        return listOf(UNDO, SELECT_ALL, COPY, CLIPBOARD)
-    }
+        /**
+         * 获取默认的4个按钮配置
+         * 默认顺序：撤销、全选、复制、收起键盘
+         */
+        fun getDefaults(): List<ExtensionButtonAction> {
+            return listOf(UNDO, SELECT_ALL, COPY, HIDE_KEYBOARD)
+        }
     }
 }

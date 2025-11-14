@@ -744,7 +744,7 @@ class Prefs(context: Context) {
         set(value) = sp.edit { putString(KEY_PUNCT_4, value.trim()) }
 
     // 自定义扩展按钮（4个位置，存储动作类型ID）
-    // 默认值：数字键盘、全选、复制、撤销
+    // 默认值（从左到右）：撤销、全选、复制、收起键盘
     var extBtn1: com.brycewg.asrkb.ime.ExtensionButtonAction
         get() {
             val stored = sp.getString(KEY_EXT_BTN_1, null)

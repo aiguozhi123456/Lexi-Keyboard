@@ -107,7 +107,7 @@
   <!-- 擴展按鈕配置 -->
   <!-- ============================================== -->
   <string name="label_extension_buttons">擴展按鈕配置</string>
-  <string name="ext_btn_default_summary">復原、全選、複製、剪貼簿</string>
+  <string name="ext_btn_default_summary">復原、全選、複製、隱藏鍵盤</string>
   <string name="ext_btn_none_selected">未選擇</string>
   <string name="ext_btn_must_select_4">請選擇恰好 4 個按鈕</string>
   <string name="ext_btn_max_4">最多選擇 4 個按鈕</string>
@@ -122,6 +122,7 @@
   <string name="ext_btn_move_end">移至結尾</string>
   <string name="ext_btn_numpad">數字鍵盤</string>
   <string name="ext_btn_undo">復原</string>
+  <string name="ext_btn_hide">隱藏鍵盤</string>
   <string name="status_copied">已複製</string>
   <string name="status_pasted">已貼上</string>
   <string name="status_nothing_to_undo">無可復原的操作</string>

@@ -940,7 +940,7 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
 
         btnHide?.setOnClickListener { v ->
             performKeyHaptic(v)
-            hideKeyboardPanel()
+            showClipboardPanel()
         }
 
         // 覆盖行按钮：Prompt 选择（article）
@@ -1829,6 +1829,9 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
             KeyboardActionHandler.ExtensionButtonActionResult.NEED_CURSOR_LEFT,
             KeyboardActionHandler.ExtensionButtonActionResult.NEED_CURSOR_RIGHT -> {
                 // 光标移动已在长按处理中完成
+            }
+            KeyboardActionHandler.ExtensionButtonActionResult.NEED_HIDE_KEYBOARD -> {
+                hideKeyboardPanel()
             }
         }
     }

@@ -466,7 +466,11 @@ class InputSettingsActivity : AppCompatActivity() {
     private fun setupExtensionButtonsSelection(prefs: Prefs, tvExtensionButtons: TextView) {
         // 获取所有可用的按钮动作（排除 NONE 与 NUMPAD：数字/符号键盘改为固定入口）
         val allActions = com.brycewg.asrkb.ime.ExtensionButtonAction.values()
-            .filter { it != com.brycewg.asrkb.ime.ExtensionButtonAction.NONE && it != com.brycewg.asrkb.ime.ExtensionButtonAction.NUMPAD }
+            .filter {
+                it != com.brycewg.asrkb.ime.ExtensionButtonAction.NONE &&
+                    it != com.brycewg.asrkb.ime.ExtensionButtonAction.NUMPAD &&
+                    it != com.brycewg.asrkb.ime.ExtensionButtonAction.CLIPBOARD
+            }
 
         fun updateSummary() {
             val current = listOf(prefs.extBtn1, prefs.extBtn2, prefs.extBtn3, prefs.extBtn4)
@@ -492,6 +496,47 @@ class InputSettingsActivity : AppCompatActivity() {
             val checked = BooleanArray(allActions.size) { idx ->
                 current.contains(allActions[idx])
             }
+            // 根据当前配置初始化“选中顺序”（保持 extBtn1~4 的顺序）
+            val selectedOrder = mutableListOf<Int>()
+            current.forEach { action ->
+                val idx = allActions.indexOf(action)
+                if (idx >= 0 && !selectedOrder.contains(idx)) {
+                    selectedOrder.add(idx)
+                }
+            }
+
+            fun updateListVisual(listView: android.widget.ListView?) {
+                val lv = listView ?: return
+                val selectedCount = checked.count { it }
+                for (i in 0 until lv.childCount) {
+                    val position = lv.firstVisiblePosition + i
+                    if (position >= 0 && position < checked.size) {
+                        val itemView = lv.getChildAt(i)
+                        val shouldDisable = (selectedCount >= 4 && !checked[position])
+                        if (shouldDisable) {
+                            // 已选4个且当前项未选中：变灰并禁用
+                            itemView?.alpha = 0.5f
+                            itemView?.isEnabled = false
+                        } else {
+                            // 恢复正常
+                            itemView?.alpha = 1.0f
+                            itemView?.isEnabled = true
+                        }
+
+                        // 为已选按钮显示顺序编号（1~4）
+                        val orderIndex = selectedOrder.indexOf(position)
+                        val baseLabel = items[position]
+                        val textView = itemView?.findViewById<android.widget.CheckedTextView>(android.R.id.text1)
+                        if (textView != null) {
+                            if (orderIndex >= 0) {
+                                textView.text = "${orderIndex + 1}. $baseLabel"
+                            } else {
+                                textView.text = baseLabel
+                            }
+                        }
+                    }
+                }
+            }
 
             val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.ext_btn_must_select_4)
@@ -513,34 +558,27 @@ class InputSettingsActivity : AppCompatActivity() {
 
                     // 操作合法，更新 checked 数组
                     checked[which] = isChecked
+                    // 按点击顺序维护已选动作顺序
+                    if (isChecked) {
+                        if (!selectedOrder.contains(which)) {
+                            selectedOrder.add(which)
+                        }
+                    } else {
+                        selectedOrder.remove(which)
+                    }
                     val selectedCount = checked.count { it }
 
                     // 更新确定按钮的启用状态
                     alertDialog?.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.isEnabled = (selectedCount == 4)
 
-                    // 更新列表项的视觉状态和禁用状态
+                    // 更新列表项的视觉状态和禁用状态 + 顺序编号
                     listView?.post {
-                        for (i in 0 until listView.childCount) {
-                            val position = listView.firstVisiblePosition + i
-                            if (position >= 0 && position < checked.size) {
-                                val itemView = listView.getChildAt(i)
-                                val shouldDisable = (selectedCount >= 4 && !checked[position])
-                                if (shouldDisable) {
-                                    // 已选4个且当前项未选中：变灰并禁用
-                                    itemView?.alpha = 0.5f
-                                    itemView?.isEnabled = false
-                                } else {
-                                    // 恢复正常
-                                    itemView?.alpha = 1.0f
-                                    itemView?.isEnabled = true
-                                }
-                            }
-                        }
+                        updateListVisual(listView)
                     }
                 }
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     // 收集选中的按钮动作
-                    val selected = allActions.filterIndexed { idx, _ -> checked[idx] }
+                    val selected = selectedOrder.mapNotNull { idx -> allActions.getOrNull(idx) }
 
                     // 填充到4个位置
                     prefs.extBtn1 = selected.getOrElse(0) { com.brycewg.asrkb.ime.ExtensionButtonAction.NONE }
@@ -560,26 +598,26 @@ class InputSettingsActivity : AppCompatActivity() {
             val initialSelectedCount = checked.count { it }
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.isEnabled = (initialSelectedCount == 4)
 
-            // 初始化列表项的视觉状态和禁用状态
+            // 初始化列表项的视觉状态、禁用状态和顺序编号
             dialog.listView?.post {
-                val listView = dialog.listView
-                for (i in 0 until listView.childCount) {
-                    val position = listView.firstVisiblePosition + i
-                    if (position >= 0 && position < checked.size) {
-                        val itemView = listView.getChildAt(i)
-                        val shouldDisable = (initialSelectedCount >= 4 && !checked[position])
-                        if (shouldDisable) {
-                            // 已选4个且当前项未选中：变灰并禁用
-                            itemView?.alpha = 0.5f
-                            itemView?.isEnabled = false
-                        } else {
-                            // 恢复正常
-                            itemView?.alpha = 1.0f
-                            itemView?.isEnabled = true
-                        }
-                    }
-                }
+                updateListVisual(dialog.listView)
             }
+
+            // 滚动时也刷新一次文本（保证编号正确）
+            dialog.listView?.setOnScrollListener(object : android.widget.AbsListView.OnScrollListener {
+                override fun onScrollStateChanged(view: android.widget.AbsListView?, scrollState: Int) {
+                    updateListVisual(dialog.listView)
+                }
+
+                override fun onScroll(
+                    view: android.widget.AbsListView?,
+                    firstVisibleItem: Int,
+                    visibleItemCount: Int,
+                    totalItemCount: Int
+                ) {
+                    updateListVisual(dialog.listView)
+                }
+            })
         }
     }
 

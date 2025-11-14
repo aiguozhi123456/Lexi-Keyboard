@@ -370,8 +370,7 @@ class KeyboardActionHandler(
         action: com.brycewg.asrkb.ime.ExtensionButtonAction,
         ic: InputConnection?
     ): ExtensionButtonActionResult {
-        if (ic == null) return ExtensionButtonActionResult.FAILED
-
+        // 部分动作不依赖输入连接（如收起键盘），因此仅对需要输入连接的动作做空判断
         return when (action) {
             com.brycewg.asrkb.ime.ExtensionButtonAction.NONE -> {
                 ExtensionButtonActionResult.SUCCESS
@@ -381,6 +380,7 @@ class KeyboardActionHandler(
                 ExtensionButtonActionResult.NEED_TOGGLE_SELECTION
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.SELECT_ALL -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 try {
                     ic.performContextMenuAction(android.R.id.selectAll)
                     ExtensionButtonActionResult.SUCCESS
@@ -390,6 +390,7 @@ class KeyboardActionHandler(
                 }
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.COPY -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 try {
                     ic.performContextMenuAction(android.R.id.copy)
                     uiListener?.onStatusMessage(context.getString(R.string.status_copied))
@@ -400,6 +401,7 @@ class KeyboardActionHandler(
                 }
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.PASTE -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 try {
                     ic.performContextMenuAction(android.R.id.paste)
                     uiListener?.onStatusMessage(context.getString(R.string.status_pasted))
@@ -418,6 +420,7 @@ class KeyboardActionHandler(
                 ExtensionButtonActionResult.NEED_CURSOR_RIGHT
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.MOVE_START -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 try {
                     // 移动到文本开头
                     val before = inputHelper.getTextBeforeCursor(ic, 100000)?.length ?: 0
@@ -431,6 +434,7 @@ class KeyboardActionHandler(
                 }
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.MOVE_END -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 try {
                     // 移动到文本结尾
                     val before = inputHelper.getTextBeforeCursor(ic, 100000)?.toString() ?: ""
@@ -452,6 +456,7 @@ class KeyboardActionHandler(
                 ExtensionButtonActionResult.NEED_SHOW_CLIPBOARD
             }
             com.brycewg.asrkb.ime.ExtensionButtonAction.UNDO -> {
+                if (ic == null) return ExtensionButtonActionResult.FAILED
                 val success = handleUndo(ic)
                 if (success) {
                     ExtensionButtonActionResult.SUCCESS
@@ -459,6 +464,10 @@ class KeyboardActionHandler(
                     uiListener?.onStatusMessage(context.getString(R.string.status_nothing_to_undo))
                     ExtensionButtonActionResult.FAILED
                 }
+            }
+            com.brycewg.asrkb.ime.ExtensionButtonAction.HIDE_KEYBOARD -> {
+                // 收起键盘由 IME 层处理
+                ExtensionButtonActionResult.NEED_HIDE_KEYBOARD
             }
         }
     }
@@ -473,7 +482,8 @@ class KeyboardActionHandler(
         NEED_CURSOR_LEFT,           // 需要 IME 处理左移（支持长按）
         NEED_CURSOR_RIGHT,          // 需要 IME 处理右移（支持长按）
         NEED_SHOW_NUMPAD,           // 需要 IME 显示数字键盘
-        NEED_SHOW_CLIPBOARD         // 需要 IME 显示剪贴板面板
+        NEED_SHOW_CLIPBOARD,        // 需要 IME 显示剪贴板面板
+        NEED_HIDE_KEYBOARD          // 需要 IME 收起键盘
     }
 
     /**

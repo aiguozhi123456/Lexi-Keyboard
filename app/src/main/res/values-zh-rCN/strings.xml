@@ -107,7 +107,7 @@
   <!-- 扩展按钮配置 -->
   <!-- ============================================== -->
   <string name="label_extension_buttons">扩展按钮配置</string>
-  <string name="ext_btn_default_summary">撤销、全选、复制、剪贴板</string>
+  <string name="ext_btn_default_summary">撤销、全选、复制、收起键盘</string>
   <string name="ext_btn_none_selected">未选择</string>
   <string name="ext_btn_must_select_4">请选择恰好 4 个按钮</string>
   <string name="ext_btn_max_4">最多选择 4 个按钮</string>
@@ -122,6 +122,7 @@
   <string name="ext_btn_move_end">移至结尾</string>
   <string name="ext_btn_numpad">数字键盘</string>
   <string name="ext_btn_undo">撤销</string>
+  <string name="ext_btn_hide">收起键盘</string>
   <string name="status_copied">已复制</string>
   <string name="status_pasted">已粘贴</string>
   <string name="status_nothing_to_undo">无可撤销的操作</string>
