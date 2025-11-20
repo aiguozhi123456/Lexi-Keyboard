@@ -29,6 +29,7 @@ object ProUiInjector {
   private val customColorActivityRefs = CopyOnWriteArrayList<WeakReference<Activity>>()
   private val customColorHandler = Handler(Looper.getMainLooper())
   private var customColorPrefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+  private const val KEY_PRO_CONTINUOUS_TALK_ENABLED = "pro_continuous_talk_enabled"
 
   /**
    * 备份设置页注入：
@@ -224,6 +225,7 @@ object ProUiInjector {
       if (o.has("pro_regex_enabled")) edit.putBoolean("pro_regex_enabled", o.optBoolean("pro_regex_enabled", false))
       if (o.has("pro_regex_rules_json")) edit.putString("pro_regex_rules_json", o.optString("pro_regex_rules_json", ""))
       if (o.has("pro_custom_color_overlay")) edit.putString("pro_custom_color_overlay", o.optString("pro_custom_color_overlay", ""))
+      if (o.has("pro_continuous_talk_enabled")) edit.putBoolean(KEY_PRO_CONTINUOUS_TALK_ENABLED, o.optBoolean("pro_continuous_talk_enabled", false))
       edit.apply()
 
       // 触发 Pro 侧自动备份调度刷新（仅 Pro 变体会有接收者）
@@ -235,6 +237,31 @@ object ProUiInjector {
       }
     } catch (t: Throwable) {
       if (BuildConfig.DEBUG) Log.d(TAG, "applyProImport failed: ${t.message}")
+    }
+  }
+
+  /**
+   * Pro 畅说模式开关：统一封装偏好读写，避免在 main/oss 中直接依赖 Pro 专属键。
+   */
+  fun isContinuousTalkEnabled(context: Context): Boolean {
+    if (!Edition.isPro) return false
+    return try {
+      val appCtx = context.applicationContext ?: context
+      val sp = appCtx.getSharedPreferences("asr_prefs", Context.MODE_PRIVATE)
+      sp.getBoolean(KEY_PRO_CONTINUOUS_TALK_ENABLED, false)
+    } catch (_: Throwable) {
+      false
+    }
+  }
+
+  fun setContinuousTalkEnabled(context: Context, enabled: Boolean) {
+    if (!Edition.isPro) return
+    try {
+      val appCtx = context.applicationContext ?: context
+      val sp = appCtx.getSharedPreferences("asr_prefs", Context.MODE_PRIVATE)
+      sp.edit().putBoolean(KEY_PRO_CONTINUOUS_TALK_ENABLED, enabled).apply()
+    } catch (t: Throwable) {
+      if (BuildConfig.DEBUG) Log.d(TAG, "Failed to set continuous talk enabled: ${t.message}")
     }
   }
 

@@ -29,12 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-      <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
-
-
       <!-- Silence auto-stop section -->
       <TextView
           android:layout_width="match_parent"

@@ -31,6 +31,16 @@ class VadDetector(
     private val windowMs: Int,
     sensitivityLevel: Int
 ) {
+    /**
+     * 单帧分析结果：
+     * @param isSpeech 当前帧是否检测到语音
+     * @param silenceStop 是否累计静音已达到停录阈值
+     */
+    data class FrameResult(
+        val isSpeech: Boolean,
+        val silenceStop: Boolean
+    )
+
     companion object {
         private const val TAG = "VadDetector"
 
@@ -202,14 +212,24 @@ class VadDetector(
      * @return 如果连续非语音时长超过窗口阈值，返回 true
      */
     fun shouldStop(buf: ByteArray, len: Int): Boolean {
-        val vad = this.vad ?: return false
+        return analyzeFrame(buf, len).silenceStop
+    }
+
+    /**
+     * 对单帧音频进行 VAD 分析，返回“是否语音”与“是否触发静音停录”。
+     *
+     * - isSpeech：基于模型的当前帧语音判定；
+     * - silenceStop：在综合初期防抖、挂起和平滑累计后，是否达到静音停录阈值。
+     */
+    fun analyzeFrame(buf: ByteArray, len: Int): FrameResult {
+        val vad = this.vad ?: return FrameResult(isSpeech = false, silenceStop = false)
 
         try {
             val frameMs = if (sampleRate > 0) ((len / 2) * 1000) / sampleRate else 0
 
             // 1. 将 PCM ByteArray 转换为 FloatArray（归一化到 -1.0 ~ 1.0）
             val samples = pcmToFloatArray(buf, len)
-            if (samples.isEmpty()) return false
+            if (samples.isEmpty()) return FrameResult(isSpeech = false, silenceStop = false)
 
             // 2. 调用 Vad.acceptWaveform(FloatArray)
             vad.acceptWaveform(samples)
@@ -225,12 +245,13 @@ class VadDetector(
                 silentMsAcc = 0
                 hasDetectedSpeech = true
                 speechHangoverRemainingMs = speechHangoverMs
+                return FrameResult(isSpeech = true, silenceStop = false)
             } else {
                 // 初期防抖：尚未检测到语音前，不累计静音
                 if (!hasDetectedSpeech && initialDebounceRemainingMs > 0) {
                     initialDebounceRemainingMs -= frameMs
                     if (initialDebounceRemainingMs < 0) initialDebounceRemainingMs = 0
-                    return false
+                    return FrameResult(isSpeech = false, silenceStop = false)
                 }
 
                 // 语音挂起：检测到语音后的一小段时间内，不累计静音
@@ -238,20 +259,34 @@ class VadDetector(
                     speechHangoverRemainingMs -= frameMs
                     if (speechHangoverRemainingMs < 0) speechHangoverRemainingMs = 0
                     // 挂起期内直接返回
-                    return false
+                    return FrameResult(isSpeech = false, silenceStop = false)
                 }
 
                 silentMsAcc += frameMs
                 if (silentMsAcc >= windowMs) {
                     Log.d(TAG, "Silence window reached: ${silentMsAcc}ms >= ${windowMs}ms")
-                    return true
+                    return FrameResult(isSpeech = false, silenceStop = true)
                 }
             }
 
-            return false
+            return FrameResult(isSpeech = false, silenceStop = false)
         } catch (t: Throwable) {
             Log.e(TAG, "Error during VAD detection", t)
-            return false
+            return FrameResult(isSpeech = false, silenceStop = false)
+        }
+    }
+
+    /**
+     * 仅基于 VAD 判断当前帧是否包含语音，不参与静音累计与停录判定。
+     *
+     * 适用于“起说检测”等仅需语音活动信息的场景（例如畅说模式）。
+     */
+    fun isSpeechFrame(buf: ByteArray, len: Int): Boolean {
+        return try {
+            analyzeFrame(buf, len).isSpeech
+        } catch (t: Throwable) {
+            Log.e(TAG, "Error during VAD speech frame detection", t)
+            false
         }
     }
 
@@ -326,13 +361,12 @@ class VadDetector(
     }
 }
 
-// 统一判定是否应启用基于静音的自动停止（VAD）。
-// - 常规 IME：需同时开启「静音自动停止」与「点按切换录音」。
-// - 悬浮球：不受「点按切换录音」影响，只要开启「静音自动停止」即可。
 fun isVadAutoStopEnabled(context: Context, prefs: Prefs): Boolean {
-    val isFloating = context is FloatingAsrService
     return try {
-        prefs.autoStopOnSilenceEnabled && (prefs.micTapToggleEnabled || isFloating)
+        // 统一仅由「静音自动停止」开关控制是否启用基于静音的自动停录。
+        // - IME 与悬浮球行为一致：只要用户显式开启了静音判停，就启用 VAD 停录。
+        // - 点按/长按录音模式（micTapToggleEnabled）不再影响是否启用静音判停，避免和畅说模式等基于 VAD 的功能产生隐性耦合。
+        prefs.autoStopOnSilenceEnabled
     } catch (t: Throwable) {
         Log.w("VadDetector", "Failed to read prefs for VAD auto-stop", t)
         false

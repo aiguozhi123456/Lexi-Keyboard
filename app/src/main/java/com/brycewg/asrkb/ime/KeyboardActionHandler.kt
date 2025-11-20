@@ -480,6 +480,14 @@ class KeyboardActionHandler(
                 // 收起键盘由 IME 层处理
                 ExtensionButtonActionResult.NEED_HIDE_KEYBOARD
             }
+            else -> {
+                // Pro 畅说模式：通过动作 ID 识别，避免在 OSS 变体直接依赖 Pro 常量
+                return if (action.id == "continuous_talk_toggle") {
+                    ExtensionButtonActionResult.NEED_TOGGLE_CONTINUOUS_TALK
+                } else {
+                    ExtensionButtonActionResult.FAILED
+                }
+            }
         }
     }
 
@@ -494,7 +502,8 @@ class KeyboardActionHandler(
         NEED_CURSOR_RIGHT,          // 需要 IME 处理右移（支持长按）
         NEED_SHOW_NUMPAD,           // 需要 IME 显示数字键盘
         NEED_SHOW_CLIPBOARD,        // 需要 IME 显示剪贴板面板
-        NEED_HIDE_KEYBOARD          // 需要 IME 收起键盘
+        NEED_HIDE_KEYBOARD,         // 需要 IME 收起键盘
+        NEED_TOGGLE_CONTINUOUS_TALK // 需要 IME 切换畅说模式
     }
 
     /**
