@@ -55,7 +55,7 @@ Pro 版将提供更多高级功能和更优质的使用体验。目前提供的�
 - **长按录音** - 简单直观的录音操作
 - **智能判停** - 静音自动停止录音,无需手动操作
 - **极速识别** - 松开即上传，快速返回结果
-- **多引擎支持** - 7+ 主流 ASR 服务
+- **多引擎支持** - 11 个主流 ASR 服务（7 个云端 + 4 个本地）
 - **本地 ASR 模型** - 支持离线语音识别，无需网络，保护隐私
 - **AI 文本后处理** - LLM 后处理修正识别结果
 
@@ -88,7 +88,7 @@ Pro 版将提供更多高级功能和更优质的使用体验。目前提供的�
 ### 🎨 用户体验
 
 - **Material3 设计** - 现代化界面风格，Monet 色彩适配
-- **多语言支持** - 中英文快速切换
+- **多语言支持** - 支持简体中文、繁体中文、英文、日语
 - **键盘高度调节** - 三档高度自由选择
 - **测试输入** - 设置页内直接测试输入法
 - **统计功能** - 识别字数统计
@@ -106,8 +106,8 @@ Pro 版将提供更多高级功能和更优质的使用体验。目前提供的�
 <table>
 <tr>
 <td width="50%" align="center">
-<img src="images/keyboard_view.jpg" alt="键盘视图" style="max-height: 200px; width: auto;"/>
-<img src="images/edit_keyboard_view.jpg" alt="编辑键盘视图" style="max-height: 200px; width: auto;"/>
+<img src="images/keyboard_view.png" alt="键盘视图" style="max-height: 200px; width: auto;"/>
+<img src="images/edit_keyboard_view.png" alt="编辑键盘视图" style="max-height: 200px; width: auto;"/>
 <img src="images/numpad_keyboard_view.jpg" alt="小键盘视图" style="max-height: 200px; width: auto;"/>
 <br/>
 <b>🎹 键盘视图</b>
@@ -205,7 +205,8 @@ Pro 版将提供更多高级功能和更优质的使用体验。目前提供的�
   - Google Gemini：4 小时（官方约 9.5 小时，留出安全余量）
   - Soniox：1 小时
   - 本地 SenseVoice：5 分钟
-- 流式识别模式不设时长上限
+  - 本地 Telespeech：5 分钟
+- 流式识别模式不设时长上限（支持：Volc、Soniox、DashScope、ElevenLabs、Paraformer、Zipformer）
 
 </details>
 
@@ -351,7 +352,8 @@ AI 编辑支持多种目标选择方式：
 
 ```
 ✅ 将常用的第三方输入法设为默认输入法（如搜狗、百度等）
-✅ 开启言犀键盘的悬浮球语音识别功能，使用非流式识别，流式识别仅火山引擎支持，并且处于早期阶段
+✅ 开启言犀键盘的悬浮球语音识别功能
+✅ 支持多种流式引擎：Volc、Soniox、DashScope、ElevenLabs（云端）及 Paraformer、Zipformer（本地）
 ✅ 日常使用第三方输入法打字，需要语音输入时点击悬浮球
 ✅ 享受两全其美的输入体验：熟悉的打字手感 + 高质量的语音识别
 ✅ 需要时切换到言犀键盘，享受更多智能 ASR 功能
@@ -423,7 +425,7 @@ AI 编辑支持多种目标选择方式：
 
 - **键盘高度**: 小/中/大三档可调
 - **振动反馈**: 麦克风 / 键盘按键振动
-- **语言设置**: 跟随系统 / 简体中文 / 英文
+- **语言设置**: 跟随系统 / 简体中文 / 繁体中文 / 英文 / 日语
 - **测试输入**: 设置页内直接测试输入法
 - **自动更新**: 每日自动检查新版本
 
@@ -434,12 +436,13 @@ AI 编辑支持多种目标选择方式：
 ---
 
 ```
-Kotlin 1.9.24
-Android SDK 34 (Min SDK 29)
+Kotlin 2.2.20
+Android SDK 36 (Compile SDK 36, Target SDK 35, Min SDK 29)
 Material Design 3
 Coroutines (异步处理)
-OkHttp (网络请求)
+OkHttp 5.2.1 (网络请求)
 SharedPreferences (数据存储)
+sherpa-onnx (本地 ASR 模型)
 ```
 
 ## 📄 许可证
@@ -492,31 +495,13 @@ Apache 2.0 License - 自由使用、修改、分发，需保留版权声明
 
 ## ☕ 赞赏支持
 
-如果这个项目对你有帮助，请给个 Star ⭐️ 也欢迎请我喝杯咖啡 ☕️
+如果这个项目对你有帮助，请给个 Star ⭐️ 也欢迎请我喝杯咖啡或者购买 Pro 版 ☕️
 
 <div align="center">
 <img src="images/wechat.jpg" alt="微信赞赏码" width="300"/>
 <br/>
 <sub>微信扫码赞赏</sub>
 </div>
-
-## 💝 感谢名单
-
-感谢以下用户的赞赏支持，你们的鼓励是项目持续发展的动力！
-
-匿名- 50 RMB
-
-王千郡 - 26.66 RMB
-
-天凉好个秋 - 16.66 RMB
-
-Return - 16.66 RMB
-
-树人 - 10.24 RMB
-
-x 年 - 10 RMB
-
-flyhunterl - 6.66 RMB
 
 ## 🙏 致谢
 

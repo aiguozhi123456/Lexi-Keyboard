@@ -31,7 +31,7 @@ English | [简体中文](README.md)
 - **Press & Hold Recording** - Simple and intuitive recording
 - **Smart Auto-Stop** - Automatically stops recording on silence
 - **Fast Recognition** - Release to upload, quick results
-- **Multi-Engine Support** - 7+ mainstream ASR services
+- **Multi-Engine Support** - 11 mainstream ASR services (7 cloud + 4 local)
 - **Local ASR Model** - Offline voice recognition, no network required, privacy-focused
 - **AI Text Optimization** - LLM smart correction of recognition results
 
@@ -64,7 +64,7 @@ English | [简体中文](README.md)
 ### 🎨 User Experience
 
 - **Material3 Design** - Modern interface style with Monet color adaptation
-- **Multi-language Support** - Quick switching between Chinese and English
+- **Multi-language Support** - Supports Simplified Chinese, Traditional Chinese, English, and Japanese
 - **Keyboard Height Adjustment** - Three height levels to choose from
 - **Test Input** - Test input method directly in settings
 - **Statistics** - Recognition character count
@@ -80,8 +80,8 @@ English | [简体中文](README.md)
 <table>
 <tr>
 <td width="50%" align="center">
-<img src="images/keyboard_view_en.jpg" alt="Keyboard View" style="max-height: 200px; width: auto;"/>
-<img src="images/edit_keyboard_view.jpg" alt="Editing Keyboard View" style="max-height: 200px; width: auto;"/>
+<img src="images/keyboard_view_en.png" alt="Keyboard View" style="max-height: 200px; width: auto;"/>
+<img src="images/edit_keyboard_view.png" alt="Editing Keyboard View" style="max-height: 200px; width: auto;"/>
 <img src="images/numpad_keyboard_view.jpg" alt="NumPad View" style="max-height: 200px; width: auto;"/>
 <br/>
 <b>🎹 Keyboard View</b>
@@ -166,7 +166,7 @@ English | [简体中文](README.md)
 
 - When enabled, automatically stops recording when continuous silence is detected
 - Adjustable silence duration (0.5-3 seconds) and sensitivity (1-10 levels) in settings
-- Supports both streaming recognition (Volcengine, Soniox) and file recognition modes
+- Supports both streaming recognition (Volc, Soniox, DashScope, ElevenLabs, Paraformer, Zipformer) and file recognition modes
 
 **Segmented Recording & Auto-Continue (non-streaming)**:
 
@@ -181,7 +181,8 @@ English | [简体中文](README.md)
   - Google Gemini: 4 hours (official ~9.5h, with safety margin)
   - Soniox: 1 hour
   - Local SenseVoice: 5 minutes
-- Streaming mode has no duration cap
+  - Local Telespeech: 5 minutes
+- Streaming mode has no duration cap (supports: Volc, Soniox, DashScope, ElevenLabs, Paraformer, Zipformer)
 
 </details>
 
@@ -329,7 +330,8 @@ In some apps, input fields expose background placeholder text to Accessibility, 
 
 ```
 ✅ Set your frequently used third-party IME as default (Sogou, Baidu, etc.)
-✅ Enable LexiSharp Keyboard's floating ball voice recognition, use non-streaming recognition. Streaming recognition is only supported by Volcengine and is in early stages
+✅ Enable LexiSharp Keyboard's floating ball voice recognition
+✅ Multiple streaming engines supported: Volc, Soniox, DashScope, ElevenLabs (cloud) and Paraformer, Zipformer (local)
 ✅ Use third-party IME for daily typing, click floating ball when voice input is needed
 ✅ Enjoy the best of both worlds: familiar typing experience + high-quality voice recognition
 ✅ Switch to LexiSharp Keyboard when needed for more smart ASR features
@@ -401,7 +403,7 @@ If you use Fcitx5, you can call up LexiSharp Keyboard through the voice recognit
 
 - **Keyboard Height**: Three levels - Small/Medium/Large
 - **Vibration Feedback**: Microphone / keyboard button vibration
-- **Language Settings**: Follow system / Simplified Chinese / English
+- **Language Settings**: Follow system / Simplified Chinese / Traditional Chinese / English / Japanese
 - **Test Input**: Test input method directly in settings
 - **Auto Update**: Daily automatic update check on app launch
 
@@ -413,11 +415,12 @@ If you use Fcitx5, you can call up LexiSharp Keyboard through the voice recognit
 
 ```
 Kotlin 2.2.20
-Android SDK 34 (Min SDK 29)
+Android SDK 36 (Compile SDK 36, Target SDK 35, Min SDK 29)
 Material Design 3
 Coroutines (async processing)
-OkHttp (network requests)
+OkHttp 5.2.1 (network requests)
 SharedPreferences (data storage)
+sherpa-onnx (local ASR models)
 ```
 
 ---
