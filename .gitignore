@@ -1,4 +1,3 @@
-*.md
 !README.md
 !README_EN.md
 !CHANGELOG.md
@@ -9,6 +8,9 @@ local.properties
 .gradle
 .idea
 
+AGENTS.md 
+CLAUDE.md
+!docs/
 app/build
 build/
 app/release
@@ -22,3 +24,11 @@ pro-dev/
 fcitx5-android-lexi-keyboard/
 website/
 openspec/
+
+# Node modules for docs
+node_modules/
+package-lock.json
+
+# VitePress build output
+docs/.vitepress/dist
+docs/.vitepress/cache

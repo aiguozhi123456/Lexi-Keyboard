@@ -248,7 +248,7 @@ jobs:
           chmod +x ./gradlew || true
           sed -i -e 's/\r$//' ./gradlew || true
 
-      - name: Build OSS Release APK with signing
+      - name: Build Release APK with signing
         if: steps.version.outputs.changed == 'true' && steps.check_keystore.outputs.has_keystore == 'true'
         env:
           KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
@@ -256,23 +256,23 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "使用签名密钥构建 OSS Release APK..."
-          ./gradlew --no-daemon clean :app:assembleOssRelease
-          ls -lah app/build/outputs/apk/oss/release/ || true
+          echo "使用签名密钥构建 Release APK..."
+          ./gradlew --no-daemon clean :app:assembleRelease
+          ls -lah app/build/outputs/apk/release/ || true
 
-      - name: Build OSS Debug APK (fallback)
+      - name: Build Debug APK (fallback)
         if: steps.version.outputs.changed == 'true' && steps.check_keystore.outputs.has_keystore != 'true'
         run: |
-          echo "未配置签名密钥,构建 OSS Debug APK..."
-          ./gradlew --no-daemon clean :app:assembleOssDebug
+          echo "未配置签名密钥,构建 Debug APK..."
+          ./gradlew --no-daemon clean :app:assembleDebug
 
-      - name: Locate built APK (OSS)
+      - name: Locate built APK
         if: steps.version.outputs.changed == 'true'
         id: locate_apk
         run: |
           # 优先查找 release APK
-          RELEASE_APK=$(ls app/build/outputs/apk/oss/release/*.apk 2>/dev/null | grep -v unaligned | head -n 1 || true)
-          DEBUG_APK=$(ls app/build/outputs/apk/oss/debug/*.apk 2>/dev/null | head -n 1 || true)
+          RELEASE_APK=$(ls app/build/outputs/apk/release/*.apk 2>/dev/null | grep -v unaligned | head -n 1 || true)
+          DEBUG_APK=$(ls app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
 
           if [ -n "$RELEASE_APK" ]; then
             APK_PATH="$RELEASE_APK"
@@ -295,7 +295,7 @@ jobs:
             echo "未找到 APK 文件"
           fi
 
-      - name: Rename APK (OSS)
+      - name: Rename APK
         if: steps.version.outputs.changed == 'true' && steps.locate_apk.outputs.apk_path != ''
         id: rename_apk
         run: |

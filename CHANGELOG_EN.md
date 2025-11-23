@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.7.2 (2025-11-23)
+
+### New Features
+
+- **Model Selection Guide**: Added model selection guide feature to help new users quickly choose appropriate speech recognition models
+- **[Pro] Continuous Talk Mode**: Added continuous talk mode support (Pro version)
+
+### Improvements
+
+- Refactored build configuration, removed multi-variant builds, and cleaned up open-source codebase
+
+### Documentation
+
+- Updated project logo image resources
+- Updated README documentation and image resources
+
+---
+
 ## v3.7.1 (2025-11-17)
 
 ### New Features
