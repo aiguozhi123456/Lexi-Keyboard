@@ -51,9 +51,13 @@
   <string name="title_ai_settings">AI 後處理設定</string>
   <string name="title_other_settings">其他設定</string>
 
+  <!-- Settings page section titles -->
+  <string name="section_settings_items">主要設定項</string>
+  <string name="section_more">更多</string>
+
   <string name="label_app_key">X-Api-App-Key</string>
   <string name="label_access_key">X-Api-Access-Key</string>
-  <string name="label_asr_vendor">ASR 服務商</string>
+  <string name="label_asr_vendor">語音識別服務商</string>
 
   <!-- ============================================== -->
   <!-- 自定義標點 -->
@@ -186,6 +190,7 @@
   <string name="toast_vad_sensitivity_applied">已套用 VAD 靈敏度，將在下次錄音生效</string>
 
   <!-- 隱私與資料開關 -->
+  <string name="section_data_retention">記錄留痕</string>
   <string name="label_disable_asr_history">關閉識別歷史記錄</string>
   <string name="label_disable_usage_stats">關閉資料統計記錄</string>
   <string name="dialog_disable_asr_history_title">確認關閉識別歷史？</string>

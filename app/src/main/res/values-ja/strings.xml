@@ -52,9 +52,13 @@
   <string name="title_ai_settings">AI後処理設定</string>
   <string name="title_other_settings">その他の設定</string>
 
+  <!-- Settings page section titles -->
+  <string name="section_settings_items">主要設定項目</string>
+  <string name="section_more">その他</string>
+
   <string name="label_app_key">X-Api-App-Key</string>
   <string name="label_access_key">X-Api-Access-Key</string>
-  <string name="label_asr_vendor">ASRプロバイダー</string>
+  <string name="label_asr_vendor">音声認識プロバイダー</string>
 
   <!-- ============================================== -->
   <!-- 自定义标点 -->
@@ -187,6 +191,7 @@
   <string name="toast_vad_sensitivity_applied">VAD感度が更新されました。次回の録音に適用されます</string>
 
   <!-- プライバシーとデータのトグル -->
+  <string name="section_data_retention">データ保持</string>
   <string name="label_disable_asr_history">ASR履歴を無効化</string>
   <string name="label_disable_usage_stats">利用統計を無効化</string>
   <string name="dialog_disable_asr_history_title">ASR履歴を無効にしますか？</string>

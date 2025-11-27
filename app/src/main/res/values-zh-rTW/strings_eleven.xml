@@ -1,6 +1,6 @@
 <resources>
     <string name="vendor_eleven">ElevenLabs</string>
-    <string name="eleven_section_title">ElevenLabs 鑑權參數</string>
+    <string name="eleven_section_title">ElevenLabs API設定</string>
     <string name="label_eleven_api_key">xi-api-key</string>
     <string name="label_eleven_language">識別語言（可選，留空自動）</string>
     <string name="eleven_lang_auto">自動（啟用語種識別）</string>

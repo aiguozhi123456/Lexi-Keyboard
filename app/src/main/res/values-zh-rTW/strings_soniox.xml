@@ -1,6 +1,6 @@
 <resources>
     <!-- Soniox ASR 配置字串 -->
-    <string name="soniox_section_title">Soniox 鑑權參數</string>
+    <string name="soniox_section_title">Soniox API設定</string>
     <string name="vendor_soniox">Soniox</string>
 
     <!-- Soniox configuration -->

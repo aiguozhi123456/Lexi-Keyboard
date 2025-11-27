@@ -51,9 +51,13 @@
   <string name="title_ai_settings">AI Post-processing Settings</string>
   <string name="title_other_settings">Other Settings</string>
 
+  <!-- Settings page section titles -->
+  <string name="section_settings_items">Main Settings</string>
+  <string name="section_more">More</string>
+
   <string name="label_app_key">X-Api-App-Key</string>
   <string name="label_access_key">X-Api-Access-Key</string>
-  <string name="label_asr_vendor">ASR Provider</string>
+  <string name="label_asr_vendor">Speech Recognition Provider</string>
 
   <!-- ============================================== -->
   <!-- Custom Punctuation -->
@@ -186,6 +190,7 @@
   <string name="toast_vad_sensitivity_applied">VAD sensitivity updated; will apply to the next recording</string>
 
   <!-- Privacy & Data toggles -->
+  <string name="section_data_retention">Data Retention</string>
   <string name="label_disable_asr_history">Disable ASR history</string>
   <string name="label_disable_usage_stats">Disable usage statistics</string>
   <string name="dialog_disable_asr_history_title">Disable ASR history?</string>

@@ -2,6 +2,8 @@
     <!-- 懸浮球相關字串 - Floating ball related strings -->
 
     <string name="title_floating_settings">懸浮球設定</string>
+    <string name="section_floating_basic">基本設定</string>
+    <string name="section_floating_compat">相容性</string>
     <string name="label_floating_only_when_ime_visible">僅在鍵盤顯示時顯示懸浮球</string>
     <string name="label_floating_alpha">懸浮球透明度</string>
     <string name="label_floating_size">懸浮球大小</string>

@@ -2,6 +2,8 @@
     <!-- Floating ball related strings -->
 
     <string name="title_floating_settings">Floating Settings</string>
+    <string name="section_floating_basic">Basic Settings</string>
+    <string name="section_floating_compat">Compatibility</string>
     <string name="label_floating_only_when_ime_visible">Only show floating ball when keyboard is visible</string>
     <string name="label_floating_alpha">Floating ball transparency</string>
     <string name="label_floating_size">Floating ball size</string>

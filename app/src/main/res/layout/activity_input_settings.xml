@@ -31,155 +31,185 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_max="@dimen/settings_form_max_width">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchTrimTrailingPunct"
-          style="@style/SettingsSwitch.First"
-          android:text="@string/label_trim_trailing_punct" />
-
-
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchMicHaptic"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_mic_haptic" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchMicTapToggle"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_mic_tap_toggle" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchAutoStartRecordingOnShow"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_auto_start_recording_on_show" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchFcitx5ReturnOnSwitcher"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_fcitx5_return_on_switcher" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchReturnPrevImeOnHide"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_return_prev_ime_on_hide" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchHideRecentTasks"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_hide_recent_task_card" />
-
-
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchDuckMediaOnRecord"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_audio_ducking_on_record" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchHeadsetMicPriority"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_headset_mic_priority" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchExternalImeAidl"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_external_ime_link_aidl" />
-
-        <!-- 键盘高度 -->
-        <TextView
-          style="@style/SettingsSectionTitle"
-          android:text="@string/label_keyboard_height" />
-
-        <TextView
-          android:id="@+id/tvKeyboardHeightValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/keyboard_height_medium" />
-
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <!-- 底部间距调节 -->
-        <TextView
-          style="@style/SettingsSectionTitle"
-          android:text="@string/label_keyboard_bottom_padding" />
-
+        <!-- 输入行为设置 -->
         <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          android:orientation="horizontal"
-          android:gravity="center_vertical">
-
-          <com.google.android.material.slider.Slider
-            android:id="@+id/sliderBottomPadding"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:valueFrom="0"
-            android:valueTo="100"
-            android:stepSize="5"
-            android:value="0" />
+          style="@style/SettingsSectionCard.First"
+          android:orientation="vertical">
 
           <TextView
-            android:id="@+id/tvBottomPaddingValue"
-            style="@style/SettingsSliderValue"
-            android:minWidth="48dp"
-            android:text="0 dp" />
+            style="@style/SettingsSectionCardTitle"
+            android:text="@string/section_input_behavior" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchTrimTrailingPunct"
+            style="@style/SettingsSwitch.First"
+            android:layout_marginTop="0dp"
+            android:text="@string/label_trim_trailing_punct" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchMicHaptic"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_mic_haptic" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchMicTapToggle"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_mic_tap_toggle" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchAutoStartRecordingOnShow"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_auto_start_recording_on_show" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchFcitx5ReturnOnSwitcher"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_fcitx5_return_on_switcher" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchReturnPrevImeOnHide"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_return_prev_ime_on_hide" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchHideRecentTasks"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_hide_recent_task_card" />
 
         </LinearLayout>
 
-        <!-- 波形灵敏度 -->
-        <TextView
-          style="@style/SettingsSectionTitle"
-          android:text="@string/label_waveform_sensitivity" />
-
+        <!-- 音频和联动设置 -->
         <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          android:orientation="horizontal"
-          android:gravity="center_vertical">
-
-          <com.google.android.material.slider.Slider
-            android:id="@+id/sliderWaveformSensitivity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:valueFrom="1"
-            android:valueTo="10"
-            android:stepSize="1"
-            android:value="5" />
+          style="@style/SettingsSectionCard"
+          android:orientation="vertical">
 
           <TextView
-            android:id="@+id/tvWaveformSensitivityValue"
-            style="@style/SettingsSliderValue"
-            android:minWidth="24dp"
-            android:text="5" />
+            style="@style/SettingsSectionCardTitle"
+            android:text="@string/section_audio_and_link" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchDuckMediaOnRecord"
+            style="@style/SettingsSwitch.First"
+            android:layout_marginTop="0dp"
+            android:text="@string/label_audio_ducking_on_record" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchHeadsetMicPriority"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_headset_mic_priority" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchExternalImeAidl"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_external_ime_link_aidl" />
 
         </LinearLayout>
 
-        <!-- App language selection -->
-        <TextView
-          style="@style/SettingsSectionTitle"
-          android:text="@string/label_language" />
+        <!-- UI设置 -->
+        <LinearLayout
+          style="@style/SettingsSectionCard"
+          android:orientation="vertical">
 
-        <TextView
-          android:id="@+id/tvLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/lang_follow_system" />
+          <TextView
+            style="@style/SettingsSectionCardTitle"
+            android:text="@string/section_ui_settings" />
 
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
+          <!-- 键盘高度 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:layout_marginTop="0dp"
+            android:text="@string/label_keyboard_height" />
 
-        <!-- 扩展按钮配置 -->
-        <TextView
-          style="@style/SettingsSectionTitle"
-          android:text="@string/label_extension_buttons" />
+          <TextView
+            android:id="@+id/tvKeyboardHeightValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/keyboard_height_medium" />
 
-        <TextView
-          android:id="@+id/tvExtensionButtonsValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/ext_btn_default_summary" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <!-- 底部间距调节 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_keyboard_bottom_padding" />
+
+          <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.slider.Slider
+              android:id="@+id/sliderBottomPadding"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:valueFrom="0"
+              android:valueTo="100"
+              android:stepSize="5"
+              android:value="0" />
+
+            <TextView
+              android:id="@+id/tvBottomPaddingValue"
+              style="@style/SettingsSliderValue"
+              android:minWidth="48dp"
+              android:text="0 dp" />
+
+          </LinearLayout>
+
+          <!-- 波形灵敏度 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_waveform_sensitivity" />
+
+          <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.slider.Slider
+              android:id="@+id/sliderWaveformSensitivity"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:valueFrom="1"
+              android:valueTo="10"
+              android:stepSize="1"
+              android:value="5" />
+
+            <TextView
+              android:id="@+id/tvWaveformSensitivityValue"
+              style="@style/SettingsSliderValue"
+              android:minWidth="24dp"
+              android:text="5" />
+
+          </LinearLayout>
+
+          <!-- 界面语言 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_language" />
+
+          <TextView
+            android:id="@+id/tvLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/lang_follow_system" />
+
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <!-- 扩展按钮配置 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_extension_buttons" />
+
+          <TextView
+            android:id="@+id/tvExtensionButtonsValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/ext_btn_default_summary" />
+
+        </LinearLayout>
 
       </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

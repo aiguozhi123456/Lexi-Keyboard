@@ -3,6 +3,8 @@
     <!-- フローティングボール関連文字列 - Floating ball related strings -->
 
     <string name="title_floating_settings">フローティング設定</string>
+    <string name="section_floating_basic">基本設定</string>
+    <string name="section_floating_compat">互換性</string>
     <string name="label_floating_only_when_ime_visible">キーボード表示時のみフローティングボールを表示する</string>
     <string name="label_floating_alpha">フローティングボールの透明度</string>
     <string name="label_floating_size">フローティングボールのサイズ</string>

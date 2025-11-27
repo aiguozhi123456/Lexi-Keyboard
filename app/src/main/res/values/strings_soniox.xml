@@ -1,6 +1,6 @@
 <resources>
     <!-- Soniox ASR configuration strings -->
-    <string name="soniox_section_title">Soniox Credentials</string>
+    <string name="soniox_section_title">Soniox API Settings</string>
     <string name="vendor_soniox">Soniox</string>
 
     <!-- Soniox configuration -->

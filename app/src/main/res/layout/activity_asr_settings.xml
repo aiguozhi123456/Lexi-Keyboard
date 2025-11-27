@@ -23,889 +23,909 @@
       android:layout_height="wrap_content"
       android:orientation="vertical"
       android:padding="16dp">
+
       <!-- Silence auto-stop section -->
-      <TextView
-        style="@style/SettingsSectionTitle"
-        android:text="@string/section_silence_autostop" />
-
-      <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switchAutoStopSilence"
-        style="@style/SettingsSwitch"
-        android:text="@string/label_auto_stop_silence" />
-
-      <TextView
-        android:id="@+id/tvSilenceWindowLabel"
-        style="@style/SettingsLabel"
-        android:text="@string/label_silence_window_ms" />
-
-      <com.google.android.material.slider.Slider
-        android:id="@+id/sliderSilenceWindow"
-        style="@style/SettingsSlider"
-        android:valueFrom="300"
-        android:valueTo="5000"
-        android:stepSize="100" />
-
-      <TextView
-        android:id="@+id/tvSilenceSensitivityLabel"
-        style="@style/SettingsLabel"
-        android:text="@string/label_silence_sensitivity" />
-
-      <com.google.android.material.slider.Slider
-        android:id="@+id/sliderSilenceSensitivity"
-        style="@style/SettingsSlider"
-        android:valueFrom="1"
-        android:valueTo="10"
-        android:stepSize="1" />
-
-
-      <!-- Divider between silence settings and vendor selection -->
-      <com.google.android.material.divider.MaterialDivider
-        style="@style/SettingsDivider" />
-
-      <!-- ASR vendor selection moved below divider -->
-      <TextView
-        style="@style/SettingsSectionTitle.First"
-        android:text="@string/label_asr_vendor" />
-
-      <TextView
-        android:id="@+id/tvAsrVendorValue"
-        style="@style/SettingsClickableValue"
-        android:text="@string/vendor_volc" />
-      <Spinner
-        style="@style/SettingsHiddenSpinner" />
-
-      <!-- Volcano Engine -->
-      <TextView
-        android:id="@+id/titleVolc"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/volc_section_title" />
-
       <LinearLayout
-        android:id="@+id/groupVolc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_app_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etAppKey"
-            style="@style/SettingsTextInput"
-            android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_access_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etAccessKey"
-            style="@style/SettingsTextInput"
-            android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcStreaming"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_streaming" />
-
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcBidiStreaming"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_bidi_streaming" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcNonstream"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_nonstream" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcDdc"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_ddc" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcVad"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_vad" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchVolcFirstCharAccel"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_volc_first_char_accel" />
+        style="@style/SettingsSectionCard.First">
 
         <TextView
-          android:id="@+id/tvVolcLanguageLabel"
+          style="@style/SettingsSectionCardTitle"
+          android:text="@string/section_silence_autostop" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchAutoStopSilence"
+          style="@style/SettingsSwitch"
+          android:layout_marginTop="0dp"
+          android:text="@string/label_auto_stop_silence" />
+
+        <TextView
+          android:id="@+id/tvSilenceWindowLabel"
           style="@style/SettingsLabel"
-          android:text="@string/label_volc_language" />
+          android:text="@string/label_silence_window_ms" />
+
+        <com.google.android.material.slider.Slider
+          android:id="@+id/sliderSilenceWindow"
+          style="@style/SettingsSlider"
+          android:valueFrom="300"
+          android:valueTo="5000"
+          android:stepSize="100" />
+
         <TextView
-          android:id="@+id/tvVolcLanguageValue"
+          android:id="@+id/tvSilenceSensitivityLabel"
+          style="@style/SettingsLabel"
+          android:text="@string/label_silence_sensitivity" />
+
+        <com.google.android.material.slider.Slider
+          android:id="@+id/sliderSilenceSensitivity"
+          style="@style/SettingsSlider"
+          android:valueFrom="1"
+          android:valueTo="10"
+          android:stepSize="1" />
+      </LinearLayout>
+
+      <!-- ASR vendor selection and configuration -->
+      <LinearLayout
+        style="@style/SettingsSectionCard">
+
+        <TextView
+          style="@style/SettingsSectionCardTitle"
+          android:text="@string/label_asr_vendor" />
+
+        <TextView
+          android:id="@+id/tvAsrVendorValue"
           style="@style/SettingsClickableValue"
-          android:text="@string/volc_lang_auto" />
+          android:layout_marginTop="0dp"
+          android:text="@string/vendor_volc" />
         <Spinner
           style="@style/SettingsHiddenSpinner" />
 
-        <TextView
-          android:id="@+id/tvVolcModesHint"
-          style="@style/SettingsHint"
-          android:text="@string/volc_modes_hint" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnVolcGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- SiliconFlow -->
-      <TextView
-        android:id="@+id/titleSf"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/sf_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupSf"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- 免费服务开关 -->
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSfFreeEnabled"
-          style="@style/SettingsSwitch.First"
-          android:text="@string/label_sf_free_enabled" />
-
-        <TextView
-          style="@style/SettingsHint"
-          android:text="@string/sf_free_description" />
-
-        <!-- 免费服务模型选择（仅在免费服务启用时显示） -->
+        <!-- Volcano Engine -->
         <LinearLayout
-          android:id="@+id/groupSfFreeModel"
+          android:id="@+id/groupVolc"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:orientation="vertical"
           android:visibility="gone">
 
           <TextView
-            style="@style/SettingsLabel"
-            android:text="@string/label_sf_model_select" />
-          <TextView
-            android:id="@+id/tvSfFreeModelValue"
-            style="@style/SettingsClickableValue"
-            android:text="@string/sf_model_default_display" />
-
-          <!-- Powered by SiliconFlow Logo -->
-          <ImageView
-            android:id="@+id/imgSfFreePoweredBy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/powered_by_siliconflow_light"
-            android:contentDescription="@string/sf_powered_by_desc" />
-
-          <!-- Register SiliconFlow account prompt -->
-          <TextView
-            style="@style/SettingsHint"
-            android:layout_marginTop="12dp"
-            android:text="@string/sf_free_register_hint" />
-
-          <LinearLayout
-            style="@style/SettingsButtonRow">
-
-            <com.google.android.material.button.MaterialButton
-              android:id="@+id/btnSfFreeRegister"
-              style="@style/SettingsRowButtonLeft"
-              android:text="@string/btn_sf_free_register" />
-
-            <com.google.android.material.button.MaterialButton
-              android:id="@+id/btnSfFreeGuide"
-              style="@style/SettingsRowButtonRight"
-              android:text="@string/btn_sf_free_guide" />
-          </LinearLayout>
-          
-        </LinearLayout>
-
-        <!-- 自有 API Key 配置（仅在免费服务禁用时显示） -->
-        <LinearLayout
-          android:id="@+id/groupSfApiKey"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="vertical">
+            android:id="@+id/titleVolc"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/volc_section_title" />
 
           <com.google.android.material.textfield.TextInputLayout
             style="@style/SettingsTextInputLayout"
-            android:hint="@string/label_sf_api_key">
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_app_key">
 
             <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/etSfApiKey"
+              android:id="@+id/etAppKey"
+              style="@style/SettingsTextInput"
+              android:inputType="text" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_access_key">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etAccessKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcStreaming"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_streaming" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcBidiStreaming"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_bidi_streaming" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcNonstream"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_nonstream" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcDdc"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_ddc" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcVad"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_vad" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchVolcFirstCharAccel"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_volc_first_char_accel" />
+
+          <TextView
+            android:id="@+id/tvVolcLanguageLabel"
+            style="@style/SettingsLabel"
+            android:text="@string/label_volc_language" />
+          <TextView
+            android:id="@+id/tvVolcLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/volc_lang_auto" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <TextView
+            android:id="@+id/tvVolcModesHint"
+            style="@style/SettingsHint"
+            android:text="@string/volc_modes_hint" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVolcGetKey"
+            style="@style/SettingsTonalButton"
+            android:text="@string/btn_get_api_key_guide" />
+        </LinearLayout>
+
+        <!-- SiliconFlow -->
+        <LinearLayout
+          android:id="@+id/groupSf"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleSf"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/sf_section_title" />
+
+          <!-- 免费服务开关 -->
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSfFreeEnabled"
+            style="@style/SettingsSwitch"
+            android:layout_marginTop="0dp"
+            android:text="@string/label_sf_free_enabled" />
+
+          <TextView
+            style="@style/SettingsHint"
+            android:text="@string/sf_free_description" />
+
+          <!-- 免费服务模型选择（仅在免费服务启用时显示） -->
+          <LinearLayout
+            android:id="@+id/groupSfFreeModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+              style="@style/SettingsLabel"
+              android:text="@string/label_sf_model_select" />
+            <TextView
+              android:id="@+id/tvSfFreeModelValue"
+              style="@style/SettingsClickableValue"
+              android:text="@string/sf_model_default_display" />
+
+            <!-- Powered by SiliconFlow Logo -->
+            <ImageView
+              android:id="@+id/imgSfFreePoweredBy"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="8dp"
+              android:adjustViewBounds="true"
+              android:scaleType="fitCenter"
+              android:src="@drawable/powered_by_siliconflow_light"
+              android:contentDescription="@string/sf_powered_by_desc" />
+
+            <!-- Register SiliconFlow account prompt -->
+            <TextView
+              style="@style/SettingsHint"
+              android:layout_marginTop="12dp"
+              android:text="@string/sf_free_register_hint" />
+
+            <LinearLayout
+              style="@style/SettingsButtonRow">
+
+              <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSfFreeRegister"
+                style="@style/SettingsRowButtonLeft"
+                android:text="@string/btn_sf_free_register" />
+
+              <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSfFreeGuide"
+                style="@style/SettingsRowButtonRight"
+                android:text="@string/btn_sf_free_guide" />
+            </LinearLayout>
+
+          </LinearLayout>
+
+          <!-- 自有 API Key 配置（仅在免费服务禁用时显示） -->
+          <LinearLayout
+            android:id="@+id/groupSfApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+              style="@style/SettingsTextInputLayout"
+              android:hint="@string/label_sf_api_key">
+
+              <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSfApiKey"
+                style="@style/SettingsTextInput"
+                android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+              android:id="@+id/tvSfModelLabel"
+              style="@style/SettingsLabel"
+              android:text="@string/label_sf_model_select" />
+            <TextView
+              android:id="@+id/tvSfModelValue"
+              style="@style/SettingsClickableValue"
+              android:text="@string/sf_model_default_display" />
+            <Spinner
+              style="@style/SettingsHiddenSpinner" />
+
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/tilSfOmniPrompt"
+              style="@style/SettingsTextInputLayout"
+              android:hint="@string/label_sf_omni_prompt">
+
+              <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSfOmniPrompt"
+                style="@style/SettingsTextInput.MultiLine" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnSfGetKey"
+              style="@style/SettingsTonalButton"
+              android:text="@string/btn_get_api_key_guide" />
+          </LinearLayout>
+        </LinearLayout>
+
+        <!-- ElevenLabs -->
+        <LinearLayout
+          android:id="@+id/groupEleven"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleEleven"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/eleven_section_title" />
+
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_eleven_api_key">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etElevenApiKey"
               style="@style/SettingsTextInput"
               android:inputType="textPassword" />
           </com.google.android.material.textfield.TextInputLayout>
 
           <TextView
-            android:id="@+id/tvSfModelLabel"
             style="@style/SettingsLabel"
-            android:text="@string/label_sf_model_select" />
+            android:text="@string/label_eleven_language" />
           <TextView
-            android:id="@+id/tvSfModelValue"
+            android:id="@+id/tvElevenLanguageValue"
             style="@style/SettingsClickableValue"
-            android:text="@string/sf_model_default_display" />
+            android:text="@string/eleven_lang_auto" />
           <Spinner
             style="@style/SettingsHiddenSpinner" />
 
-          <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilSfOmniPrompt"
-            style="@style/SettingsTextInputLayout"
-            android:hint="@string/label_sf_omni_prompt">
-
-            <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/etSfOmniPrompt"
-              style="@style/SettingsTextInput.MultiLine" />
-          </com.google.android.material.textfield.TextInputLayout>
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchElevenStreaming"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_eleven_streaming" />
 
           <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSfGetKey"
+            android:id="@+id/btnElevenGetKey"
             style="@style/SettingsTonalButton"
             android:text="@string/btn_get_api_key_guide" />
         </LinearLayout>
-      </LinearLayout>
 
-      <!-- ElevenLabs -->
-      <TextView
-        android:id="@+id/titleEleven"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/eleven_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupEleven"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_eleven_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etElevenApiKey"
-            style="@style/SettingsTextInput"
-            android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_eleven_language" />
-        <TextView
-          android:id="@+id/tvElevenLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/eleven_lang_auto" />
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchElevenStreaming"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_eleven_streaming" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnElevenGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- OpenAI ASR -->
-      <TextView
-        android:id="@+id/titleOpenAI"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/openai_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupOpenAI"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_openai_asr_endpoint">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etOpenAiAsrEndpoint"
-            style="@style/SettingsTextInput"
-            android:inputType="textUri" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_openai_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etOpenAiApiKey"
-            style="@style/SettingsTextInput"
-            android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_openai_model">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etOpenAiModel"
-            style="@style/SettingsTextInput"
-            android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchOpenAiUsePrompt"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_openai_use_prompt" />
-
-        <com.google.android.material.textfield.TextInputLayout
-          android:id="@+id/tilOpenAiPrompt"
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_openai_prompt">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etOpenAiPrompt"
-            style="@style/SettingsTextInput.MultiLine" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_openai_language" />
-        <TextView
-          android:id="@+id/tvOpenAiLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/dash_lang_auto" />
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenAiGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- DashScope -->
-      <TextView
-        android:id="@+id/titleDash"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/dash_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupDashScope"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_dash_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etDashApiKey"
-            style="@style/SettingsTextInput"
-            android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- 移除模型ID输入：固定使用 qwen3-asr-flash / qwen3-asr-flash-realtime -->
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout.MarginTop"
-          android:hint="@string/label_dash_prompt">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etDashPrompt"
-            style="@style/SettingsTextInput.MultiLine" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_dash_language" />
-
-        <TextView
-          android:id="@+id/tvDashLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/dash_lang_auto" />
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <!-- DashScope 地域选择 -->
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_dash_region" />
-
-        <TextView
-          android:id="@+id/tvDashRegionValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/dash_region_cn" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchDashStreaming"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_dash_streaming" />
-
-        <TextView
-          android:id="@+id/tvDashStreamingNote"
-          style="@style/SettingsHint"
-          android:text="@string/dash_streaming_note" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnDashGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- Gemini -->
-      <TextView
-        android:id="@+id/titleGemini"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/gemini_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupGemini"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_gemini_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etGeminiApiKey"
-            style="@style/SettingsTextInput.MultiLine"
-            android:maxLines="6" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_gemini_model">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etGeminiModel"
-            style="@style/SettingsTextInput"
-            android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_gemini_prompt">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etGeminiPrompt"
-            style="@style/SettingsTextInput.MultiLine" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchGeminiDisableThinking"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_gemini_disable_thinking" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnGeminiGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- Soniox -->
-      <TextView
-        android:id="@+id/titleSoniox"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/soniox_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupSoniox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_soniox_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSonioxApiKey"
-            style="@style/SettingsTextInput"
-            android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSonioxStreaming"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_soniox_streaming" />
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_soniox_language" />
-
-        <TextView
-          android:id="@+id/tvSonioxLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/soniox_lang_auto" />
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnSonioxGetKey"
-          style="@style/SettingsTonalButton"
-          android:text="@string/btn_get_api_key_guide" />
-      </LinearLayout>
-
-      <!-- SenseVoice (Local) -->
-      <TextView
-        android:id="@+id/titleSenseVoice"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/sensevoice_section_title" />
-
-      <LinearLayout
-        android:id="@+id/groupSenseVoice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-
-        <TextView
-          android:id="@+id/tvSvModelVariantValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_model_small_int8" />
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_sv_language" />
-
-        <TextView
-          android:id="@+id/tvSvLanguageValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_lang_auto" />
-
-        <com.google.android.material.divider.MaterialDivider
-          style="@style/SettingsDivider" />
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSvUseItn"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_sv_use_itn" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSvPreload"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_sv_preload" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSvPseudoStream"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_sv_pseudo_stream" />
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_sv_keep_alive" />
-
-        <TextView
-          android:id="@+id/tvSvKeepAliveValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_keep_alive_always" />
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_sv_threads" />
-
-        <com.google.android.material.slider.Slider
-          android:id="@+id/sliderSvThreads"
-          style="@style/SettingsSlider"
-          android:valueFrom="1"
-          android:valueTo="8"
-          android:stepSize="1" />
-
+        <!-- OpenAI ASR -->
         <LinearLayout
-          style="@style/SettingsButtonRow.MarginTop12">
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSvDownloadModel"
-            style="@style/SettingsRowButtonLeft"
-            android:text="@string/btn_sv_download_model" />
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSvImportModel"
-            style="@style/SettingsRowButtonRight"
-            android:text="@string/btn_sv_import_model" />
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnSvClearModel"
-          style="@style/Widget.Material3.Button.TonalButton"
+          android:id="@+id/groupOpenAI"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
-          android:text="@string/btn_sv_clear_model" />
+          android:orientation="vertical"
+          android:visibility="gone">
 
-        <TextView
-          android:id="@+id/tvSvDownloadStatus"
-          style="@style/SettingsStatusText"
-          android:text="" />
-      </LinearLayout>
+          <TextView
+            android:id="@+id/titleOpenAI"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/openai_section_title" />
 
-      <!-- TeleSpeech (Local) -->
-      <TextView
-        android:id="@+id/titleTelespeech"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/telespeech_section_title" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_openai_asr_endpoint">
 
-      <LinearLayout
-        android:id="@+id/groupTelespeech"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etOpenAiAsrEndpoint"
+              style="@style/SettingsTextInput"
+              android:inputType="textUri" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-          android:id="@+id/tvTsModelVariantValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/ts_model_int8" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_openai_api_key">
 
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etOpenAiApiKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_ts_keep_alive" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_openai_model">
 
-        <TextView
-          android:id="@+id/tvTsKeepAliveValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_keep_alive_always" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etOpenAiModel"
+              style="@style/SettingsTextInput"
+              android:inputType="text" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <Spinner
-          style="@style/SettingsHiddenSpinner" />
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchOpenAiUsePrompt"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_openai_use_prompt" />
 
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_ts_threads" />
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilOpenAiPrompt"
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_openai_prompt">
 
-        <com.google.android.material.slider.Slider
-          android:id="@+id/sliderTsThreads"
-          style="@style/SettingsSlider"
-          android:valueFrom="1"
-          android:valueTo="8"
-          android:stepSize="1" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etOpenAiPrompt"
+              style="@style/SettingsTextInput.MultiLine" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchTsUseItn"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_ts_use_itn" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchTsPreload"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_ts_preload" />
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchTsPseudoStream"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_ts_pseudo_stream" />
-
-        <LinearLayout
-          style="@style/SettingsButtonRow.MarginTop12">
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_openai_language" />
+          <TextView
+            android:id="@+id/tvOpenAiLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/dash_lang_auto" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
 
           <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTsDownloadModel"
-            style="@style/SettingsRowButtonLeft"
-            android:text="@string/btn_ts_download_model" />
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTsImportModel"
-            style="@style/SettingsRowButtonRight"
-            android:text="@string/btn_ts_import_model" />
+            android:id="@+id/btnOpenAiGetKey"
+            style="@style/SettingsTonalButton"
+            android:text="@string/btn_get_api_key_guide" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnTsClearModel"
-          style="@style/Widget.Material3.Button.TonalButton"
+        <!-- DashScope -->
+        <LinearLayout
+          android:id="@+id/groupDashScope"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
-          android:text="@string/btn_ts_clear_model" />
+          android:orientation="vertical"
+          android:visibility="gone">
 
-        <TextView
-          android:id="@+id/tvTsDownloadStatus"
-          style="@style/SettingsStatusText"
-          android:text="" />
-      </LinearLayout>
+          <TextView
+            android:id="@+id/titleDash"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/dash_section_title" />
 
-      <!-- Paraformer (Local) -->
-      <TextView
-        android:id="@+id/titleParaformer"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/paraformer_section_title" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_dash_api_key">
 
-      <LinearLayout
-        android:id="@+id/groupParaformer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etDashApiKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-          android:id="@+id/tvPfModelVariantValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/pf_variant_bilingual_int8" />
+          <!-- 移除模型ID输入：固定使用 qwen3-asr-flash / qwen3-asr-flash-realtime -->
 
-        <com.google.android.material.divider.MaterialDivider
-          style="@style/SettingsDivider" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout.MarginTop"
+            android:hint="@string/label_dash_prompt">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchPfPreload"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_pf_preload" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etDashPrompt"
+              style="@style/SettingsTextInput.MultiLine" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchPfItn"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_pf_use_itn" />
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_dash_language" />
 
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_pf_threads" />
+          <TextView
+            android:id="@+id/tvDashLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/dash_lang_auto" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
 
-        <com.google.android.material.slider.Slider
-          android:id="@+id/sliderPfThreads"
-          style="@style/SettingsSlider"
-          android:valueFrom="1"
-          android:valueTo="8"
-          android:stepSize="1" />
+          <!-- DashScope 地域选择 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_dash_region" />
 
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_pf_keep_alive" />
+          <TextView
+            android:id="@+id/tvDashRegionValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/dash_region_cn" />
 
-        <TextView
-          android:id="@+id/tvPfKeepAliveValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_keep_alive_always" />
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchDashStreaming"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_dash_streaming" />
 
-        <LinearLayout
-          style="@style/SettingsButtonRow.MarginTop12">
+          <TextView
+            android:id="@+id/tvDashStreamingNote"
+            style="@style/SettingsHint"
+            android:text="@string/dash_streaming_note" />
 
           <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPfDownloadModel"
-            style="@style/SettingsRowButtonLeft"
-            android:text="@string/btn_pf_download_model" />
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPfImportModel"
-            style="@style/SettingsRowButtonRight"
-            android:text="@string/btn_pf_import_model" />
+            android:id="@+id/btnDashGetKey"
+            style="@style/SettingsTonalButton"
+            android:text="@string/btn_get_api_key_guide" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnPfClearModel"
-          style="@style/Widget.Material3.Button.TonalButton"
+        <!-- Gemini -->
+        <LinearLayout
+          android:id="@+id/groupGemini"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
-          android:text="@string/btn_pf_clear_model" />
+          android:orientation="vertical"
+          android:visibility="gone">
 
-        <TextView
-          android:id="@+id/tvPfDownloadStatus"
-          style="@style/SettingsStatusText"
-          android:text="" />
+          <TextView
+            android:id="@+id/titleGemini"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/gemini_section_title" />
 
-        <TextView
-          android:id="@+id/tvPfModelInfo"
-          style="@style/SettingsHint"
-          android:layout_marginTop="12dp"
-          android:text="@string/pf_model_info" />
-      </LinearLayout>
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_gemini_api_key">
 
-      <!-- Zipformer (Local streaming) -->
-      <TextView
-        android:id="@+id/titleZipformer"
-        style="@style/SettingsSectionTitle"
-        android:text="@string/zipformer_section_title" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etGeminiApiKey"
+              style="@style/SettingsTextInput.MultiLine"
+              android:maxLines="6" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-      <LinearLayout
-        android:id="@+id/groupZipformer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_gemini_model">
 
-        <TextView
-          android:id="@+id/tvZfModelVariantValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/zf_variant_zh_xl_int8_20250630" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etGeminiModel"
+              style="@style/SettingsTextInput"
+              android:inputType="text" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.divider.MaterialDivider
-          style="@style/SettingsDivider" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_gemini_prompt">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchZfPreload"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_zf_preload" />
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etGeminiPrompt"
+              style="@style/SettingsTextInput.MultiLine" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchZfItn"
-          style="@style/SettingsSwitch"
-          android:text="@string/label_zf_use_itn" />
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_zf_threads" />
-
-        <com.google.android.material.slider.Slider
-          android:id="@+id/sliderZfThreads"
-          style="@style/SettingsSlider"
-          android:valueFrom="1"
-          android:valueTo="8"
-          android:stepSize="1" />
-
-        <TextView
-          style="@style/SettingsLabel"
-          android:text="@string/label_zf_keep_alive" />
-
-        <TextView
-          android:id="@+id/tvZfKeepAliveValue"
-          style="@style/SettingsClickableValue"
-          android:text="@string/sv_keep_alive_always" />
-
-        <LinearLayout
-          style="@style/SettingsButtonRow.MarginTop12">
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchGeminiDisableThinking"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_gemini_disable_thinking" />
 
           <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnZfDownloadModel"
-            style="@style/SettingsRowButtonLeft"
-            android:text="@string/btn_zf_download_model" />
-
-          <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnZfImportModel"
-            style="@style/SettingsRowButtonRight"
-            android:text="@string/btn_zf_import_model" />
+            android:id="@+id/btnGeminiGetKey"
+            style="@style/SettingsTonalButton"
+            android:text="@string/btn_get_api_key_guide" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnZfClearModel"
-          style="@style/Widget.Material3.Button.TonalButton"
+        <!-- Soniox -->
+        <LinearLayout
+          android:id="@+id/groupSoniox"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
-          android:text="@string/btn_zf_clear_model" />
+          android:orientation="vertical"
+          android:visibility="gone">
 
-        <TextView
-          android:id="@+id/tvZfDownloadStatus"
-          style="@style/SettingsStatusText"
-          android:text="" />
+          <TextView
+            android:id="@+id/titleSoniox"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/soniox_section_title" />
 
-        <TextView
-          style="@style/SettingsHint"
-          android:layout_marginTop="8dp"
-          android:lineSpacingMultiplier="1.2"
-          android:text="@string/zf_model_info" />
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:layout_marginTop="0dp"
+            android:hint="@string/label_soniox_api_key">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSonioxApiKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSonioxStreaming"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_soniox_streaming" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_soniox_language" />
+
+          <TextView
+            android:id="@+id/tvSonioxLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/soniox_lang_auto" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSonioxGetKey"
+            style="@style/SettingsTonalButton"
+            android:text="@string/btn_get_api_key_guide" />
+        </LinearLayout>
+
+        <!-- SenseVoice (Local) -->
+        <LinearLayout
+          android:id="@+id/groupSenseVoice"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleSenseVoice"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/sensevoice_section_title" />
+
+          <TextView
+            android:id="@+id/tvSvModelVariantValue"
+            style="@style/SettingsClickableValue"
+            android:layout_marginTop="0dp"
+            android:text="@string/sv_model_small_int8" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_sv_language" />
+
+          <TextView
+            android:id="@+id/tvSvLanguageValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/sv_lang_auto" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSvUseItn"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_sv_use_itn" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSvPreload"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_sv_preload" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSvPseudoStream"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_sv_pseudo_stream" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_sv_keep_alive" />
+
+          <TextView
+            android:id="@+id/tvSvKeepAliveValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/sv_keep_alive_always" />
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_sv_threads" />
+
+          <com.google.android.material.slider.Slider
+            android:id="@+id/sliderSvThreads"
+            style="@style/SettingsSlider"
+            android:valueFrom="1"
+            android:valueTo="8"
+            android:stepSize="1" />
+
+          <LinearLayout
+            style="@style/SettingsButtonRow.MarginTop12">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnSvDownloadModel"
+              style="@style/SettingsRowButtonLeft"
+              android:text="@string/btn_sv_download_model" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnSvImportModel"
+              style="@style/SettingsRowButtonRight"
+              android:text="@string/btn_sv_import_model" />
+          </LinearLayout>
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSvClearModel"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
+            android:text="@string/btn_sv_clear_model" />
+
+          <TextView
+            android:id="@+id/tvSvDownloadStatus"
+            style="@style/SettingsStatusText"
+            android:text="" />
+        </LinearLayout>
+
+        <!-- TeleSpeech (Local) -->
+        <LinearLayout
+          android:id="@+id/groupTelespeech"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleTelespeech"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/telespeech_section_title" />
+
+          <TextView
+            android:id="@+id/tvTsModelVariantValue"
+            style="@style/SettingsClickableValue"
+            android:layout_marginTop="0dp"
+            android:text="@string/ts_model_int8" />
+
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_ts_keep_alive" />
+
+          <TextView
+            android:id="@+id/tvTsKeepAliveValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/sv_keep_alive_always" />
+
+          <Spinner
+            style="@style/SettingsHiddenSpinner" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_ts_threads" />
+
+          <com.google.android.material.slider.Slider
+            android:id="@+id/sliderTsThreads"
+            style="@style/SettingsSlider"
+            android:valueFrom="1"
+            android:valueTo="8"
+            android:stepSize="1" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchTsUseItn"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_ts_use_itn" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchTsPreload"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_ts_preload" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchTsPseudoStream"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_ts_pseudo_stream" />
+
+          <LinearLayout
+            style="@style/SettingsButtonRow.MarginTop12">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnTsDownloadModel"
+              style="@style/SettingsRowButtonLeft"
+              android:text="@string/btn_ts_download_model" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnTsImportModel"
+              style="@style/SettingsRowButtonRight"
+              android:text="@string/btn_ts_import_model" />
+          </LinearLayout>
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTsClearModel"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
+            android:text="@string/btn_ts_clear_model" />
+
+          <TextView
+            android:id="@+id/tvTsDownloadStatus"
+            style="@style/SettingsStatusText"
+            android:text="" />
+        </LinearLayout>
+
+        <!-- Paraformer (Local) -->
+        <LinearLayout
+          android:id="@+id/groupParaformer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleParaformer"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/paraformer_section_title" />
+
+          <TextView
+            android:id="@+id/tvPfModelVariantValue"
+            style="@style/SettingsClickableValue"
+            android:layout_marginTop="0dp"
+            android:text="@string/pf_variant_bilingual_int8" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchPfPreload"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_pf_preload" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchPfItn"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_pf_use_itn" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_pf_threads" />
+
+          <com.google.android.material.slider.Slider
+            android:id="@+id/sliderPfThreads"
+            style="@style/SettingsSlider"
+            android:valueFrom="1"
+            android:valueTo="8"
+            android:stepSize="1" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_pf_keep_alive" />
+
+          <TextView
+            android:id="@+id/tvPfKeepAliveValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/sv_keep_alive_always" />
+
+          <LinearLayout
+            style="@style/SettingsButtonRow.MarginTop12">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnPfDownloadModel"
+              style="@style/SettingsRowButtonLeft"
+              android:text="@string/btn_pf_download_model" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnPfImportModel"
+              style="@style/SettingsRowButtonRight"
+              android:text="@string/btn_pf_import_model" />
+          </LinearLayout>
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPfClearModel"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
+            android:text="@string/btn_pf_clear_model" />
+
+          <TextView
+            android:id="@+id/tvPfDownloadStatus"
+            style="@style/SettingsStatusText"
+            android:text="" />
+
+          <TextView
+            android:id="@+id/tvPfModelInfo"
+            style="@style/SettingsHint"
+            android:layout_marginTop="12dp"
+            android:text="@string/pf_model_info" />
+        </LinearLayout>
+
+        <!-- Zipformer (Local streaming) -->
+        <LinearLayout
+          android:id="@+id/groupZipformer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            android:id="@+id/titleZipformer"
+            style="@style/SettingsSectionTitle"
+            android:text="@string/zipformer_section_title" />
+
+          <TextView
+            android:id="@+id/tvZfModelVariantValue"
+            style="@style/SettingsClickableValue"
+            android:layout_marginTop="0dp"
+            android:text="@string/zf_variant_zh_xl_int8_20250630" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchZfPreload"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_zf_preload" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchZfItn"
+            style="@style/SettingsSwitch"
+            android:text="@string/label_zf_use_itn" />
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_zf_threads" />
+
+          <com.google.android.material.slider.Slider
+            android:id="@+id/sliderZfThreads"
+            style="@style/SettingsSlider"
+            android:valueFrom="1"
+            android:valueTo="8"
+            android:stepSize="1" />
+
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_zf_keep_alive" />
+
+          <TextView
+            android:id="@+id/tvZfKeepAliveValue"
+            style="@style/SettingsClickableValue"
+            android:text="@string/sv_keep_alive_always" />
+
+          <LinearLayout
+            style="@style/SettingsButtonRow.MarginTop12">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnZfDownloadModel"
+              style="@style/SettingsRowButtonLeft"
+              android:text="@string/btn_zf_download_model" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnZfImportModel"
+              style="@style/SettingsRowButtonRight"
+              android:text="@string/btn_zf_import_model" />
+          </LinearLayout>
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnZfClearModel"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:shapeAppearanceOverlay="@style/AsrkbShapeOverlayCapsule"
+            android:text="@string/btn_zf_clear_model" />
+
+          <TextView
+            android:id="@+id/tvZfDownloadStatus"
+            style="@style/SettingsStatusText"
+            android:text="" />
+
+          <TextView
+            style="@style/SettingsHint"
+            android:layout_marginTop="8dp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="@string/zf_model_info" />
+        </LinearLayout>
       </LinearLayout>
 
     </LinearLayout>

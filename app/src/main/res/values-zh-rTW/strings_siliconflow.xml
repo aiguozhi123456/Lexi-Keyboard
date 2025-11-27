@@ -1,6 +1,6 @@
 <resources>
     <!-- SiliconFlow ASR 配置字串 -->
-    <string name="sf_section_title">SiliconFlow 鑑權參數</string>
+    <string name="sf_section_title">SiliconFlow API設定</string>
     <string name="vendor_sf">SiliconFlow</string>
 
     <!-- SiliconFlow configuration -->

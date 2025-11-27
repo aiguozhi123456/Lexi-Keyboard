@@ -24,89 +24,109 @@
       android:orientation="vertical"
       android:padding="16dp">
 
-      <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switchFloatingAsr"
-        style="@style/SettingsSwitch"
-        android:text="@string/label_floating_asr" />
+      <!-- 基本设置分组 -->
+      <LinearLayout
+        style="@style/SettingsSectionCard.First"
+        android:orientation="vertical">
 
-      <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switchFloatingOnlyWhenImeVisible"
-        style="@style/SettingsSwitch"
-        android:text="@string/label_floating_only_when_ime_visible" />
+        <TextView
+          style="@style/SettingsSectionCardTitle"
+          android:text="@string/section_floating_basic" />
 
-      <TextView
-        style="@style/SettingsLabel"
-        android:text="@string/label_floating_alpha" />
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchFloatingAsr"
+          style="@style/SettingsSwitch"
+          android:layout_marginTop="0dp"
+          android:text="@string/label_floating_asr" />
 
-      <com.google.android.material.slider.Slider
-        android:id="@+id/sliderFloatingAlpha"
-        style="@style/SettingsSlider"
-        android:valueFrom="30"
-        android:valueTo="100"
-        android:stepSize="5" />
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchFloatingOnlyWhenImeVisible"
+          style="@style/SettingsSwitch"
+          android:text="@string/label_floating_only_when_ime_visible" />
 
-      <TextView
-        style="@style/SettingsLabel"
-        android:text="@string/label_floating_size" />
+        <TextView
+          style="@style/SettingsLabel"
+          android:text="@string/label_floating_alpha" />
 
-      <com.google.android.material.slider.Slider
-        android:id="@+id/sliderFloatingSize"
-        style="@style/SettingsSlider"
-        android:valueFrom="28"
-        android:valueTo="96"
-        android:stepSize="4" />
+        <com.google.android.material.slider.Slider
+          android:id="@+id/sliderFloatingAlpha"
+          style="@style/SettingsSlider"
+          android:valueFrom="30"
+          android:valueTo="100"
+          android:stepSize="5" />
 
-      <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnResetFloatingPos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/label_reset_floating_position"
-        app:icon="@drawable/arrow_counter_clockwise"
-        app:iconPadding="8dp"
-        app:iconGravity="textStart" />
+        <TextView
+          style="@style/SettingsLabel"
+          android:text="@string/label_floating_size" />
 
-      <com.google.android.material.divider.MaterialDivider
-        style="@style/SettingsDivider" />
+        <com.google.android.material.slider.Slider
+          android:id="@+id/sliderFloatingSize"
+          style="@style/SettingsSlider"
+          android:valueFrom="28"
+          android:valueTo="96"
+          android:stepSize="4" />
 
-      <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switchFloatingWriteCompat"
-        style="@style/SettingsSwitch"
-        android:layout_marginTop="12dp"
-        android:text="@string/label_floating_write_compat" />
+        <com.google.android.material.button.MaterialButton
+          android:id="@+id/btnResetFloatingPos"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:text="@string/label_reset_floating_position"
+          app:icon="@drawable/arrow_counter_clockwise"
+          app:iconPadding="8dp"
+          app:iconGravity="textStart" />
 
-      <com.google.android.material.textfield.TextInputLayout
-        style="@style/SettingsTextInputLayout.MarginTop"
-        app:helperText="@string/hint_floating_write_compat_pkgs">
+      </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etFloatingWriteCompatPkgs"
-          style="@style/SettingsTextInput.MultiLine"
-          android:hint="@string/label_floating_write_compat_pkgs"
-          android:inputType="textNoSuggestions|textMultiLine"
-          android:overScrollMode="ifContentScrolls"
-          android:scrollbars="vertical" />
-      </com.google.android.material.textfield.TextInputLayout>
+      <!-- 兼容性设置分组 -->
+      <LinearLayout
+        style="@style/SettingsSectionCard"
+        android:orientation="vertical">
 
-      <!-- 悬浮球写入文字采取粘贴方案 -->
-      <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switchFloatingWritePaste"
-        style="@style/SettingsSwitch"
-        android:layout_marginTop="12dp"
-        android:text="@string/label_floating_write_paste" />
+        <TextView
+          style="@style/SettingsSectionCardTitle"
+          android:text="@string/section_floating_compat" />
 
-      <com.google.android.material.textfield.TextInputLayout
-        style="@style/SettingsTextInputLayout.MarginTop"
-        app:helperText="@string/hint_floating_write_paste_pkgs">
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchFloatingWriteCompat"
+          style="@style/SettingsSwitch"
+          android:layout_marginTop="0dp"
+          android:text="@string/label_floating_write_compat" />
 
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etFloatingWritePastePkgs"
-          style="@style/SettingsTextInput.MultiLine"
-          android:hint="@string/label_floating_write_paste_pkgs"
-          android:inputType="textNoSuggestions|textMultiLine"
-          android:overScrollMode="ifContentScrolls"
-          android:scrollbars="vertical" />
-      </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+          style="@style/SettingsTextInputLayout.MarginTop"
+          app:helperText="@string/hint_floating_write_compat_pkgs">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etFloatingWriteCompatPkgs"
+            style="@style/SettingsTextInput.MultiLine"
+            android:hint="@string/label_floating_write_compat_pkgs"
+            android:inputType="textNoSuggestions|textMultiLine"
+            android:overScrollMode="ifContentScrolls"
+            android:scrollbars="vertical" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 悬浮球写入文字采取粘贴方案 -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchFloatingWritePaste"
+          style="@style/SettingsSwitch"
+          android:layout_marginTop="12dp"
+          android:text="@string/label_floating_write_paste" />
+
+        <com.google.android.material.textfield.TextInputLayout
+          style="@style/SettingsTextInputLayout.MarginTop"
+          app:helperText="@string/hint_floating_write_paste_pkgs">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etFloatingWritePastePkgs"
+            style="@style/SettingsTextInput.MultiLine"
+            android:hint="@string/label_floating_write_paste_pkgs"
+            android:inputType="textNoSuggestions|textMultiLine"
+            android:overScrollMode="ifContentScrolls"
+            android:scrollbars="vertical" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+      </LinearLayout>
 
     </LinearLayout>
   </androidx.core.widget.NestedScrollView>

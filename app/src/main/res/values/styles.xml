@@ -91,6 +91,32 @@
         <item name="android:layout_marginTop">16dp</item>
     </style>
 
+    <!-- 设置分组卡片容器 -->
+    <style name="SettingsSectionCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:background">@drawable/bg_settings_section</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <!-- 设置分组卡片容器（首个，无上边距） -->
+    <style name="SettingsSectionCard.First" parent="SettingsSectionCard">
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+
+    <!-- 分组内标题（卡片内部顶部，居中显示） -->
+    <style name="SettingsSectionCardTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- 带图标的 OutlinedButton -->
     <style name="SettingsOutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:layout_width">match_parent</item>

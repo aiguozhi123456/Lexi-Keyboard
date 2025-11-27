@@ -41,4 +41,8 @@
     <!-- AI 编辑默认使用上次识别结果 - AI Edit default scope -->
     <string name="feature_ai_edit_default_use_last_asr_off_desc">AI 编辑将默认针对整个输入字段进行操作。</string>
     <string name="feature_ai_edit_default_use_last_asr_on_desc">AI 编辑将默认操作上次识别结果，方便在语音输入后快速编辑。</string>
+
+    <!-- 章节标题 - Section titles -->
+    <string name="section_post_process_scope">后处理范围</string>
+    <string name="section_post_process_model">后处理模型</string>
 </resources>

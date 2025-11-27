@@ -35,89 +35,106 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_max="@dimen/settings_form_max_width">
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOneClickSetup"
-          style="@style/SettingsTonalButton"
-          android:layout_marginTop="0dp"
-          android:text="@string/btn_one_click_setup"
-          app:icon="@drawable/lightning_a" />
+        <!-- 快捷操作区 -->
+        <LinearLayout
+          style="@style/SettingsSectionCard.First">
 
-        <!-- 测试输入：按钮，点击后弹出底部输入框 -->
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnTestInput"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/btn_test_input"
-          app:icon="@drawable/textbox" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOneClickSetup"
+            style="@style/SettingsTonalButton"
+            android:layout_marginTop="0dp"
+            android:text="@string/btn_one_click_setup"
+            app:icon="@drawable/lightning_a" />
 
-        <com.google.android.material.divider.MaterialDivider
-          style="@style/SettingsDivider" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTestInput"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/btn_test_input"
+            app:icon="@drawable/textbox" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenInputSettings"
-          style="@style/SettingsOutlinedButton"
-          android:layout_marginTop="16dp"
-          android:text="@string/title_input_settings"
-          app:icon="@drawable/keyboard" />
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenAsrSettings"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/title_asr_settings"
-          app:icon="@drawable/microphone" />
+        <!-- 设置导航区 -->
+        <LinearLayout
+          style="@style/SettingsSectionCard">
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenAiSettings"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/title_ai_settings"
-          app:icon="@drawable/magic_wand" />
+          <TextView
+            style="@style/SettingsSectionCardTitle"
+            android:text="@string/section_settings_items" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenFloatingSettings"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/title_floating_settings"
-          app:icon="@drawable/arrows_out_cardinal" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenInputSettings"
+            style="@style/SettingsOutlinedButton"
+            android:layout_marginTop="0dp"
+            android:text="@string/title_input_settings"
+            app:icon="@drawable/keyboard" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenOtherSettings"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/title_other_settings"
-          app:icon="@drawable/dots_three_outline" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenAsrSettings"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/title_asr_settings"
+            app:icon="@drawable/microphone" />
 
-        <com.google.android.material.divider.MaterialDivider
-          style="@style/SettingsDivider" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenAiSettings"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/title_ai_settings"
+            app:icon="@drawable/magic_wand" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnExportSettings"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/btn_open_backup_settings"
-          app:icon="@drawable/cloud_arrow_up" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenFloatingSettings"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/title_floating_settings"
+            app:icon="@drawable/arrows_out_cardinal" />
 
-        <!-- 识别历史入口：位于"配置备份"按钮下方 -->
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnOpenAsrHistory"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/btn_open_asr_history"
-          app:icon="@drawable/article" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenOtherSettings"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/title_other_settings"
+            app:icon="@drawable/dots_three_outline" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnShowGuide"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/btn_show_guide"
-          app:icon="@drawable/book_open_user" />
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnCheckUpdate"
-          style="@style/SettingsOutlinedButton"
-          android:text="@string/btn_check_update"
-          app:icon="@drawable/arrows_clockwise" />
+        <!-- 工具区 -->
+        <LinearLayout
+          style="@style/SettingsSectionCard">
 
-        <!-- 关于 -->
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnAbout"
-          style="@style/SettingsOutlinedButton"
-          android:layout_marginTop="16dp"
-          android:text="@string/btn_about"
-          app:icon="@drawable/info" />
+          <TextView
+            style="@style/SettingsSectionCardTitle"
+            android:text="@string/section_more" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExportSettings"
+            style="@style/SettingsOutlinedButton"
+            android:layout_marginTop="0dp"
+            android:text="@string/btn_open_backup_settings"
+            app:icon="@drawable/cloud_arrow_up" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenAsrHistory"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/btn_open_asr_history"
+            app:icon="@drawable/article" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnShowGuide"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/btn_show_guide"
+            app:icon="@drawable/book_open_user" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCheckUpdate"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/btn_check_update"
+            app:icon="@drawable/arrows_clockwise" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAbout"
+            style="@style/SettingsOutlinedButton"
+            android:text="@string/btn_about"
+            app:icon="@drawable/info" />
+
+        </LinearLayout>
 
       </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

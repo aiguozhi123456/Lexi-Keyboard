@@ -58,4 +58,9 @@
     <!-- Keyboard layout option -->
     <string name="label_fcitx5_return_on_switcher">输入法切换键功能改为返回上个输入法</string>
     <string name="label_hide_recent_task_card">后台隐藏任务卡片</string>
+
+    <!-- Section titles -->
+    <string name="section_input_behavior">输入行为</string>
+    <string name="section_audio_and_link">音频与联动</string>
+    <string name="section_ui_settings">界面设置</string>
 </resources>

@@ -1,6 +1,6 @@
 <resources>
     <!-- SiliconFlow ASR 設定文字列 -->
-    <string name="sf_section_title">SiliconFlow 認証情報</string>
+    <string name="sf_section_title">SiliconFlow API設定</string>
     <string name="vendor_sf">SiliconFlow</string>
 
     <!-- SiliconFlow configuration -->

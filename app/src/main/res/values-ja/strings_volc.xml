@@ -1,6 +1,6 @@
 <resources>
     <!-- Volcengine (Volcano Engine) ASR 設定文字列 -->
-    <string name="volc_section_title">Volcano Engine 認証情報</string>
+    <string name="volc_section_title">Volcano Engine API設定</string>
     <string name="vendor_volc">Volcano Engine</string>
 
     <!-- Volc configuration -->
