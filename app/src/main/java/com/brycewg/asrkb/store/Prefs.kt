@@ -425,6 +425,26 @@ class Prefs(context: Context) {
         get() = sp.getString(KEY_SF_OMNI_PROMPT, DEFAULT_SF_OMNI_PROMPT) ?: DEFAULT_SF_OMNI_PROMPT
         set(value) = sp.edit { putString(KEY_SF_OMNI_PROMPT, value) }
 
+    // SiliconFlow 免费服务：是否启用免费 ASR 服务（新用户默认启用）
+    var sfFreeAsrEnabled: Boolean
+        get() = sp.getBoolean(KEY_SF_FREE_ASR_ENABLED, true)
+        set(value) = sp.edit { putBoolean(KEY_SF_FREE_ASR_ENABLED, value) }
+
+    // SiliconFlow 免费服务：ASR 模型选择
+    var sfFreeAsrModel: String
+        get() = sp.getString(KEY_SF_FREE_ASR_MODEL, DEFAULT_SF_FREE_ASR_MODEL) ?: DEFAULT_SF_FREE_ASR_MODEL
+        set(value) = sp.edit { putString(KEY_SF_FREE_ASR_MODEL, value) }
+
+    // SiliconFlow 免费服务：是否启用免费 LLM（AI 后处理，新用户默认启用）
+    var sfFreeLlmEnabled: Boolean
+        get() = sp.getBoolean(KEY_SF_FREE_LLM_ENABLED, true)
+        set(value) = sp.edit { putBoolean(KEY_SF_FREE_LLM_ENABLED, value) }
+
+    // SiliconFlow 免费服务：LLM 模型选择
+    var sfFreeLlmModel: String
+        get() = sp.getString(KEY_SF_FREE_LLM_MODEL, DEFAULT_SF_FREE_LLM_MODEL) ?: DEFAULT_SF_FREE_LLM_MODEL
+        set(value) = sp.edit { putString(KEY_SF_FREE_LLM_MODEL, value) }
+
     // 阿里云百炼（DashScope）凭证
     var dashApiKey: String by stringPref(KEY_DASH_API_KEY, "")
 
@@ -573,9 +593,9 @@ class Prefs(context: Context) {
         get() = sp.getBoolean(KEY_VOLC_FIRST_CHAR_ACCEL_ENABLED, false)
         set(value) = sp.edit { putBoolean(KEY_VOLC_FIRST_CHAR_ACCEL_ENABLED, value) }
 
-    // 选中的ASR供应商
+    // 选中的ASR供应商（默认使用 SiliconFlow 免费服务）
     var asrVendor: AsrVendor
-        get() = AsrVendor.fromId(sp.getString(KEY_ASR_VENDOR, AsrVendor.Volc.id))
+        get() = AsrVendor.fromId(sp.getString(KEY_ASR_VENDOR, AsrVendor.SiliconFlow.id))
         set(value) = sp.edit { putString(KEY_ASR_VENDOR, value.id) }
 
     // ElevenLabs：语言代码（空=自动识别）
@@ -699,8 +719,9 @@ class Prefs(context: Context) {
             VendorField(KEY_APP_KEY, required = true),
             VendorField(KEY_ACCESS_KEY, required = true)
         ),
+        // SiliconFlow：免费服务启用时无需 API Key
         AsrVendor.SiliconFlow to listOf(
-            VendorField(KEY_SF_API_KEY, required = true),
+            VendorField(KEY_SF_API_KEY, required = false),  // 免费服务时无需 API Key
             VendorField(KEY_SF_MODEL, default = DEFAULT_SF_MODEL)
         ),
         AsrVendor.ElevenLabs to listOf(
@@ -747,7 +768,7 @@ class Prefs(context: Context) {
     }
 
     fun hasVolcKeys(): Boolean = hasVendorKeys(AsrVendor.Volc)
-    fun hasSfKeys(): Boolean = hasVendorKeys(AsrVendor.SiliconFlow)
+    fun hasSfKeys(): Boolean = sfFreeAsrEnabled || sfApiKey.isNotBlank()  // 免费服务启用或有 API Key
     fun hasDashKeys(): Boolean = hasVendorKeys(AsrVendor.DashScope)
     fun hasElevenKeys(): Boolean = hasVendorKeys(AsrVendor.ElevenLabs)
     fun hasOpenAiKeys(): Boolean = hasVendorKeys(AsrVendor.OpenAI)
@@ -755,6 +776,9 @@ class Prefs(context: Context) {
     fun hasSonioxKeys(): Boolean = hasVendorKeys(AsrVendor.Soniox)
     fun hasAsrKeys(): Boolean = hasVendorKeys(asrVendor)
     fun hasLlmKeys(): Boolean {
+        // 免费 LLM 服务启用时，无需检查 API Key
+        if (sfFreeLlmEnabled) return true
+
         val p = getActiveLlmProvider()
         return if (p != null) {
             p.endpoint.isNotBlank() && p.model.isNotBlank()
@@ -1121,6 +1145,11 @@ class Prefs(context: Context) {
         private const val KEY_SF_MODEL = "sf_model"
         private const val KEY_SF_USE_OMNI = "sf_use_omni"
         private const val KEY_SF_OMNI_PROMPT = "sf_omni_prompt"
+        // SiliconFlow 免费服务
+        private const val KEY_SF_FREE_ASR_ENABLED = "sf_free_asr_enabled"
+        private const val KEY_SF_FREE_ASR_MODEL = "sf_free_asr_model"
+        private const val KEY_SF_FREE_LLM_ENABLED = "sf_free_llm_enabled"
+        private const val KEY_SF_FREE_LLM_MODEL = "sf_free_llm_model"
         private const val KEY_ELEVEN_API_KEY = "eleven_api_key"
         private const val KEY_ELEVEN_STREAMING_ENABLED = "eleven_streaming_enabled"
         private const val KEY_ELEVEN_LANGUAGE_CODE = "eleven_language_code"
@@ -1230,6 +1259,20 @@ class Prefs(context: Context) {
         const val DEFAULT_SF_MODEL = "FunAudioLLM/SenseVoiceSmall"
         const val DEFAULT_SF_OMNI_MODEL = "Qwen/Qwen3-Omni-30B-A3B-Instruct"
         const val DEFAULT_SF_OMNI_PROMPT = "请将以下音频逐字转写为文本，不要输出解释或前后缀。输入语言可能是中文、英文或其他语言"
+
+        // SiliconFlow 免费服务模型配置
+        const val DEFAULT_SF_FREE_ASR_MODEL = "FunAudioLLM/SenseVoiceSmall"  // 免费 ASR 默认模型
+        const val DEFAULT_SF_FREE_LLM_MODEL = "Qwen/Qwen3-8B"  // 免费 LLM 默认模型
+        // 免费 ASR 可选模型列表
+        val SF_FREE_ASR_MODELS = listOf(
+            "FunAudioLLM/SenseVoiceSmall",
+            "TeleAI/TeleSpeechASR"
+        )
+        // 免费 LLM 可选模型列表
+        val SF_FREE_LLM_MODELS = listOf(
+            "Qwen/Qwen3-8B",
+            "THUDM/GLM-4-9B-0414"
+        )
 
         // OpenAI Audio Transcriptions 默认值
         const val DEFAULT_OA_ASR_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions"

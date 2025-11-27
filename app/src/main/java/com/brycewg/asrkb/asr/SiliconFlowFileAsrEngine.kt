@@ -3,6 +3,7 @@ package com.brycewg.asrkb.asr
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import com.brycewg.asrkb.BuildConfig
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.store.Prefs
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +20,9 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 使用 SiliconFlow "audio/transcriptions" API 的非流式 ASR 引擎。
+ * 支持两种模式：
+ * 1. 自有 API Key 模式：使用用户自己的 API Key
+ * 2. 免费服务模式：调用免费模型
  */
 class SiliconFlowFileAsrEngine(
     context: Context,
@@ -44,11 +48,22 @@ class SiliconFlowFileAsrEngine(
         .callTimeout(180, TimeUnit.SECONDS)
         .build()
 
+    private val useFreeService: Boolean get() = prefs.sfFreeAsrEnabled
+    private val freeApiKey: String get() = BuildConfig.SF_FREE_API_KEY
+
     override fun ensureReady(): Boolean {
         if (!super.ensureReady()) return false
-        if (prefs.sfApiKey.isBlank()) {
-            listener.onError(context.getString(R.string.error_missing_siliconflow_key))
-            return false
+        // 免费服务模式无需 API Key，自有模式需要用户 API Key
+        if (useFreeService) {
+            if (freeApiKey.isBlank()) {
+                listener.onError(context.getString(R.string.error_sf_free_service_unavailable))
+                return false
+            }
+        } else {
+            if (prefs.sfApiKey.isBlank()) {
+                listener.onError(context.getString(R.string.error_missing_siliconflow_key))
+                return false
+            }
         }
         return true
     }
@@ -56,87 +71,157 @@ class SiliconFlowFileAsrEngine(
     override suspend fun recognize(pcm: ByteArray) {
         try {
             val wav = pcmToWav(pcm)
-            val apiKey = prefs.sfApiKey
             val t0 = System.nanoTime()
-            val selectedModel = prefs.sfModel.ifBlank { Prefs.DEFAULT_SF_MODEL }
-            val isOmni = selectedModel.startsWith("Qwen/Qwen3-Omni-30B-A3B-")
-            if (isOmni) {
-                val b64 = Base64.encodeToString(wav, Base64.NO_WRAP)
-                // Qwen3-Omni 通过 chat/completions，支持提示词
-                val model = if (selectedModel.isNotBlank()) selectedModel else Prefs.DEFAULT_SF_OMNI_MODEL
-                val basePrompt = prefs.sfOmniPrompt.ifBlank { Prefs.DEFAULT_SF_OMNI_PROMPT }
-                val prompt = basePrompt
-                val body = buildSfChatCompletionsBody(model, b64, prompt)
-                val request = Request.Builder()
-                    .url(Prefs.SF_CHAT_COMPLETIONS_ENDPOINT)
-                    .addHeader("Authorization", "Bearer $apiKey")
-                    .addHeader("Content-Type", "application/json; charset=utf-8")
-                    .post(body.toRequestBody("application/json; charset=utf-8".toMediaType()))
-                    .build()
-                val resp = http.newCall(request).execute()
-                resp.use { r ->
-                    val str = r.body?.string().orEmpty()
-                    if (!r.isSuccessful) {
-                        val detail = formatHttpDetail(r.message, null)
-                        listener.onError(
-                            context.getString(R.string.error_request_failed_http, r.code, detail)
-                        )
-                        return
-                    }
-                    val text = parseSfChatText(str)
-                    if (text.isNotBlank()) {
-                        val dt = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0)
-                        try { onRequestDuration?.invoke(dt) } catch (_: Throwable) {}
-                        listener.onFinal(text)
-                    } else {
-                        listener.onError(context.getString(R.string.error_asr_empty_result))
-                    }
-                }
+
+            if (useFreeService) {
+                // 免费服务模式
+                recognizeWithFreeService(wav, t0)
             } else {
-                val tmp = File.createTempFile("asr_", ".wav", context.cacheDir)
-                FileOutputStream(tmp).use { it.write(wav) }
-                // 其他模型走 transcriptions
-                val model = selectedModel
-                val multipart = MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart("model", model)
-                    .addFormDataPart(
-                        "file",
-                        "audio.wav",
-                        tmp.asRequestBody("audio/wav".toMediaType())
-                    )
-                    .build()
-                val request = Request.Builder()
-                    .url(Prefs.SF_ENDPOINT)
-                    .addHeader("Authorization", "Bearer $apiKey")
-                    .post(multipart)
-                    .build()
-                val resp = http.newCall(request).execute()
-                resp.use { r ->
-                    if (!r.isSuccessful) {
-                        val detail = formatHttpDetail(r.message, null)
-                        listener.onError(
-                            context.getString(R.string.error_request_failed_http, r.code, detail)
-                        )
-                        return
-                    }
-                    val bodyStr = r.body?.string().orEmpty()
-                    val text = try {
-                        val obj = JSONObject(bodyStr)
-                        obj.optString("text", "")
-                    } catch (_: Throwable) { "" }
-                    if (text.isNotBlank()) {
-                        val dt = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0)
-                        try { onRequestDuration?.invoke(dt) } catch (_: Throwable) {}
-                        listener.onFinal(text)
-                    } else {
-                        listener.onError(context.getString(R.string.error_asr_empty_result))
-                    }
-                }
+                // 自有 API Key 模式
+                recognizeWithApiKey(wav, t0)
             }
         } catch (t: Throwable) {
             listener.onError(
                 context.getString(R.string.error_recognize_failed_with_reason, t.message ?: "")
             )
+        }
+    }
+
+    private fun recognizeWithFreeService(wav: ByteArray, t0: Long) {
+        val tmp = File.createTempFile("asr_", ".wav", context.cacheDir)
+        FileOutputStream(tmp).use { it.write(wav) }
+
+        try {
+            val model = prefs.sfFreeAsrModel.ifBlank { Prefs.DEFAULT_SF_FREE_ASR_MODEL }
+
+            val multipart = MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("model", model)
+                .addFormDataPart(
+                    "file",
+                    "audio.wav",
+                    tmp.asRequestBody("audio/wav".toMediaType())
+                )
+                .build()
+
+            val request = Request.Builder()
+                .url(Prefs.SF_ENDPOINT)
+                .addHeader("Authorization", "Bearer $freeApiKey")
+                .post(multipart)
+                .build()
+
+            val resp = http.newCall(request).execute()
+            resp.use { r ->
+                val bodyStr = r.body?.string().orEmpty()
+                if (!r.isSuccessful) {
+                    val detail = formatHttpDetail(r.message, null)
+                    listener.onError(
+                        context.getString(R.string.error_request_failed_http, r.code, detail)
+                    )
+                    return
+                }
+                val text = try {
+                    val obj = JSONObject(bodyStr)
+                    obj.optString("text", "")
+                } catch (_: Throwable) { "" }
+                if (text.isNotBlank()) {
+                    val dt = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0)
+                    try { onRequestDuration?.invoke(dt) } catch (_: Throwable) {}
+                    listener.onFinal(text)
+                } else {
+                    listener.onError(context.getString(R.string.error_asr_empty_result))
+                }
+            }
+        } finally {
+            try {
+                if (!tmp.delete()) {
+                    tmp.deleteOnExit()
+                }
+            } catch (t: Throwable) {
+                Log.w(TAG, "Failed to delete SiliconFlow temp wav", t)
+            }
+        }
+    }
+
+    /**
+     * 使用自有 API Key 进行识别
+     */
+    private fun recognizeWithApiKey(wav: ByteArray, t0: Long) {
+        val apiKey = prefs.sfApiKey
+        val selectedModel = prefs.sfModel.ifBlank { Prefs.DEFAULT_SF_MODEL }
+        val isOmni = selectedModel.startsWith("Qwen/Qwen3-Omni-30B-A3B-")
+
+        if (isOmni) {
+            val b64 = Base64.encodeToString(wav, Base64.NO_WRAP)
+            // Qwen3-Omni 通过 chat/completions，支持提示词
+            val model = if (selectedModel.isNotBlank()) selectedModel else Prefs.DEFAULT_SF_OMNI_MODEL
+            val basePrompt = prefs.sfOmniPrompt.ifBlank { Prefs.DEFAULT_SF_OMNI_PROMPT }
+            val prompt = basePrompt
+            val body = buildSfChatCompletionsBody(model, b64, prompt)
+            val request = Request.Builder()
+                .url(Prefs.SF_CHAT_COMPLETIONS_ENDPOINT)
+                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("Content-Type", "application/json; charset=utf-8")
+                .post(body.toRequestBody("application/json; charset=utf-8".toMediaType()))
+                .build()
+            val resp = http.newCall(request).execute()
+            resp.use { r ->
+                val str = r.body?.string().orEmpty()
+                if (!r.isSuccessful) {
+                    val detail = formatHttpDetail(r.message, null)
+                    listener.onError(
+                        context.getString(R.string.error_request_failed_http, r.code, detail)
+                    )
+                    return
+                }
+                val text = parseSfChatText(str)
+                if (text.isNotBlank()) {
+                    val dt = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0)
+                    try { onRequestDuration?.invoke(dt) } catch (_: Throwable) {}
+                    listener.onFinal(text)
+                } else {
+                    listener.onError(context.getString(R.string.error_asr_empty_result))
+                }
+            }
+        } else {
+            val tmp = File.createTempFile("asr_", ".wav", context.cacheDir)
+            FileOutputStream(tmp).use { it.write(wav) }
+            // 其他模型走 transcriptions
+            val model = selectedModel
+            val multipart = MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("model", model)
+                .addFormDataPart(
+                    "file",
+                    "audio.wav",
+                    tmp.asRequestBody("audio/wav".toMediaType())
+                )
+                .build()
+            val request = Request.Builder()
+                .url(Prefs.SF_ENDPOINT)
+                .addHeader("Authorization", "Bearer $apiKey")
+                .post(multipart)
+                .build()
+            val resp = http.newCall(request).execute()
+            resp.use { r ->
+                if (!r.isSuccessful) {
+                    val detail = formatHttpDetail(r.message, null)
+                    listener.onError(
+                        context.getString(R.string.error_request_failed_http, r.code, detail)
+                    )
+                    return
+                }
+                val bodyStr = r.body?.string().orEmpty()
+                val text = try {
+                    val obj = JSONObject(bodyStr)
+                    obj.optString("text", "")
+                } catch (_: Throwable) { "" }
+                if (text.isNotBlank()) {
+                    val dt = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0)
+                    try { onRequestDuration?.invoke(dt) } catch (_: Throwable) {}
+                    listener.onFinal(text)
+                } else {
+                    listener.onError(context.getString(R.string.error_asr_empty_result))
+                }
+            }
         }
     }
 

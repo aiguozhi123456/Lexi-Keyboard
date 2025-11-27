@@ -68,136 +68,199 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-      <TextView
+      <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchSfFreeLlmEnabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/label_llm_choose_profile"
-        android:textColor="?attr/colorOnSurface"
-        android:textStyle="bold" />
+        android:text="@string/label_sf_free_llm_enabled" />
 
-      <TextView
-        android:id="@+id/tvLlmProfilesValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:text="@string/untitled_profile" />
-      <Spinner
-          android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
-      <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        android:hint="@string/label_llm_profile_name">
-
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etLlmProfileName"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:inputType="text"
-          android:textColor="?attr/colorOnSurface"
-          android:textColorHint="?attr/colorOnSurfaceVariant" />
-      </com.google.android.material.textfield.TextInputLayout>
-
+      <!-- 免费 LLM 详情（仅在开启时显示） -->
       <LinearLayout
+        android:id="@+id/groupSfFreeLlm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="4dp">
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnLlmAddProfile"
-          android:layout_width="0dp"
+        <TextView
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          style="@style/Widget.Material3.Button.TonalButton"
-          android:text="@string/btn_llm_add_profile" />
+          android:layout_marginTop="4dp"
+          android:text="@string/sf_free_llm_description"
+          android:textColor="?attr/colorOnSurfaceVariant"
+          android:textSize="12sp" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnLlmDeleteProfile"
-          android:layout_width="0dp"
+        <TextView
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginStart="8dp"
-          android:layout_weight="1"
-          style="@style/Widget.Material3.Button.OutlinedButton"
-          android:text="@string/btn_llm_delete_profile" />
+          android:layout_marginTop="8dp"
+          android:text="@string/label_sf_free_llm_model"
+          android:textColor="?attr/colorOnSurface"
+          android:textStyle="bold" />
+
+        <TextView
+          android:id="@+id/tvSfFreeLlmModel"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="8dp"
+          android:paddingBottom="8dp"
+          android:clickable="true"
+          android:focusable="true"
+          android:foreground="?attr/selectableItemBackground"
+          android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- Powered by SiliconFlow Logo -->
+        <ImageView
+          android:id="@+id/imgSfFreeLlmPoweredBy"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:adjustViewBounds="true"
+          android:scaleType="fitCenter"
+          android:src="@drawable/powered_by_siliconflow_light"
+          android:contentDescription="@string/sf_powered_by_desc" />
       </LinearLayout>
 
-      <com.google.android.material.textfield.TextInputLayout
+      <!-- 自定义 LLM 配置 -->
+      <LinearLayout
+        android:id="@+id/groupCustomLlm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        android:hint="@string/label_llm_endpoint">
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etLlmEndpoint"
+        <TextView
+          android:id="@+id/titleCustomLlm"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:inputType="textUri"
+          android:layout_marginTop="8dp"
+          android:text="@string/label_llm_choose_profile"
           android:textColor="?attr/colorOnSurface"
-          android:textColorHint="?attr/colorOnSurfaceVariant" />
-      </com.google.android.material.textfield.TextInputLayout>
+          android:textStyle="bold" />
 
-      <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        android:hint="@string/label_llm_api_key">
-
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etLlmApiKey"
+        <TextView
+          android:id="@+id/tvLlmProfilesValue"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:inputType="textPassword"
-          android:textColor="?attr/colorOnSurface"
-          android:textColorHint="?attr/colorOnSurfaceVariant" />
-      </com.google.android.material.textfield.TextInputLayout>
+          android:paddingTop="8dp"
+          android:paddingBottom="8dp"
+          android:clickable="true"
+          android:focusable="true"
+          android:foreground="?attr/selectableItemBackground"
+          android:textColor="?attr/colorOnSurfaceVariant"
+          android:text="@string/untitled_profile" />
+        <Spinner
+            android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:visibility="gone" />
 
-      <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        android:hint="@string/label_llm_model">
-
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etLlmModel"
+        <com.google.android.material.textfield.TextInputLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:inputType="text"
-          android:textColor="?attr/colorOnSurface"
-          android:textColorHint="?attr/colorOnSurfaceVariant" />
-      </com.google.android.material.textfield.TextInputLayout>
+          app:boxBackgroundMode="outline"
+          android:hint="@string/label_llm_profile_name">
 
-      <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        android:hint="@string/label_llm_temperature">
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLlmProfileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-          android:id="@+id/etLlmTemperature"
+        <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:inputType="numberDecimal"
-          android:textColor="?attr/colorOnSurface"
-          android:textColorHint="?attr/colorOnSurfaceVariant" />
-      </com.google.android.material.textfield.TextInputLayout>
+          android:orientation="horizontal"
+          android:layout_marginTop="4dp">
 
-      <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLlmTestCall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:text="@string/btn_llm_test_call" />
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLlmAddProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:text="@string/btn_llm_add_profile" />
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLlmDeleteProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:text="@string/btn_llm_delete_profile" />
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxBackgroundMode="outline"
+          android:hint="@string/label_llm_endpoint">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLlmEndpoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxBackgroundMode="outline"
+          android:hint="@string/label_llm_api_key">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLlmApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxBackgroundMode="outline"
+          android:hint="@string/label_llm_model">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLlmModel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:boxBackgroundMode="outline"
+          android:hint="@string/label_llm_temperature">
+
+          <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLlmTemperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+          android:id="@+id/btnLlmTestCall"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          style="@style/Widget.Material3.Button.TonalButton"
+          android:text="@string/btn_llm_test_call" />
+      </LinearLayout>
 
       <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"

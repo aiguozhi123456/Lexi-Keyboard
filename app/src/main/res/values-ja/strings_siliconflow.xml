@@ -8,4 +8,21 @@
     <string name="label_sf_model_select">モデルを選択</string>
     <string name="sf_model_default_display">FunAudioLLM/SenseVoiceSmall</string>
     <string name="label_sf_omni_prompt">マルチモーダル文字起こしプロンプト（オプション）</string>
+
+    <!-- SiliconFlow 無料サービス（ASR） -->
+    <string name="label_sf_free_enabled">無料サービスを使用</string>
+    <string name="sf_free_description">SiliconFlow から寛大に提供された無料サービスで、すぐに AI 音声認識を体験できます。APIキー不要。</string>
+
+    <!-- SiliconFlow 無料サービス（LLM） -->
+    <string name="sf_free_llm_description">SiliconFlow から寛大に提供された無料AI後処理サービス。APIキー不要。</string>
+    <string name="label_sf_free_llm_enabled">SiliconFlow 提供の無料モデルを使用</string>
+    <string name="label_sf_free_llm_model">後処理モデルを選択</string>
+
+    <!-- SiliconFlow 無料サービスエラーメッセージ -->
+    <string name="error_sf_free_quota_exceeded">無料サービスの使用量が上限を超えました。後でもう一度お試しください</string>
+    <string name="error_sf_free_auth_failed">無料サービスの認証に失敗しました</string>
+    <string name="error_sf_free_service_unavailable">無料サービスは一時的に利用できません</string>
+
+    <!-- SiliconFlow Powered By -->
+    <string name="sf_powered_by_desc">Powered by SiliconFlow</string>
 </resources>

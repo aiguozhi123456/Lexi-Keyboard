@@ -990,19 +990,28 @@ class SettingsActivity : AppCompatActivity() {
      */
     private fun showModelSelectionGuide() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_model_selection, null, false)
+        val cardSfFree = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardSiliconFlowFree)
         val cardLocal = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardLocalModel)
         val cardOnline = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardOnlineModel)
 
-        // 设置初始选中状态
-        cardLocal.isChecked = true
+        // 设置初始选中状态（硅基流动免费服务为默认）
+        cardSfFree.isChecked = true
+        cardLocal.isChecked = false
         cardOnline.isChecked = false
 
         // 点击卡片切换选中状态（单选逻辑）
+        cardSfFree.setOnClickListener {
+            cardSfFree.isChecked = true
+            cardLocal.isChecked = false
+            cardOnline.isChecked = false
+        }
         cardLocal.setOnClickListener {
+            cardSfFree.isChecked = false
             cardLocal.isChecked = true
             cardOnline.isChecked = false
         }
         cardOnline.setOnClickListener {
+            cardSfFree.isChecked = false
             cardLocal.isChecked = false
             cardOnline.isChecked = true
         }
@@ -1022,11 +1031,26 @@ class SettingsActivity : AppCompatActivity() {
             positiveButton.setOnClickListener {
                 // 根据选择执行不同的操作
                 when {
+                    cardSfFree.isChecked -> {
+                        // 选择硅基流动免费服务：设置 vendor 和启用免费服务
+                        val prefs = Prefs(this)
+                        prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SiliconFlow
+                        prefs.sfFreeAsrEnabled = true
+                        prefs.sfFreeLlmEnabled = true
+                        dialog.dismiss()
+                        Toast.makeText(
+                            this,
+                            getString(R.string.model_guide_sf_free_ready),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                     cardLocal.isChecked -> {
                         // 选择本地模型：先切换 vendor，然后显示镜像源选择
                         val prefs = Prefs(this)
                         prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SenseVoice
                         prefs.svModelVariant = "small-full"
+                        prefs.sfFreeAsrEnabled = false
+                        prefs.sfFreeLlmEnabled = false
 
                         dialog.dismiss()
 
@@ -1034,7 +1058,10 @@ class SettingsActivity : AppCompatActivity() {
                         showModelDownloadSourceDialog()
                     }
                     cardOnline.isChecked -> {
-                        // 选择在线模型：显示配置指南对话框
+                        // 选择在线模型：禁用免费服务，显示配置指南对话框
+                        val prefs = Prefs(this)
+                        prefs.sfFreeAsrEnabled = false
+                        prefs.sfFreeLlmEnabled = false
                         dialog.dismiss()
                         showOnlineModelConfigGuide()
                     }

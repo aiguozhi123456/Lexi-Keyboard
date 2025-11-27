@@ -1,5 +1,6 @@
 package com.brycewg.asrkb.ui.settings.ai
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,6 +8,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -51,6 +53,12 @@ class AiPostSettingsActivity : AppCompatActivity() {
     private lateinit var btnDeletePromptPreset: Button
     private lateinit var switchAiEditPreferLastAsr: MaterialSwitch
     private lateinit var etSkipAiUnderChars: EditText
+
+    // SiliconFlow Free LLM Views
+    private lateinit var groupSfFreeLlm: View
+    private lateinit var switchSfFreeLlmEnabled: MaterialSwitch
+    private lateinit var tvSfFreeLlmModel: TextView
+    private lateinit var groupCustomLlm: View
 
     // Flag to prevent recursive updates during programmatic text changes
     private var isUpdatingProgrammatically = false
@@ -127,6 +135,74 @@ class AiPostSettingsActivity : AppCompatActivity() {
             val coerced = num.coerceIn(0, 1000)
             prefs.postprocSkipUnderChars = coerced
         }
+
+        // SiliconFlow 免费 LLM 服务
+        groupSfFreeLlm = findViewById(R.id.groupSfFreeLlm)
+        switchSfFreeLlmEnabled = findViewById(R.id.switchSfFreeLlmEnabled)
+        tvSfFreeLlmModel = findViewById(R.id.tvSfFreeLlmModel)
+        groupCustomLlm = findViewById(R.id.groupCustomLlm)
+
+        // 根据深色模式设置 Powered by 图片
+        val imgSfFreeLlmPoweredBy = findViewById<ImageView>(R.id.imgSfFreeLlmPoweredBy)
+        val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        imgSfFreeLlmPoweredBy.setImageResource(
+            if (isDarkMode) R.drawable.powered_by_siliconflow_dark else R.drawable.powered_by_siliconflow_light
+        )
+
+        // 初始化免费服务开关状态
+        switchSfFreeLlmEnabled.isChecked = prefs.sfFreeLlmEnabled
+        updateSfFreeLlmModelDisplay()
+        updateSfFreeLlmVisibility()
+
+        // 免费服务开关监听
+        switchSfFreeLlmEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.sfFreeLlmEnabled = isChecked
+            updateSfFreeLlmVisibility()
+            hapticTapIfEnabled(switchSfFreeLlmEnabled)
+        }
+
+        // 免费服务模型选择
+        tvSfFreeLlmModel.setOnClickListener {
+            showSfFreeLlmModelSelectionDialog()
+        }
+    }
+
+    /**
+     * Updates the display of the selected free LLM model
+     */
+    private fun updateSfFreeLlmModelDisplay() {
+        tvSfFreeLlmModel.text = prefs.sfFreeLlmModel
+    }
+
+    /**
+     * Updates the visibility of free LLM details and custom LLM configuration based on free service state
+     */
+    private fun updateSfFreeLlmVisibility() {
+        val isFreeEnabled = prefs.sfFreeLlmEnabled
+        // 开启免费服务时：显示免费服务详情，隐藏自定义LLM配置
+        // 关闭免费服务时：隐藏免费服务详情，显示自定义LLM配置
+        groupSfFreeLlm.visibility = if (isFreeEnabled) View.VISIBLE else View.GONE
+        groupCustomLlm.visibility = if (isFreeEnabled) View.GONE else View.VISIBLE
+    }
+
+    /**
+     * Shows dialog to select free LLM model
+     */
+    private fun showSfFreeLlmModelSelectionDialog() {
+        val models = Prefs.SF_FREE_LLM_MODELS.toTypedArray()
+        val currentModel = prefs.sfFreeLlmModel
+        val selectedIndex = models.indexOf(currentModel).coerceAtLeast(0)
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.label_sf_free_llm_model)
+            .setSingleChoiceItems(models, selectedIndex) { dialog, which ->
+                val selected = models.getOrNull(which) ?: return@setSingleChoiceItems
+                prefs.sfFreeLlmModel = selected
+                updateSfFreeLlmModelDisplay()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
     /**

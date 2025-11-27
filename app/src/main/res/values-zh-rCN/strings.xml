@@ -166,10 +166,14 @@
   <!-- 模型选择引导 -->
   <string name="model_guide_title">选择语音识别模型</string>
   <string name="model_guide_message">使用言犀键盘前，请先选择语音识别模型类型：</string>
+  <string name="model_guide_option_sf_free">⭐ 免费云服务（推荐）</string>
+  <string name="model_guide_option_sf_free_desc">无需任何配置，由硅基流动提供支持。包含免费的语音识别和 AI 文本优化。</string>
+  <string name="model_guide_option_sf_free_action">开箱即用，有免费用量限制</string>
+  <string name="model_guide_sf_free_ready">免费服务已启用，可以开始使用！</string>
   <string name="model_guide_option_local">📦 使用本地模型</string>
   <string name="model_guide_option_local_desc">无需配置密钥，可以离线使用，隐私更安全</string>
   <string name="model_guide_option_local_action">将下载 SenseVoice 模型（约1GB）并启用离线识别</string>
-  <string name="model_guide_option_online">☁️ 使用在线模型</string>
+  <string name="model_guide_option_online">☁️ 使用在线模型（自定义）</string>
   <string name="model_guide_option_online_desc">识别更精准，支持多种供应商（火山引擎、OpenAI、Gemini 等），需要配置密钥</string>
   <string name="model_guide_option_online_action">将打开配置指南，帮助您完成密钥配置</string>
   <string name="model_guide_online_dialog_message">在线语音识别支持多种供应商（火山引擎、硅基流动、OpenAI、Gemini、阿里云百炼、Soniox、ElevenLabs 等），请参阅配置指南了解详细步骤。</string>

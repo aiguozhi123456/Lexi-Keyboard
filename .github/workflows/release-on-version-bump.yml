@@ -255,6 +255,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SF_FREE_API_KEY: ${{ secrets.SF_FREE_API_KEY }}
         run: |
           echo "使用签名密钥构建 Release APK..."
           ./gradlew --no-daemon clean :app:assembleRelease
@@ -262,6 +263,8 @@ jobs:
 
       - name: Build Debug APK (fallback)
         if: steps.version.outputs.changed == 'true' && steps.check_keystore.outputs.has_keystore != 'true'
+        env:
+          SF_FREE_API_KEY: ${{ secrets.SF_FREE_API_KEY }}
         run: |
           echo "未配置签名密钥,构建 Debug APK..."
           ./gradlew --no-daemon clean :app:assembleDebug

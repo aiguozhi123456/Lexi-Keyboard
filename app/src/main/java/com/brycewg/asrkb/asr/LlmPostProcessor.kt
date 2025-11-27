@@ -1,6 +1,7 @@
 package com.brycewg.asrkb.asr
 
 import android.util.Log
+import com.brycewg.asrkb.BuildConfig
 import com.brycewg.asrkb.store.Prefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,11 +19,6 @@ import java.util.concurrent.TimeUnit
  */
 class LlmPostProcessor(private val client: OkHttpClient? = null) {
   private val jsonMedia = "application/json; charset=utf-8".toMediaType()
-
-  companion object {
-    private const val TAG = "LlmPostProcessor"
-    private const val DEFAULT_TIMEOUT_SECONDS = 30L
-  }
 
   /**
    * LLM 测试结果
@@ -66,10 +62,25 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
     val temperature: Double
   )
 
+  companion object {
+    private const val TAG = "LlmPostProcessor"
+    private const val DEFAULT_TIMEOUT_SECONDS = 30L
+  }
+
   /**
    * 从 Prefs 获取活动的 LLM 配置
    */
   private fun getActiveConfig(prefs: Prefs): LlmRequestConfig {
+    // 检查是否启用免费 LLM 服务
+    if (prefs.sfFreeLlmEnabled) {
+      return LlmRequestConfig(
+        apiKey = BuildConfig.SF_FREE_API_KEY,
+        endpoint = Prefs.SF_CHAT_COMPLETIONS_ENDPOINT,
+        model = prefs.sfFreeLlmModel,
+        temperature = Prefs.DEFAULT_LLM_TEMPERATURE.toDouble()
+      )
+    }
+
     val active = prefs.getActiveLlmProvider()
     return LlmRequestConfig(
       apiKey = active?.apiKey ?: prefs.llmApiKey,

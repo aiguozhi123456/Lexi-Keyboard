@@ -19,6 +19,9 @@ android {
         ndk {
             abiFilters += listOf("arm64-v8a")
         }
+
+        // 从环境变量注入免费服务内置 API Key（GitHub Secrets）
+        buildConfigField("String", "SF_FREE_API_KEY", "\"${System.getenv("SF_FREE_API_KEY") ?: "sk-ushefhzyqmarvaufeaivopuupsrqtdyrjvdzpwpktbruixpl"}\"")
     }
 
     signingConfigs {

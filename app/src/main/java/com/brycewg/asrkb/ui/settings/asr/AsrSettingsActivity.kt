@@ -1,6 +1,7 @@
 package com.brycewg.asrkb.ui.settings.asr
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -8,6 +9,7 @@ import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -400,11 +402,63 @@ class AsrSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupSiliconFlowSettings() {
+        // 免费服务开关与 UI 切换
+        val switchSfFreeEnabled = findViewById<MaterialSwitch>(R.id.switchSfFreeEnabled)
+        val groupSfFreeModel = findViewById<View>(R.id.groupSfFreeModel)
+        val groupSfApiKey = findViewById<View>(R.id.groupSfApiKey)
+        val tvSfFreeModelValue = findViewById<TextView>(R.id.tvSfFreeModelValue)
+        val imgSfFreePoweredBy = findViewById<ImageView>(R.id.imgSfFreePoweredBy)
+
+        // 根据深色模式设置 Powered by 图片
+        val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        imgSfFreePoweredBy.setImageResource(
+            if (isDarkMode) R.drawable.powered_by_siliconflow_dark else R.drawable.powered_by_siliconflow_light
+        )
+
+        fun updateSfFreeUi(freeEnabled: Boolean) {
+            groupSfFreeModel.visibility = if (freeEnabled) View.VISIBLE else View.GONE
+            groupSfApiKey.visibility = if (freeEnabled) View.GONE else View.VISIBLE
+        }
+
+        // 初始化免费服务开关
+        switchSfFreeEnabled.isChecked = prefs.sfFreeAsrEnabled
+        updateSfFreeUi(prefs.sfFreeAsrEnabled)
+
+        switchSfFreeEnabled.setOnCheckedChangeListener { _, isChecked ->
+            prefs.sfFreeAsrEnabled = isChecked
+            updateSfFreeUi(isChecked)
+            hapticTapIfEnabled(switchSfFreeEnabled)
+        }
+
+        // 免费服务模型选择
+        val sfFreeModels = Prefs.SF_FREE_ASR_MODELS
+        val initialFreeModel = prefs.sfFreeAsrModel.ifBlank { Prefs.DEFAULT_SF_FREE_ASR_MODEL }
+        if (initialFreeModel != prefs.sfFreeAsrModel) prefs.sfFreeAsrModel = initialFreeModel
+        tvSfFreeModelValue.text = initialFreeModel
+
+        tvSfFreeModelValue.setOnClickListener { v ->
+            hapticTapIfEnabled(v)
+            val curIdx = sfFreeModels.indexOf(prefs.sfFreeAsrModel).coerceAtLeast(0)
+            showSingleChoiceDialog(
+                titleResId = R.string.label_sf_model_select,
+                items = sfFreeModels.toTypedArray(),
+                currentIndex = curIdx
+            ) { which ->
+                val selected = sfFreeModels.getOrNull(which) ?: Prefs.DEFAULT_SF_FREE_ASR_MODEL
+                if (selected != prefs.sfFreeAsrModel) {
+                    prefs.sfFreeAsrModel = selected
+                    tvSfFreeModelValue.text = selected
+                }
+            }
+        }
+
+        // 自有 API Key 配置
         findViewById<EditText>(R.id.etSfApiKey).apply {
             setText(prefs.sfApiKey)
             bindString { prefs.sfApiKey = it }
         }
-        // 模型选项：提供四种可用模型
+
+        // 自有 API Key 模型选项
         val tvSfModelValue = findViewById<TextView>(R.id.tvSfModelValue)
         val sfModels = listOf(
             "Qwen/Qwen3-Omni-30B-A3B-Instruct",
@@ -416,12 +470,10 @@ class AsrSettingsActivity : AppCompatActivity() {
             return model.startsWith("Qwen/Qwen3-Omni-30B-A3B-")
         }
         fun ensureValidModel(current: String): String {
-            // 若现有值不在可选列表内，则根据是否可能是旧 Omni 开关选择合适默认
             return if (current in sfModels) current else {
                 if (prefs.sfUseOmni) Prefs.DEFAULT_SF_OMNI_MODEL else Prefs.DEFAULT_SF_MODEL
             }
         }
-        // 初始化显示与容错
         val initialModel = ensureValidModel(prefs.sfModel.ifBlank { Prefs.DEFAULT_SF_MODEL })
         if (initialModel != prefs.sfModel) prefs.sfModel = initialModel
         tvSfModelValue.text = initialModel
@@ -438,7 +490,6 @@ class AsrSettingsActivity : AppCompatActivity() {
                 if (selected != prefs.sfModel) {
                     prefs.sfModel = selected
                     tvSfModelValue.text = selected
-                    // 根据模型自动决定是否显示 Omni 提示词框
                     viewModel.updateSfUseOmni(isOmni(selected))
                 }
             }

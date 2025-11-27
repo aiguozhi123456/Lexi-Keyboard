@@ -10,8 +10,8 @@ import com.brycewg.asrkb.asr.AsrVendor
 object AsrVendorUi {
   /** 固定的供应商顺序（设置页/菜单统一使用） */
   fun ordered(): List<AsrVendor> = listOf(
-    AsrVendor.Volc,
     AsrVendor.SiliconFlow,
+    AsrVendor.Volc,
     AsrVendor.ElevenLabs,
     AsrVendor.OpenAI,
     AsrVendor.DashScope,

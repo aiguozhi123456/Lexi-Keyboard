@@ -250,69 +250,130 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- 免费服务开关 -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+          android:id="@+id/switchSfFreeEnabled"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          app:boxBackgroundMode="outline"
-          android:hint="@string/label_sf_api_key">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSfApiKey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:textColor="?attr/colorOnSurface"
-            android:textColorHint="?attr/colorOnSurfaceVariant" />
-        </com.google.android.material.textfield.TextInputLayout>
+          android:text="@string/label_sf_free_enabled" />
 
         <TextView
-          android:id="@+id/tvSfModelLabel"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          android:textColor="?attr/colorOnSurface"
-          android:text="@string/label_sf_model_select" />
-        <TextView
-          android:id="@+id/tvSfModelValue"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:paddingTop="8dp"
-          android:paddingBottom="8dp"
-          android:clickable="true"
-          android:focusable="true"
-          android:foreground="?attr/selectableItemBackground"
+          android:layout_marginTop="4dp"
           android:textColor="?attr/colorOnSurfaceVariant"
-          android:text="@string/sf_model_default_display" />
-        <Spinner
+          android:textSize="12sp"
+          android:text="@string/sf_free_description" />
+
+        <!-- 免费服务模型选择（仅在免费服务启用时显示） -->
+        <LinearLayout
+          android:id="@+id/groupSfFreeModel"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:visibility="gone" />
+          android:orientation="vertical"
+          android:visibility="gone">
 
-        <com.google.android.material.textfield.TextInputLayout
-          android:id="@+id/tilSfOmniPrompt"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          app:boxBackgroundMode="outline"
-          android:hint="@string/label_sf_omni_prompt">
-
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSfOmniPrompt"
+          <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:minLines="2"
-            android:gravity="top|start"
+            android:layout_marginTop="8dp"
             android:textColor="?attr/colorOnSurface"
-            android:textColorHint="?attr/colorOnSurfaceVariant" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:text="@string/label_sf_model_select" />
+          <TextView
+            android:id="@+id/tvSfFreeModelValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:text="@string/sf_model_default_display" />
 
-        <com.google.android.material.button.MaterialButton
-          android:id="@+id/btnSfGetKey"
+          <!-- Powered by SiliconFlow Logo -->
+          <ImageView
+            android:id="@+id/imgSfFreePoweredBy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/powered_by_siliconflow_light"
+            android:contentDescription="@string/sf_powered_by_desc" />
+        </LinearLayout>
+
+        <!-- 自有 API Key 配置（仅在免费服务禁用时显示） -->
+        <LinearLayout
+          android:id="@+id/groupSfApiKey"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="8dp"
-          style="@style/Widget.Material3.Button.TonalButton"
-          android:text="@string/btn_get_api_key_guide" />
+          android:orientation="vertical">
+
+          <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="@string/label_sf_api_key">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSfApiKey"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="textPassword"
+              android:textColor="?attr/colorOnSurface"
+              android:textColorHint="?attr/colorOnSurfaceVariant" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <TextView
+            android:id="@+id/tvSfModelLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="?attr/colorOnSurface"
+            android:text="@string/label_sf_model_select" />
+          <TextView
+            android:id="@+id/tvSfModelValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:text="@string/sf_model_default_display" />
+          <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSfOmniPrompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="outline"
+            android:hint="@string/label_sf_omni_prompt">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSfOmniPrompt"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="textMultiLine"
+              android:minLines="2"
+              android:gravity="top|start"
+              android:textColor="?attr/colorOnSurface"
+              android:textColorHint="?attr/colorOnSurfaceVariant" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSfGetKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:text="@string/btn_get_api_key_guide" />
+        </LinearLayout>
       </LinearLayout>
 
       <!-- ElevenLabs -->

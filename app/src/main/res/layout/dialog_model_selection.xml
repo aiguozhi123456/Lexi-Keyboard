@@ -9,6 +9,56 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
+    <!-- SiliconFlow Free Service Option Card (Recommended) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSiliconFlowFree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:checkable="true"
+        android:checked="true"
+        app:cardCornerRadius="24dp"
+        app:strokeWidth="2dp"
+        app:checkedIcon="@null"
+        style="@style/Widget.Material3.CardView.Outlined">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/model_guide_option_sf_free"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/model_guide_option_sf_free_desc"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/model_guide_option_sf_free_action"
+                android:textSize="12sp"
+                android:textColor="?attr/colorPrimary"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Local Model Option Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardLocalModel"
@@ -18,7 +68,7 @@
         android:clickable="true"
         android:focusable="true"
         android:checkable="true"
-        android:checked="true"
+        android:checked="false"
         app:cardCornerRadius="24dp"
         app:strokeWidth="2dp"
         app:checkedIcon="@null"
