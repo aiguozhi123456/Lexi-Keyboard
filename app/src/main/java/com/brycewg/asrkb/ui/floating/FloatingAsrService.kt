@@ -622,28 +622,28 @@ class FloatingAsrService : Service(),
         val center = viewManager.getBallCenterSnapshot()
         val alpha = try { prefs.floatingSwitcherAlpha } catch (_: Throwable) { 1.0f }
 
-        val items = listOf(
-            FloatingMenuHelper.MenuItem(
+        val items = buildList {
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.article,
                 getString(R.string.label_radial_switch_prompt),
                 getString(R.string.label_radial_switch_prompt)
-            ) { onPickPromptPresetFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { onPickPromptPresetFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.waveform,
                 getString(R.string.label_radial_switch_asr),
                 getString(R.string.label_radial_switch_asr)
-            ) { onPickAsrVendor() },
-            FloatingMenuHelper.MenuItem(
+            ) { onPickAsrVendor() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.keyboard,
                 getString(R.string.label_radial_switch_ime),
                 getString(R.string.label_radial_switch_ime)
-            ) { invokeImePickerFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { invokeImePickerFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.arrows_out_cardinal,
                 getString(R.string.label_radial_move),
                 getString(R.string.label_radial_move)
-            ) { enableMoveModeFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { enableMoveModeFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 if (try { prefs.autoStopOnSilenceEnabled } catch (_: Throwable) { false }) {
                     R.drawable.hand_palm_fill
                 } else {
@@ -651,8 +651,8 @@ class FloatingAsrService : Service(),
                 },
                 getString(R.string.label_radial_toggle_silence_autostop),
                 getString(R.string.label_radial_toggle_silence_autostop)
-            ) { toggleAutoStopSilenceFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { toggleAutoStopSilenceFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 if (try { prefs.postProcessEnabled } catch (_: Throwable) { false }) {
                     R.drawable.magic_wand_fill
                 } else {
@@ -660,23 +660,32 @@ class FloatingAsrService : Service(),
                 },
                 getString(R.string.label_radial_postproc),
                 getString(R.string.label_radial_postproc)
-            ) { togglePostprocFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { togglePostprocFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.textbox,
                 getString(R.string.label_radial_open_history),
                 getString(R.string.label_radial_open_history)
-            ) { showHistoryPanelFromMenu() },
-            FloatingMenuHelper.MenuItem(
-                R.drawable.cloud_arrow_up,
-                getString(R.string.label_radial_clipboard_upload),
-                getString(R.string.label_radial_clipboard_upload)
-            ) { uploadClipboardOnceFromMenu() },
-            FloatingMenuHelper.MenuItem(
-                R.drawable.cloud_arrow_down,
-                getString(R.string.label_radial_clipboard_pull),
-                getString(R.string.label_radial_clipboard_pull)
-            ) { pullClipboardOnceFromMenu() }
-        )
+            ) { showHistoryPanelFromMenu() })
+            // 剪贴板同步按钮仅在启用剪贴板同步功能时显示
+            if (try { prefs.syncClipboardEnabled } catch (_: Throwable) { false }) {
+                add(FloatingMenuHelper.MenuItem(
+                    R.drawable.cloud_arrow_up,
+                    getString(R.string.label_radial_clipboard_upload),
+                    getString(R.string.label_radial_clipboard_upload)
+                ) { uploadClipboardOnceFromMenu() })
+                add(FloatingMenuHelper.MenuItem(
+                    R.drawable.cloud_arrow_down,
+                    getString(R.string.label_radial_clipboard_pull),
+                    getString(R.string.label_radial_clipboard_pull)
+                ) { pullClipboardOnceFromMenu() })
+            }
+            // 设置按钮放在菜单最下方
+            add(FloatingMenuHelper.MenuItem(
+                R.drawable.gear,
+                getString(R.string.label_radial_open_settings),
+                getString(R.string.label_radial_open_settings)
+            ) { openSettingsFromMenu() })
+        }
 
         radialDragSession = menuHelper.showRadialMenuForDrag(center, alpha, items) {
             radialMenuView = null
@@ -738,29 +747,29 @@ class FloatingAsrService : Service(),
             1.0f
         }
 
-        val items = listOf(
-            FloatingMenuHelper.MenuItem(
+        val items = buildList {
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.article,
                 getString(R.string.label_radial_switch_prompt),
                 getString(R.string.label_radial_switch_prompt)
-            ) { onPickPromptPresetFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { onPickPromptPresetFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.waveform,
                 getString(R.string.label_radial_switch_asr),
                 getString(R.string.label_radial_switch_asr)
-            ) { onPickAsrVendor() },
-            FloatingMenuHelper.MenuItem(
+            ) { onPickAsrVendor() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.keyboard,
                 getString(R.string.label_radial_switch_ime),
                 getString(R.string.label_radial_switch_ime)
-            ) { invokeImePickerFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { invokeImePickerFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.arrows_out_cardinal,
                 getString(R.string.label_radial_move),
                 getString(R.string.label_radial_move)
-            ) { enableMoveModeFromMenu() },
+            ) { enableMoveModeFromMenu() })
             // 录音判停开关（与 ASR 设置一致）
-            FloatingMenuHelper.MenuItem(
+            add(FloatingMenuHelper.MenuItem(
                 if (try { prefs.autoStopOnSilenceEnabled } catch (_: Throwable) { false }) {
                     R.drawable.hand_palm_fill
                 } else {
@@ -768,8 +777,8 @@ class FloatingAsrService : Service(),
                 },
                 getString(R.string.label_radial_toggle_silence_autostop),
                 getString(R.string.label_radial_toggle_silence_autostop)
-            ) { toggleAutoStopSilenceFromMenu() },
-            FloatingMenuHelper.MenuItem(
+            ) { toggleAutoStopSilenceFromMenu() })
+            add(FloatingMenuHelper.MenuItem(
                 if (try { prefs.postProcessEnabled } catch (_: Throwable) { false }) {
                     R.drawable.magic_wand_fill
                 } else {
@@ -777,24 +786,33 @@ class FloatingAsrService : Service(),
                 },
                 getString(R.string.label_radial_postproc),
                 getString(R.string.label_radial_postproc)
-            ) { togglePostprocFromMenu() },
+            ) { togglePostprocFromMenu() })
             // 查看识别历史（简版面板）
-            FloatingMenuHelper.MenuItem(
+            add(FloatingMenuHelper.MenuItem(
                 R.drawable.textbox,
                 getString(R.string.label_radial_open_history),
                 getString(R.string.label_radial_open_history)
-            ) { showHistoryPanelFromMenu() },
-            FloatingMenuHelper.MenuItem(
-                R.drawable.cloud_arrow_up,
-                getString(R.string.label_radial_clipboard_upload),
-                getString(R.string.label_radial_clipboard_upload)
-            ) { uploadClipboardOnceFromMenu() },
-            FloatingMenuHelper.MenuItem(
-                R.drawable.cloud_arrow_down,
-                getString(R.string.label_radial_clipboard_pull),
-                getString(R.string.label_radial_clipboard_pull)
-            ) { pullClipboardOnceFromMenu() }
-        )
+            ) { showHistoryPanelFromMenu() })
+            // 剪贴板同步按钮仅在启用剪贴板同步功能时显示
+            if (try { prefs.syncClipboardEnabled } catch (_: Throwable) { false }) {
+                add(FloatingMenuHelper.MenuItem(
+                    R.drawable.cloud_arrow_up,
+                    getString(R.string.label_radial_clipboard_upload),
+                    getString(R.string.label_radial_clipboard_upload)
+                ) { uploadClipboardOnceFromMenu() })
+                add(FloatingMenuHelper.MenuItem(
+                    R.drawable.cloud_arrow_down,
+                    getString(R.string.label_radial_clipboard_pull),
+                    getString(R.string.label_radial_clipboard_pull)
+                ) { pullClipboardOnceFromMenu() })
+            }
+            // 设置按钮放在菜单最下方
+            add(FloatingMenuHelper.MenuItem(
+                R.drawable.gear,
+                getString(R.string.label_radial_open_settings),
+                getString(R.string.label_radial_open_settings)
+            ) { openSettingsFromMenu() })
+        }
 
         radialMenuView = menuHelper.showRadialMenu(center, alpha, items) {
             radialMenuView = null
@@ -1064,6 +1082,17 @@ class FloatingAsrService : Service(),
             Toast.makeText(this, getString(msgRes), Toast.LENGTH_SHORT).show()
         } catch (e: Throwable) {
             Log.e(TAG, "Failed to toggle silence auto-stop", e)
+        }
+    }
+
+    private fun openSettingsFromMenu() {
+        try {
+            val intent = Intent(this, SettingsActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+        } catch (e: Throwable) {
+            Log.e(TAG, "Failed to open settings", e)
         }
     }
 
