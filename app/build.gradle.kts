@@ -12,8 +12,8 @@ android {
         applicationId = "com.brycewg.asrkb"
         minSdk = 29
         targetSdk = 35
-        versionCode = 116
-        versionName = "3.7.3"
+        versionCode = 117
+        versionName = "3.8.0"
 
         // 仅构建 arm64-v8a 以减小包体体积
         ndk {
@@ -21,7 +21,7 @@ android {
         }
 
         // 从环境变量注入免费服务内置 API Key（GitHub Secrets）
-        buildConfigField("String", "SF_FREE_API_KEY", "\"${System.getenv("SF_FREE_API_KEY") ?: "sk-ushefhzyqmarvaufeaivopuupsrqtdyrjvdzpwpktbruixpl"}\"")
+        buildConfigField("String", "SF_FREE_API_KEY", "\"${System.getenv("SF_FREE_API_KEY") ?: ""}\"")
     }
 
     signingConfigs {

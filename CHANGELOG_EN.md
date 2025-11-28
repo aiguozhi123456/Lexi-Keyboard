@@ -1,5 +1,30 @@
 # Changelog
 
+## v3.8.0 (2025-11-28)
+
+### New Features
+
+- **SiliconFlow Free Service**: Added SiliconFlow free speech recognition service support with registration and configuration tutorial buttons
+- **Dynamic Timeout Mechanism**: Implemented dynamic timeout calculation based on recording duration for better handling of long recordings
+- **Floating Ball Settings Shortcut**: Added settings button to floating ball menu for quick access to settings
+
+### UI Improvements
+
+- **Settings Page Redesign**: Redesigned settings page layout with grouped card design for improved visual hierarchy and readability
+- **Floating Ball Touch Interaction**: Enhanced long-press move touch interaction for floating ball
+- **Style Unification**:
+  - Unified text style definitions and layout structure across settings pages
+  - Unified horizontal button container style definitions
+  - Unified layout styles through centralized theme resources
+- **Button Text Optimization**: Optimized tap-to-record mode gesture button text
+- **Clipboard Sync Button**: Optimized clipboard sync button display logic
+
+### Documentation
+
+- Changed keyboard name to "Lexi Keyboard" in README
+
+---
+
 ## v3.7.3 (2025-11-25)
 
 ### New Features
