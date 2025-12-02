@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.8.2 (2025-12-02)
+
+### UI Improvements
+
+- **Configuration Guide Button**: Added configuration guide button to local model settings page
+- **Skip Button**: Added skip button functionality to model selection dialog
+
+### Bug Fixes
+
+- **Status Bar Icon Color**: Fixed dynamic switching of status bar colors
+
+---
+
 ## v3.8.1 (2025-11-29)
 
 ### UI Improvements
