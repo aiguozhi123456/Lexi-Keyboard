@@ -44,4 +44,29 @@
     <!-- 章節標題 - Section titles -->
     <string name="section_post_process_scope">後處理範圍</string>
     <string name="section_post_process_model">後處理模型</string>
+
+    <!-- LLM 供應商選擇 -->
+    <string name="label_llm_vendor">LLM 供應商</string>
+    <string name="label_llm_model_select">選擇模型</string>
+    <string name="btn_llm_register">註冊帳號</string>
+    <string name="btn_llm_guide">設定教學</string>
+    <string name="custom_llm_description">完全自訂的 OpenAI 相容 API 設定。可建立多個設定檔以適配不同供應商。</string>
+
+    <!-- 內建 LLM 供應商 -->
+    <string name="llm_vendor_sf_free">矽基流動</string>
+    <string name="llm_vendor_openai">OpenAI</string>
+    <string name="llm_vendor_gemini">Google Gemini</string>
+    <string name="llm_vendor_deepseek">DeepSeek（深度求索）</string>
+    <string name="llm_vendor_moonshot">月之暗面 (Kimi)</string>
+    <string name="llm_vendor_custom">自訂</string>
+
+    <!-- 矽基流動免費/付費切換 -->
+    <string name="label_sf_use_free_service">使用免費服務</string>
+    <string name="sf_free_service_desc">矽基流動慷慨提供的免費 AI 後處理服務，無需 API Key。</string>
+    <string name="sf_paid_service_hint">填寫您自己的矽基流動 API Key 以使用更多模型。</string>
+
+    <!-- 通用按鈕 -->
+    <string name="btn_get_api_key">去獲取 Key</string>
+    <string name="label_custom_model_id">自訂模型 ID</string>
+    <string name="option_custom_model">自訂…</string>
 </resources>

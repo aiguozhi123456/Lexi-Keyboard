@@ -16,7 +16,7 @@
     <!-- SiliconFlow Free Service (LLM) -->
     <string name="sf_free_llm_description">Free AI post-processing service generously provided by SiliconFlow. No API key required.</string>
     <string name="label_sf_free_llm_enabled">Use SiliconFlow free model</string>
-    <string name="label_sf_free_llm_model">Choose post-processing model</string>
+    <string name="label_sf_free_llm_model">Select Model</string>
 
     <!-- SiliconFlow Free Error Messages -->
     <string name="error_sf_free_quota_exceeded">Free service quota exceeded, please try again later</string>

@@ -2,6 +2,7 @@ package com.brycewg.asrkb.ui.settings.ai
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.brycewg.asrkb.asr.LlmVendor
 import com.brycewg.asrkb.store.Prefs
 import com.brycewg.asrkb.store.PromptPreset
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,14 +12,28 @@ import java.util.UUID
 
 /**
  * ViewModel for AI Post-Processing Settings
- * Manages LLM providers and prompt presets with reactive state updates
+ * Manages LLM vendors, providers and prompt presets with reactive state updates
  */
 class AiPostSettingsViewModel : ViewModel() {
     companion object {
         private const val TAG = "AiPostSettingsVM"
     }
 
-    // State for LLM providers
+    // State for LLM vendor selection
+    private val _selectedVendor = MutableStateFlow(LlmVendor.SF_FREE)
+    val selectedVendor: StateFlow<LlmVendor> = _selectedVendor.asStateFlow()
+
+    // State for builtin vendor configuration
+    data class BuiltinVendorConfig(
+        val apiKey: String = "",
+        val model: String = "",
+        val temperature: Float = Prefs.DEFAULT_LLM_TEMPERATURE
+    )
+
+    private val _builtinVendorConfig = MutableStateFlow(BuiltinVendorConfig())
+    val builtinVendorConfig: StateFlow<BuiltinVendorConfig> = _builtinVendorConfig.asStateFlow()
+
+    // State for LLM providers (custom profiles)
     private val _llmProfiles = MutableStateFlow<List<Prefs.LlmProvider>>(emptyList())
     val llmProfiles: StateFlow<List<Prefs.LlmProvider>> = _llmProfiles.asStateFlow()
 
@@ -38,11 +53,100 @@ class AiPostSettingsViewModel : ViewModel() {
      * Loads all data from preferences and updates state flows
      */
     fun loadData(prefs: Prefs) {
+        loadLlmVendor(prefs)
         loadLlmProviders(prefs)
         loadPromptPresets(prefs)
     }
 
-    // ======== LLM Provider Management ========
+    // ======== LLM Vendor Management ========
+
+    /**
+     * Loads LLM vendor selection from preferences
+     */
+    private fun loadLlmVendor(prefs: Prefs) {
+        try {
+            val vendor = prefs.llmVendor
+            _selectedVendor.value = vendor
+            loadBuiltinVendorConfig(prefs, vendor)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load LLM vendor", e)
+        }
+    }
+
+    /**
+     * Loads builtin vendor configuration for the specified vendor
+     */
+    private fun loadBuiltinVendorConfig(prefs: Prefs, vendor: LlmVendor) {
+        if (vendor == LlmVendor.CUSTOM || vendor == LlmVendor.SF_FREE) {
+            // Custom uses LlmProvider, SF_FREE uses sfFreeLlmModel
+            _builtinVendorConfig.value = BuiltinVendorConfig()
+            return
+        }
+        _builtinVendorConfig.value = BuiltinVendorConfig(
+            apiKey = prefs.getLlmVendorApiKey(vendor),
+            model = prefs.getLlmVendorModel(vendor),
+            temperature = prefs.getLlmVendorTemperature(vendor)
+        )
+    }
+
+    /**
+     * Selects a LLM vendor
+     */
+    fun selectVendor(prefs: Prefs, vendor: LlmVendor) {
+        try {
+            prefs.llmVendor = vendor
+            _selectedVendor.value = vendor
+            loadBuiltinVendorConfig(prefs, vendor)
+            Log.d(TAG, "Selected LLM vendor: ${vendor.id}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to select LLM vendor", e)
+        }
+    }
+
+    /**
+     * Updates builtin vendor API key
+     */
+    fun updateBuiltinApiKey(prefs: Prefs, apiKey: String) {
+        val vendor = _selectedVendor.value
+        if (vendor == LlmVendor.CUSTOM || vendor == LlmVendor.SF_FREE) return
+        try {
+            prefs.setLlmVendorApiKey(vendor, apiKey)
+            _builtinVendorConfig.value = _builtinVendorConfig.value.copy(apiKey = apiKey)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update builtin API key", e)
+        }
+    }
+
+    /**
+     * Updates builtin vendor model
+     */
+    fun updateBuiltinModel(prefs: Prefs, model: String) {
+        val vendor = _selectedVendor.value
+        if (vendor == LlmVendor.CUSTOM || vendor == LlmVendor.SF_FREE) return
+        try {
+            prefs.setLlmVendorModel(vendor, model)
+            _builtinVendorConfig.value = _builtinVendorConfig.value.copy(model = model)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update builtin model", e)
+        }
+    }
+
+    /**
+     * Updates builtin vendor temperature
+     */
+    fun updateBuiltinTemperature(prefs: Prefs, temperature: Float) {
+        val vendor = _selectedVendor.value
+        if (vendor == LlmVendor.CUSTOM || vendor == LlmVendor.SF_FREE) return
+        try {
+            val coerced = temperature.coerceIn(0f, 2f)
+            prefs.setLlmVendorTemperature(vendor, coerced)
+            _builtinVendorConfig.value = _builtinVendorConfig.value.copy(temperature = coerced)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update builtin temperature", e)
+        }
+    }
+
+    // ======== LLM Provider Management (Custom) ========
 
     /**
      * Loads LLM providers from preferences

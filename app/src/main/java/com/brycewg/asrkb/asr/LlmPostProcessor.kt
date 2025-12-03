@@ -74,11 +74,13 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
   }
 
   /**
-   * 从 Prefs 获取活动的 LLM 配置
+   * 从 Prefs 获取活动的 LLM 配置（使用新的供应商架构）
    */
   private fun getActiveConfig(prefs: Prefs): LlmRequestConfig {
-    // 检查是否启用免费 LLM 服务
-    if (prefs.sfFreeLlmEnabled) {
+    val vendor = prefs.llmVendor
+
+    // SiliconFlow 免费服务特殊处理
+    if (vendor == LlmVendor.SF_FREE && !prefs.sfFreeLlmUsePaidKey) {
       return LlmRequestConfig(
         apiKey = BuildConfig.SF_FREE_API_KEY,
         endpoint = Prefs.SF_CHAT_COMPLETIONS_ENDPOINT,
@@ -87,10 +89,23 @@ class LlmPostProcessor(private val client: OkHttpClient? = null) {
       )
     }
 
+    // 使用统一的 getEffectiveLlmConfig
+    val config = prefs.getEffectiveLlmConfig()
+    if (config != null) {
+      return LlmRequestConfig(
+        apiKey = config.apiKey,
+        endpoint = config.endpoint,
+        model = config.model,
+        temperature = config.temperature.toDouble()
+      )
+    }
+
+    // 回退到旧的逻辑（兼容性）
     val active = prefs.getActiveLlmProvider()
+    val fallbackEndpoint = if (vendor.hasBuiltinEndpoint) vendor.endpoint else (active?.endpoint ?: prefs.llmEndpoint)
     return LlmRequestConfig(
       apiKey = active?.apiKey ?: prefs.llmApiKey,
-      endpoint = active?.endpoint ?: prefs.llmEndpoint,
+      endpoint = fallbackEndpoint,
       model = active?.model ?: prefs.llmModel,
       temperature = (active?.temperature ?: prefs.llmTemperature).toDouble()
     )

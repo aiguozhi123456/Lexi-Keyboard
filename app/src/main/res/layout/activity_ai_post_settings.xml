@@ -56,7 +56,7 @@
         </com.google.android.material.textfield.TextInputLayout>
       </LinearLayout>
 
-      <!-- Group 2: 后处理模型 (LLM 配置：免费 + 自定义) -->
+      <!-- Group 2: 后处理模型 (LLM 配置：供应商选择 + 内置/自定义) -->
       <LinearLayout
         style="@style/SettingsSectionCard"
         android:orientation="vertical">
@@ -65,13 +65,17 @@
           style="@style/SettingsSectionCardTitle"
           android:text="@string/section_post_process_model" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-          android:id="@+id/switchSfFreeLlmEnabled"
-          style="@style/SettingsSwitch"
+        <!-- LLM 供应商选择 -->
+        <TextView
+          style="@style/SettingsSectionTitle"
           android:layout_marginTop="0dp"
-          android:text="@string/label_sf_free_llm_enabled" />
+          android:text="@string/label_llm_vendor" />
 
-        <!-- 免费 LLM 详情（仅在开启时显示） -->
+        <TextView
+          android:id="@+id/tvLlmVendor"
+          style="@style/SettingsClickableValue" />
+
+        <!-- ========== SiliconFlow 配置区域 ========== -->
         <LinearLayout
           android:id="@+id/groupSfFreeLlm"
           android:layout_width="match_parent"
@@ -79,10 +83,33 @@
           android:orientation="vertical"
           android:visibility="gone">
 
-          <TextView
-            style="@style/SettingsHint"
-            android:text="@string/sf_free_llm_description" />
+          <!-- 免费/付费切换 -->
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchSfUseFreeService"
+            style="@style/SettingsSwitch"
+            android:layout_marginTop="0dp"
+            android:text="@string/label_sf_use_free_service" />
 
+          <!-- 免费服务说明 (仅免费模式可见) -->
+          <TextView
+            android:id="@+id/tvSfFreeServiceDesc"
+            style="@style/SettingsHint"
+            android:text="@string/sf_free_service_desc" />
+
+          <!-- 付费模式 API Key 输入 (仅付费模式可见) -->
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSfApiKey"
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_llm_api_key"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSfApiKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <!-- 模型选择 -->
           <TextView
             style="@style/SettingsSectionTitle"
             android:text="@string/label_sf_free_llm_model" />
@@ -90,6 +117,32 @@
           <TextView
             android:id="@+id/tvSfFreeLlmModel"
             style="@style/SettingsClickableValue" />
+
+          <!-- 自定义模型ID输入 (选中自定义模型时可见) -->
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSfCustomModelId"
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_custom_model_id"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSfCustomModelId"
+              style="@style/SettingsTextInput"
+              android:inputType="text" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <!-- Temperature 输入（付费模式可见） -->
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSfTemperature"
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_llm_temperature"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etSfTemperature"
+              style="@style/SettingsTextInput"
+              android:inputType="numberDecimal" />
+          </com.google.android.material.textfield.TextInputLayout>
 
           <!-- Powered by SiliconFlow Logo -->
           <ImageView
@@ -115,21 +168,95 @@
             <com.google.android.material.button.MaterialButton
               android:id="@+id/btnSfFreeLlmRegister"
               style="@style/SettingsRowButtonLeft"
-              android:text="@string/btn_sf_free_register" />
+              android:text="@string/btn_get_api_key" />
 
             <com.google.android.material.button.MaterialButton
-              android:id="@+id/btnSfFreeLlmGuide"
+              android:id="@+id/btnSfFreeLlmTestCall"
               style="@style/SettingsRowButtonRight"
-              android:text="@string/btn_sf_free_guide" />
+              android:text="@string/btn_llm_test_call" />
           </LinearLayout>
         </LinearLayout>
 
-        <!-- 自定义 LLM 配置 -->
+        <!-- ========== 内置供应商配置区域 ========== -->
+        <LinearLayout
+          android:id="@+id/groupBuiltinLlm"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <!-- API Key 输入 -->
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_llm_api_key">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etBuiltinApiKey"
+              style="@style/SettingsTextInput"
+              android:inputType="textPassword" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <!-- 模型选择 -->
+          <TextView
+            style="@style/SettingsSectionTitle"
+            android:text="@string/label_llm_model_select" />
+
+          <TextView
+            android:id="@+id/tvBuiltinModel"
+            style="@style/SettingsClickableValue" />
+
+          <!-- 自定义模型ID输入 (选中自定义时可见) -->
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilBuiltinCustomModelId"
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_custom_model_id"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etBuiltinCustomModelId"
+              style="@style/SettingsTextInput"
+              android:inputType="text" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <!-- Temperature 输入 -->
+          <com.google.android.material.textfield.TextInputLayout
+            style="@style/SettingsTextInputLayout"
+            android:hint="@string/label_llm_temperature">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/etBuiltinTemperature"
+              style="@style/SettingsTextInput"
+              android:inputType="numberDecimal" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <!-- 按钮行：获取Key + 测试调用 -->
+          <LinearLayout
+            style="@style/SettingsButtonRow"
+            android:layout_marginTop="8dp">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnBuiltinRegister"
+              style="@style/SettingsRowButtonLeft"
+              android:text="@string/btn_get_api_key" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btnBuiltinTestCall"
+              style="@style/SettingsRowButtonRight"
+              android:text="@string/btn_llm_test_call" />
+          </LinearLayout>
+        </LinearLayout>
+
+        <!-- ========== 自定义 LLM 配置区域 ========== -->
         <LinearLayout
           android:id="@+id/groupCustomLlm"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical">
+          android:orientation="vertical"
+          android:visibility="gone">
+
+          <TextView
+            style="@style/SettingsHint"
+            android:text="@string/custom_llm_description" />
 
           <TextView
             android:id="@+id/titleCustomLlm"

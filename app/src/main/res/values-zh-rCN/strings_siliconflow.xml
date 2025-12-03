@@ -16,7 +16,7 @@
     <!-- SiliconFlow 免费服务（LLM） -->
     <string name="sf_free_llm_description">硅基流动慷慨提供的免费 AI 后处理服务。无需 API Key。</string>
     <string name="label_sf_free_llm_enabled">使用 SiliconFlow 提供的免费模型</string>
-    <string name="label_sf_free_llm_model">选择后处理模型</string>
+    <string name="label_sf_free_llm_model">选择模型</string>
 
     <!-- SiliconFlow 免费服务错误消息 -->
     <string name="error_sf_free_quota_exceeded">免费服务用量已超限，请稍后再试</string>

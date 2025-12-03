@@ -5,7 +5,8 @@
       "Bash(.\\gradlew build:*)",
       "Bash(tree:*)",
       "Bash(dir:*)",
-      "Bash(openspec list:*)"
+      "Bash(openspec list:*)",
+      "mcp__auggie-mcp__codebase-retrieval"
     ],
     "deny": [],
     "ask": []

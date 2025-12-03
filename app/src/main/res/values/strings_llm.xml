@@ -44,4 +44,29 @@
     <!-- Section titles -->
     <string name="section_post_process_scope">Post-processing Scope</string>
     <string name="section_post_process_model">Post-processing Model</string>
+
+    <!-- LLM vendor selection -->
+    <string name="label_llm_vendor">LLM Provider</string>
+    <string name="label_llm_model_select">Select Model</string>
+    <string name="btn_llm_register">Register Account</string>
+    <string name="btn_llm_guide">Configuration Guide</string>
+    <string name="custom_llm_description">Fully customizable OpenAI-compatible API configuration. Create multiple profiles for different providers.</string>
+
+    <!-- Built-in LLM vendors -->
+    <string name="llm_vendor_sf_free">SiliconFlow</string>
+    <string name="llm_vendor_openai">OpenAI</string>
+    <string name="llm_vendor_gemini">Google Gemini</string>
+    <string name="llm_vendor_deepseek">DeepSeek</string>
+    <string name="llm_vendor_moonshot">Moonshot (Kimi)</string>
+    <string name="llm_vendor_custom">Custom</string>
+
+    <!-- SiliconFlow free/paid toggle -->
+    <string name="label_sf_use_free_service">Use free service</string>
+    <string name="sf_free_service_desc">Free AI post-processing provided by SiliconFlow. No API key required.</string>
+    <string name="sf_paid_service_hint">Enter your SiliconFlow API key for more model options.</string>
+
+    <!-- Common buttons -->
+    <string name="btn_get_api_key">Get API Key</string>
+    <string name="label_custom_model_id">Custom Model ID</string>
+    <string name="option_custom_model">Custom…</string>
 </resources>

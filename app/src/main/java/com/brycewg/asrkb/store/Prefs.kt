@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import com.brycewg.asrkb.asr.AsrVendor
+import com.brycewg.asrkb.asr.LlmVendor
 import com.brycewg.asrkb.store.debug.DebugLogManager
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -487,6 +488,137 @@ class Prefs(context: Context) {
         get() = sp.getString(KEY_SF_FREE_LLM_MODEL, DEFAULT_SF_FREE_LLM_MODEL) ?: DEFAULT_SF_FREE_LLM_MODEL
         set(value) = sp.edit { putString(KEY_SF_FREE_LLM_MODEL, value) }
 
+    // SiliconFlow：是否使用自己的付费 API Key（而非免费服务）
+    var sfFreeLlmUsePaidKey: Boolean
+        get() = sp.getBoolean(KEY_SF_FREE_LLM_USE_PAID_KEY, false)
+        set(value) = sp.edit { putBoolean(KEY_SF_FREE_LLM_USE_PAID_KEY, value) }
+
+    // ========== LLM 供应商选择（新架构） ==========
+
+    // 当前选择的 LLM 供应商（默认使用 SiliconFlow 免费服务）
+    var llmVendor: LlmVendor
+        get() {
+            val stored = sp.getString(KEY_LLM_VENDOR, null)
+            // 兼容旧版本：如果未设置供应商，进行智能迁移
+            if (stored == null) {
+                // 如果启用了 SF 免费 LLM，使用 SF_FREE
+                if (sfFreeLlmEnabled) return LlmVendor.SF_FREE
+                // 检查是否有配置完整的自定义供应商
+                val provider = getActiveLlmProvider()
+                if (provider != null && provider.endpoint.isNotBlank() && provider.model.isNotBlank()) {
+                    return LlmVendor.CUSTOM
+                }
+                // 兜底：默认使用 SF_FREE（免费服务无需配置即可使用）
+                return LlmVendor.SF_FREE
+            }
+            return LlmVendor.fromId(stored)
+        }
+        set(value) = sp.edit { putString(KEY_LLM_VENDOR, value.id) }
+
+    // 内置供应商 API Key 存储（按供应商 ID 分别存储）
+    fun getLlmVendorApiKey(vendor: LlmVendor): String {
+        val key = "llm_vendor_${vendor.id}_api_key"
+        return sp.getString(key, "") ?: ""
+    }
+
+    fun setLlmVendorApiKey(vendor: LlmVendor, apiKey: String) {
+        val key = "llm_vendor_${vendor.id}_api_key"
+        sp.edit { putString(key, apiKey.trim()) }
+    }
+
+    // 内置供应商模型选择（按供应商 ID 分别存储）
+    fun getLlmVendorModel(vendor: LlmVendor): String {
+        val key = "llm_vendor_${vendor.id}_model"
+        val stored = sp.getString(key, null)
+        // 如果未设置，返回供应商默认模型
+        return stored ?: vendor.defaultModel
+    }
+
+    fun setLlmVendorModel(vendor: LlmVendor, model: String) {
+        val key = "llm_vendor_${vendor.id}_model"
+        sp.edit { putString(key, model.trim()) }
+    }
+
+    // 内置供应商 Temperature（按供应商 ID 分别存储）
+    fun getLlmVendorTemperature(vendor: LlmVendor): Float {
+        val key = "llm_vendor_${vendor.id}_temperature"
+        return sp.getFloat(key, DEFAULT_LLM_TEMPERATURE)
+    }
+
+    fun setLlmVendorTemperature(vendor: LlmVendor, temperature: Float) {
+        val key = "llm_vendor_${vendor.id}_temperature"
+        sp.edit { putFloat(key, temperature.coerceIn(0f, 2f)) }
+    }
+
+    /**
+     * 获取当前有效的 LLM 配置（根据选择的供应商）
+     * @return Triple<endpoint, apiKey, model> 或 null（如果配置无效）
+     */
+    fun getEffectiveLlmConfig(): EffectiveLlmConfig? {
+        return when (val vendor = llmVendor) {
+            LlmVendor.SF_FREE -> {
+                if (sfFreeLlmUsePaidKey) {
+                    // 使用用户自己的付费 API Key
+                    val apiKey = getLlmVendorApiKey(LlmVendor.SF_FREE)
+                    if (apiKey.isBlank()) {
+                        null // 需要 API Key 但未配置
+                    } else {
+                        EffectiveLlmConfig(
+                            endpoint = vendor.endpoint,
+                            apiKey = apiKey,
+                            model = getLlmVendorModel(LlmVendor.SF_FREE).ifBlank { sfFreeLlmModel },
+                            temperature = getLlmVendorTemperature(LlmVendor.SF_FREE)
+                        )
+                    }
+                } else {
+                    // SiliconFlow 免费服务：使用内置端点和模型，无需 API Key
+                    // 实际 API Key 在 LlmPostProcessor 中注入
+                    EffectiveLlmConfig(
+                        endpoint = vendor.endpoint,
+                        apiKey = "", // 免费服务在调用层注入内置 Key
+                        model = sfFreeLlmModel,
+                        temperature = DEFAULT_LLM_TEMPERATURE
+                    )
+                }
+            }
+            LlmVendor.CUSTOM -> {
+                // 自定义供应商：使用用户配置的 LlmProvider
+                val provider = getActiveLlmProvider()
+                if (provider != null && provider.endpoint.isNotBlank() && provider.model.isNotBlank()) {
+                    EffectiveLlmConfig(
+                        endpoint = provider.endpoint,
+                        apiKey = provider.apiKey,
+                        model = provider.model,
+                        temperature = provider.temperature
+                    )
+                } else null
+            }
+            else -> {
+                // 内置供应商：使用预设端点 + 用户 API Key + 用户选择的模型
+                val apiKey = getLlmVendorApiKey(vendor)
+                val model = getLlmVendorModel(vendor)
+                if (vendor.requiresApiKey && apiKey.isBlank()) {
+                    null // 需要 API Key 但未配置
+                } else {
+                    EffectiveLlmConfig(
+                        endpoint = vendor.endpoint,
+                        apiKey = apiKey,
+                        model = model.ifBlank { vendor.defaultModel },
+                        temperature = getLlmVendorTemperature(vendor)
+                    )
+                }
+            }
+        }
+    }
+
+    /** 有效的 LLM 配置数据类 */
+    data class EffectiveLlmConfig(
+        val endpoint: String,
+        val apiKey: String,
+        val model: String,
+        val temperature: Float
+    )
+
     // 阿里云百炼（DashScope）凭证
     var dashApiKey: String by stringPref(KEY_DASH_API_KEY, "")
 
@@ -818,15 +950,8 @@ class Prefs(context: Context) {
     fun hasSonioxKeys(): Boolean = hasVendorKeys(AsrVendor.Soniox)
     fun hasAsrKeys(): Boolean = hasVendorKeys(asrVendor)
     fun hasLlmKeys(): Boolean {
-        // 免费 LLM 服务启用时，无需检查 API Key
-        if (sfFreeLlmEnabled) return true
-
-        val p = getActiveLlmProvider()
-        return if (p != null) {
-            p.endpoint.isNotBlank() && p.model.isNotBlank()
-        } else {
-            llmEndpoint.isNotBlank() && llmModel.isNotBlank()
-        }
+        // 使用新的 getEffectiveLlmConfig 检查配置有效性
+        return getEffectiveLlmConfig() != null
     }
 
     // 自定义标点按钮（4个位置）
@@ -1177,6 +1302,7 @@ class Prefs(context: Context) {
         private const val KEY_LLM_TEMPERATURE = "llm_temperature"
         private const val KEY_LLM_PROVIDERS = "llm_providers"
         private const val KEY_LLM_ACTIVE_ID = "llm_active_id"
+        private const val KEY_LLM_VENDOR = "llm_vendor"
         private const val KEY_LLM_PROMPT = "llm_prompt"
         private const val KEY_LLM_PROMPT_PRESETS = "llm_prompt_presets"
         private const val KEY_LLM_PROMPT_ACTIVE_ID = "llm_prompt_active_id"
@@ -1192,6 +1318,7 @@ class Prefs(context: Context) {
         private const val KEY_SF_FREE_ASR_MODEL = "sf_free_asr_model"
         private const val KEY_SF_FREE_LLM_ENABLED = "sf_free_llm_enabled"
         private const val KEY_SF_FREE_LLM_MODEL = "sf_free_llm_model"
+        private const val KEY_SF_FREE_LLM_USE_PAID_KEY = "sf_free_llm_use_paid_key"
         private const val KEY_ELEVEN_API_KEY = "eleven_api_key"
         private const val KEY_ELEVEN_STREAMING_ENABLED = "eleven_streaming_enabled"
         private const val KEY_ELEVEN_LANGUAGE_CODE = "eleven_language_code"
@@ -1552,6 +1679,10 @@ class Prefs(context: Context) {
         o.put(KEY_LLM_API_KEY, llmApiKey)
         o.put(KEY_LLM_MODEL, llmModel)
         o.put(KEY_LLM_TEMPERATURE, llmTemperature.toDouble())
+        // SiliconFlow 免费/付费 LLM 配置
+        o.put(KEY_SF_FREE_LLM_ENABLED, sfFreeLlmEnabled)
+        o.put(KEY_SF_FREE_LLM_MODEL, sfFreeLlmModel)
+        o.put(KEY_SF_FREE_LLM_USE_PAID_KEY, sfFreeLlmUsePaidKey)
         // OpenAI ASR：Prompt 开关（布尔）
         o.put(KEY_OA_ASR_USE_PROMPT, oaAsrUsePrompt)
         // Volcano streaming toggle
@@ -1651,6 +1782,22 @@ class Prefs(context: Context) {
         try { o.put(KEY_DISABLE_USAGE_STATS, disableUsageStats) } catch (_: Throwable) {}
         // AI 后处理：少于字数跳过
         try { o.put(KEY_POSTPROC_SKIP_UNDER_CHARS, postprocSkipUnderChars) } catch (_: Throwable) {}
+        // LLM 供应商选择（新架构）
+        try { o.put(KEY_LLM_VENDOR, llmVendor.id) } catch (_: Throwable) {}
+        // 内置供应商配置（遍历所有内置供应商）
+        for (vendor in LlmVendor.builtinVendors()) {
+            val keyPrefix = "llm_vendor_${vendor.id}"
+            try { o.put("${keyPrefix}_api_key", getLlmVendorApiKey(vendor)) } catch (_: Throwable) {}
+            try {
+                val model = if (vendor == LlmVendor.SF_FREE && !sfFreeLlmUsePaidKey) {
+                    sfFreeLlmModel
+                } else {
+                    getLlmVendorModel(vendor)
+                }
+                o.put("${keyPrefix}_model", model)
+            } catch (_: Throwable) {}
+            try { o.put("${keyPrefix}_temperature", getLlmVendorTemperature(vendor).toDouble()) } catch (_: Throwable) {}
+        }
         return o.toString()
     }
 
@@ -1687,6 +1834,10 @@ class Prefs(context: Context) {
             optString(KEY_APP_LANGUAGE_TAG)?.let { appLanguageTag = it }
             optBool(KEY_POSTPROC_ENABLED)?.let { postProcessEnabled = it }
             optBool(KEY_HEADSET_MIC_PRIORITY_ENABLED)?.let { headsetMicPriorityEnabled = it }
+            // SiliconFlow 免费/付费 LLM 配置
+            optBool(KEY_SF_FREE_LLM_ENABLED)?.let { sfFreeLlmEnabled = it }
+            optString(KEY_SF_FREE_LLM_MODEL)?.let { sfFreeLlmModel = it }
+            optBool(KEY_SF_FREE_LLM_USE_PAID_KEY)?.let { sfFreeLlmUsePaidKey = it }
             // 外部输入法联动（AIDL）
             optBool(KEY_EXTERNAL_AIDL_ENABLED)?.let { externalAidlEnabled = it }
             optBool(KEY_FLOATING_SWITCHER_ENABLED)?.let { floatingSwitcherEnabled = it }
@@ -1810,6 +1961,15 @@ class Prefs(context: Context) {
             optString(KEY_WD_PASSWORD)?.let { webdavPassword = it }
             // 剪贴板固定记录（仅覆盖固定集合；非固定不导入）
             optString(KEY_CLIP_PINNED_JSON)?.let { setPrefString(KEY_CLIP_PINNED_JSON, it) }
+            // LLM 供应商选择（新架构）
+            optString(KEY_LLM_VENDOR)?.let { llmVendor = LlmVendor.fromId(it) }
+            // 内置供应商配置（遍历所有内置供应商）
+            for (vendor in LlmVendor.builtinVendors()) {
+                val keyPrefix = "llm_vendor_${vendor.id}"
+                optString("${keyPrefix}_api_key")?.let { setLlmVendorApiKey(vendor, it) }
+                optString("${keyPrefix}_model")?.let { setLlmVendorModel(vendor, it) }
+                optFloat("${keyPrefix}_temperature")?.let { setLlmVendorTemperature(vendor, it) }
+            }
             Log.i(TAG, "Successfully imported settings from JSON")
             true
         } catch (e: Exception) {

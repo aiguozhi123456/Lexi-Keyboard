@@ -45,4 +45,29 @@
     <!-- 章节标题 - Section titles -->
     <string name="section_post_process_scope">后处理范围</string>
     <string name="section_post_process_model">后处理模型</string>
+
+    <!-- LLM 供应商选择 -->
+    <string name="label_llm_vendor">LLM 供应商</string>
+    <string name="label_llm_model_select">选择模型</string>
+    <string name="btn_llm_register">注册账号</string>
+    <string name="btn_llm_guide">配置教程</string>
+    <string name="custom_llm_description">完全自定义的 OpenAI 兼容 API 配置。可创建多个配置文件以适配不同供应商。</string>
+
+    <!-- 内置 LLM 供应商 -->
+    <string name="llm_vendor_sf_free">硅基流动</string>
+    <string name="llm_vendor_openai">OpenAI</string>
+    <string name="llm_vendor_gemini">Google Gemini</string>
+    <string name="llm_vendor_deepseek">DeepSeek（深度求索）</string>
+    <string name="llm_vendor_moonshot">月之暗面 (Kimi)</string>
+    <string name="llm_vendor_custom">自定义</string>
+
+    <!-- 硅基流动免费/付费切换 -->
+    <string name="label_sf_use_free_service">使用免费服务</string>
+    <string name="sf_free_service_desc">硅基流动慷慨提供的免费 AI 后处理服务，无需 API Key。</string>
+    <string name="sf_paid_service_hint">填写您自己的硅基流动 API Key 以使用更多模型。</string>
+
+    <!-- 通用按钮 -->
+    <string name="btn_get_api_key">去获取 Key</string>
+    <string name="label_custom_model_id">自定义模型 ID</string>
+    <string name="option_custom_model">自定义…</string>
 </resources>

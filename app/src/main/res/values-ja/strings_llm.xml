@@ -45,4 +45,29 @@
     <!-- セクションタイトル - Section titles -->
     <string name="section_post_process_scope">後処理範囲</string>
     <string name="section_post_process_model">後処理モデル</string>
+
+    <!-- LLMプロバイダー選択 -->
+    <string name="label_llm_vendor">LLMプロバイダー</string>
+    <string name="label_llm_model_select">モデルを選択</string>
+    <string name="btn_llm_register">アカウント登録</string>
+    <string name="btn_llm_guide">設定ガイド</string>
+    <string name="custom_llm_description">OpenAI互換APIのフルカスタマイズ設定。異なるプロバイダー向けに複数のプロファイルを作成できます。</string>
+
+    <!-- 組み込みLLMプロバイダー -->
+    <string name="llm_vendor_sf_free">SiliconFlow</string>
+    <string name="llm_vendor_openai">OpenAI</string>
+    <string name="llm_vendor_gemini">Google Gemini</string>
+    <string name="llm_vendor_deepseek">DeepSeek</string>
+    <string name="llm_vendor_moonshot">Moonshot (Kimi)</string>
+    <string name="llm_vendor_custom">カスタム</string>
+
+    <!-- SiliconFlow無料/有料切替 -->
+    <string name="label_sf_use_free_service">無料サービスを使用</string>
+    <string name="sf_free_service_desc">SiliconFlowが提供する無料AI後処理サービス。APIキー不要。</string>
+    <string name="sf_paid_service_hint">より多くのモデルを使用するには、SiliconFlow APIキーを入力してください。</string>
+
+    <!-- 共通ボタン -->
+    <string name="btn_get_api_key">APIキーを取得</string>
+    <string name="label_custom_model_id">カスタムモデルID</string>
+    <string name="option_custom_model">カスタム…</string>
 </resources>

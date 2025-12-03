@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.asr.LlmPostProcessor
+import com.brycewg.asrkb.asr.LlmVendor
 import com.brycewg.asrkb.store.Prefs
 import com.brycewg.asrkb.store.PromptPreset
 import com.brycewg.asrkb.ui.installExplainedSwitch
@@ -29,14 +30,40 @@ import kotlinx.coroutines.launch
 
 /**
  * Activity for configuring AI post-processing settings
- * Manages LLM providers and prompt presets with reactive UI updates
+ * Manages LLM vendors, providers and prompt presets with reactive UI updates
  */
 class AiPostSettingsActivity : AppCompatActivity() {
 
     private lateinit var prefs: Prefs
     private lateinit var viewModel: AiPostSettingsViewModel
 
-    // LLM Profile Views
+    // LLM Vendor Selection Views
+    private lateinit var tvLlmVendor: TextView
+
+    // SiliconFlow LLM Views
+    private lateinit var groupSfFreeLlm: View
+    private lateinit var switchSfUseFreeService: MaterialSwitch
+    private lateinit var tvSfFreeServiceDesc: TextView
+    private lateinit var tilSfApiKey: View
+    private lateinit var etSfApiKey: EditText
+    private lateinit var tvSfFreeLlmModel: TextView
+    private lateinit var tilSfCustomModelId: View
+    private lateinit var etSfCustomModelId: EditText
+    private lateinit var tilSfTemperature: View
+    private lateinit var etSfTemperature: EditText
+
+    // Builtin LLM Views
+    private lateinit var groupBuiltinLlm: View
+    private lateinit var etBuiltinApiKey: EditText
+    private lateinit var tvBuiltinModel: TextView
+    private lateinit var tilBuiltinCustomModelId: View
+    private lateinit var etBuiltinCustomModelId: EditText
+    private lateinit var etBuiltinTemperature: EditText
+    private lateinit var btnBuiltinRegister: Button
+    private lateinit var btnBuiltinTestCall: Button
+
+    // Custom LLM Profile Views
+    private lateinit var groupCustomLlm: View
     private lateinit var tvLlmProfiles: TextView
     private lateinit var etLlmProfileName: EditText
     private lateinit var etLlmEndpoint: EditText
@@ -56,12 +83,6 @@ class AiPostSettingsActivity : AppCompatActivity() {
     private lateinit var switchAiEditPreferLastAsr: MaterialSwitch
     private lateinit var etSkipAiUnderChars: EditText
 
-    // SiliconFlow Free LLM Views
-    private lateinit var groupSfFreeLlm: View
-    private lateinit var switchSfFreeLlmEnabled: MaterialSwitch
-    private lateinit var tvSfFreeLlmModel: TextView
-    private lateinit var groupCustomLlm: View
-
     // Flag to prevent recursive updates during programmatic text changes
     private var isUpdatingProgrammatically = false
 
@@ -78,40 +99,21 @@ class AiPostSettingsActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[AiPostSettingsViewModel::class.java]
 
         initViews()
+        setupVendorSection()
         setupLlmProfileSection()
         setupPromptPresetSection()
+        observeViewModelState()
         loadInitialData()
     }
 
     // ======== Initialization Methods ========
 
-    /**
-     * Initializes all view references
-     */
     private fun initViews() {
         // Toolbar
         findViewById<MaterialToolbar>(R.id.toolbar).apply {
             setTitle(R.string.title_ai_settings)
             setNavigationOnClickListener { finish() }
         }
-
-        // LLM Profile Views
-        tvLlmProfiles = findViewById(R.id.tvLlmProfilesValue)
-        etLlmProfileName = findViewById(R.id.etLlmProfileName)
-        etLlmEndpoint = findViewById(R.id.etLlmEndpoint)
-        etLlmApiKey = findViewById(R.id.etLlmApiKey)
-        etLlmModel = findViewById(R.id.etLlmModel)
-        etLlmTemperature = findViewById(R.id.etLlmTemperature)
-        btnLlmAddProfile = findViewById(R.id.btnLlmAddProfile)
-        btnLlmDeleteProfile = findViewById(R.id.btnLlmDeleteProfile)
-        btnLlmTestCall = findViewById(R.id.btnLlmTestCall)
-
-        // Prompt Preset Views
-        tvPromptPresets = findViewById(R.id.tvPromptPresetsValue)
-        etLlmPromptTitle = findViewById(R.id.etLlmPromptTitle)
-        etLlmPrompt = findViewById(R.id.etLlmPrompt)
-        btnAddPromptPreset = findViewById(R.id.btnAddPromptPreset)
-        btnDeletePromptPreset = findViewById(R.id.btnDeletePromptPreset)
 
         // AI 编辑默认范围开关：使用上次识别结果
         switchAiEditPreferLastAsr = findViewById(R.id.switchAiEditPreferLastAsr)
@@ -131,18 +133,69 @@ class AiPostSettingsActivity : AppCompatActivity() {
         etSkipAiUnderChars = findViewById(R.id.etSkipAiUnderChars)
         etSkipAiUnderChars.setText(prefs.postprocSkipUnderChars.toString())
         etSkipAiUnderChars.addTextChangeListener { text ->
-            // 空字符串不更新；否则解析并保存
             if (text.isBlank()) return@addTextChangeListener
             val num = text.toIntOrNull() ?: return@addTextChangeListener
             val coerced = num.coerceIn(0, 1000)
             prefs.postprocSkipUnderChars = coerced
         }
 
-        // SiliconFlow 免费 LLM 服务
+        // LLM Vendor Selection
+        tvLlmVendor = findViewById(R.id.tvLlmVendor)
+        tvLlmVendor.setOnClickListener { showVendorSelectionDialog() }
+
+        // SiliconFlow LLM Group
         groupSfFreeLlm = findViewById(R.id.groupSfFreeLlm)
-        switchSfFreeLlmEnabled = findViewById(R.id.switchSfFreeLlmEnabled)
+        switchSfUseFreeService = findViewById(R.id.switchSfUseFreeService)
+        tvSfFreeServiceDesc = findViewById(R.id.tvSfFreeServiceDesc)
+        tilSfApiKey = findViewById(R.id.tilSfApiKey)
+        etSfApiKey = findViewById(R.id.etSfApiKey)
         tvSfFreeLlmModel = findViewById(R.id.tvSfFreeLlmModel)
-        groupCustomLlm = findViewById(R.id.groupCustomLlm)
+        tilSfCustomModelId = findViewById(R.id.tilSfCustomModelId)
+        etSfCustomModelId = findViewById(R.id.etSfCustomModelId)
+        tilSfTemperature = findViewById(R.id.tilSfTemperature)
+        etSfTemperature = findViewById(R.id.etSfTemperature)
+
+        // Initialize SF free/paid toggle
+        switchSfUseFreeService.isChecked = !prefs.sfFreeLlmUsePaidKey
+        updateSfFreePaidUI(!prefs.sfFreeLlmUsePaidKey)
+        switchSfUseFreeService.setOnCheckedChangeListener { _, isChecked ->
+            prefs.sfFreeLlmUsePaidKey = !isChecked
+            updateSfFreePaidUI(isChecked)
+        }
+
+        // SF API key listener
+        etSfApiKey.addTextChangeListener { text ->
+            prefs.setLlmVendorApiKey(LlmVendor.SF_FREE, text)
+        }
+        // Load SF API key if exists
+        etSfApiKey.setText(prefs.getLlmVendorApiKey(LlmVendor.SF_FREE))
+
+        // SF model selection
+        tvSfFreeLlmModel.setOnClickListener { showSfFreeLlmModelSelectionDialog() }
+
+        // SF custom model ID listener
+        etSfCustomModelId.addTextChangeListener { text ->
+            if (text.isNotBlank()) {
+                if (prefs.sfFreeLlmUsePaidKey) {
+                    prefs.setLlmVendorModel(LlmVendor.SF_FREE, text)
+                } else {
+                    prefs.sfFreeLlmModel = text
+                }
+            }
+        }
+
+        etSfTemperature.addTextChangeListener { text ->
+            if (!prefs.sfFreeLlmUsePaidKey) return@addTextChangeListener
+            if (text.isBlank()) return@addTextChangeListener
+            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
+            val coerced = parsed.coerceIn(0f, 2f)
+            if (coerced != parsed) {
+                isUpdatingProgrammatically = true
+                etSfTemperature.setTextIfDifferent(coerced.toString())
+                isUpdatingProgrammatically = false
+            }
+            prefs.setLlmVendorTemperature(LlmVendor.SF_FREE, coerced)
+        }
 
         // 根据深色模式设置 Powered by 图片
         val imgSfFreeLlmPoweredBy = findViewById<ImageView>(R.id.imgSfFreeLlmPoweredBy)
@@ -151,180 +204,145 @@ class AiPostSettingsActivity : AppCompatActivity() {
             if (isDarkMode) R.drawable.powered_by_siliconflow_dark else R.drawable.powered_by_siliconflow_light
         )
 
-        // 初始化免费服务开关状态
-        switchSfFreeLlmEnabled.isChecked = prefs.sfFreeLlmEnabled
-        updateSfFreeLlmModelDisplay()
-        updateSfFreeLlmVisibility()
-
-        // 免费服务开关监听
-        switchSfFreeLlmEnabled.setOnCheckedChangeListener { _, isChecked ->
-            prefs.sfFreeLlmEnabled = isChecked
-            updateSfFreeLlmVisibility()
-            hapticTapIfEnabled(switchSfFreeLlmEnabled)
-        }
-
-        // 免费服务模型选择
-        tvSfFreeLlmModel.setOnClickListener {
-            showSfFreeLlmModelSelectionDialog()
-        }
-
-        // 免费服务注册按钮
+        // SF register button
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSfFreeLlmRegister).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://cloud.siliconflow.cn/i/g8thUcWa")
+            openUrlSafely(LlmVendor.SF_FREE.registerUrl)
         }
 
-        // 免费服务配置教程按钮
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSfFreeLlmGuide).setOnClickListener { v ->
-            hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
-        }
-    }
-
-    /**
-     * Updates the display of the selected free LLM model
-     */
-    private fun updateSfFreeLlmModelDisplay() {
-        tvSfFreeLlmModel.text = prefs.sfFreeLlmModel
-    }
-
-    /**
-     * Updates the visibility of free LLM details and custom LLM configuration based on free service state
-     */
-    private fun updateSfFreeLlmVisibility() {
-        val isFreeEnabled = prefs.sfFreeLlmEnabled
-        // 开启免费服务时：显示免费服务详情，隐藏自定义LLM配置
-        // 关闭免费服务时：隐藏免费服务详情，显示自定义LLM配置
-        groupSfFreeLlm.visibility = if (isFreeEnabled) View.VISIBLE else View.GONE
-        groupCustomLlm.visibility = if (isFreeEnabled) View.GONE else View.VISIBLE
-    }
-
-    /**
-     * Shows dialog to select free LLM model
-     */
-    private fun showSfFreeLlmModelSelectionDialog() {
-        val models = Prefs.SF_FREE_LLM_MODELS.toTypedArray()
-        val currentModel = prefs.sfFreeLlmModel
-        val selectedIndex = models.indexOf(currentModel).coerceAtLeast(0)
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.label_sf_free_llm_model)
-            .setSingleChoiceItems(models, selectedIndex) { dialog, which ->
-                val selected = models.getOrNull(which) ?: return@setSingleChoiceItems
-                prefs.sfFreeLlmModel = selected
-                updateSfFreeLlmModelDisplay()
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.btn_cancel, null)
-            .show()
-    }
-
-    /**
-     * Sets up LLM profile section with listeners and observers
-     */
-    private fun setupLlmProfileSection() {
-        // Click listener for profile selector
-        tvLlmProfiles.setOnClickListener {
-            showLlmProfileSelectionDialog()
-        }
-
-        // Text change listeners with ViewModel updates
-        etLlmProfileName.addTextChangeListener { text ->
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(name = text) }
-        }
-
-        etLlmEndpoint.addTextChangeListener { text ->
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(endpoint = text) }
-        }
-
-        etLlmApiKey.addTextChangeListener { text ->
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(apiKey = text) }
-        }
-
-        etLlmModel.addTextChangeListener { text ->
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(model = text) }
-        }
-
-        etLlmTemperature.addTextChangeListener { text ->
-            if (text.isBlank()) return@addTextChangeListener
-            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
-            val temperature = parsed.coerceIn(0f, 2f)
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(temperature = temperature) }
-        }
-
-        // 测试 LLM 调用
-        btnLlmTestCall.setOnClickListener {
+        // SF test call button
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSfFreeLlmTestCall).setOnClickListener {
             handleTestLlmCall()
         }
 
-        // Button listeners
-        btnLlmAddProfile.setOnClickListener {
-            handleAddLlmProfile()
-        }
+        // Builtin LLM Group
+        groupBuiltinLlm = findViewById(R.id.groupBuiltinLlm)
+        etBuiltinApiKey = findViewById(R.id.etBuiltinApiKey)
+        tvBuiltinModel = findViewById(R.id.tvBuiltinModel)
+        tilBuiltinCustomModelId = findViewById(R.id.tilBuiltinCustomModelId)
+        etBuiltinCustomModelId = findViewById(R.id.etBuiltinCustomModelId)
+        etBuiltinTemperature = findViewById(R.id.etBuiltinTemperature)
+        btnBuiltinRegister = findViewById(R.id.btnBuiltinRegister)
+        btnBuiltinTestCall = findViewById(R.id.btnBuiltinTestCall)
 
-        btnLlmDeleteProfile.setOnClickListener {
-            handleDeleteLlmProfile()
-        }
+        // Custom LLM Group
+        groupCustomLlm = findViewById(R.id.groupCustomLlm)
+        tvLlmProfiles = findViewById(R.id.tvLlmProfilesValue)
+        etLlmProfileName = findViewById(R.id.etLlmProfileName)
+        etLlmEndpoint = findViewById(R.id.etLlmEndpoint)
+        etLlmApiKey = findViewById(R.id.etLlmApiKey)
+        etLlmModel = findViewById(R.id.etLlmModel)
+        etLlmTemperature = findViewById(R.id.etLlmTemperature)
+        btnLlmAddProfile = findViewById(R.id.btnLlmAddProfile)
+        btnLlmDeleteProfile = findViewById(R.id.btnLlmDeleteProfile)
+        btnLlmTestCall = findViewById(R.id.btnLlmTestCall)
 
-        // Observe ViewModel state
-        observeLlmProfileState()
+        // Prompt Preset Views
+        tvPromptPresets = findViewById(R.id.tvPromptPresetsValue)
+        etLlmPromptTitle = findViewById(R.id.etLlmPromptTitle)
+        etLlmPrompt = findViewById(R.id.etLlmPrompt)
+        btnAddPromptPreset = findViewById(R.id.btnAddPromptPreset)
+        btnDeletePromptPreset = findViewById(R.id.btnDeletePromptPreset)
     }
 
-    /**
-     * Sets up prompt preset section with listeners and observers
-     */
-    private fun setupPromptPresetSection() {
-        // Click listener for preset selector
-        tvPromptPresets.setOnClickListener {
-            showPromptPresetSelectionDialog()
+    // ======== Vendor Section Setup ========
+
+    private fun setupVendorSection() {
+        // Builtin vendor API key listener
+        etBuiltinApiKey.addTextChangeListener { text ->
+            viewModel.updateBuiltinApiKey(prefs, text)
         }
 
-        // Text change listeners with ViewModel updates
+        // Builtin vendor temperature listener
+        etBuiltinTemperature.addTextChangeListener { text ->
+            if (text.isBlank()) return@addTextChangeListener
+            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
+            viewModel.updateBuiltinTemperature(prefs, parsed)
+        }
+
+        // Builtin model selection
+        tvBuiltinModel.setOnClickListener { showBuiltinModelSelectionDialog() }
+
+        // Builtin custom model ID listener
+        etBuiltinCustomModelId.addTextChangeListener { text ->
+            if (text.isNotBlank()) {
+                viewModel.updateBuiltinModel(prefs, text)
+            }
+        }
+
+        // Builtin register button
+        btnBuiltinRegister.setOnClickListener { v ->
+            hapticTapIfEnabled(v)
+            val vendor = viewModel.selectedVendor.value
+            if (vendor.registerUrl.isNotBlank()) {
+                openUrlSafely(vendor.registerUrl)
+            }
+        }
+        btnBuiltinTestCall.setOnClickListener { handleTestLlmCall() }
+    }
+
+    // ======== LLM Profile Section Setup ========
+
+    private fun setupLlmProfileSection() {
+        tvLlmProfiles.setOnClickListener { showLlmProfileSelectionDialog() }
+
+        etLlmProfileName.addTextChangeListener { text ->
+            viewModel.updateActiveLlmProvider(prefs) { it.copy(name = text) }
+        }
+        etLlmEndpoint.addTextChangeListener { text ->
+            viewModel.updateActiveLlmProvider(prefs) { it.copy(endpoint = text) }
+        }
+        etLlmApiKey.addTextChangeListener { text ->
+            viewModel.updateActiveLlmProvider(prefs) { it.copy(apiKey = text) }
+        }
+        etLlmModel.addTextChangeListener { text ->
+            viewModel.updateActiveLlmProvider(prefs) { it.copy(model = text) }
+        }
+        etLlmTemperature.addTextChangeListener { text ->
+            if (text.isBlank()) return@addTextChangeListener
+            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
+            viewModel.updateActiveLlmProvider(prefs) { it.copy(temperature = parsed.coerceIn(0f, 2f)) }
+        }
+
+        btnLlmTestCall.setOnClickListener { handleTestLlmCall() }
+        btnLlmAddProfile.setOnClickListener { handleAddLlmProfile() }
+        btnLlmDeleteProfile.setOnClickListener { handleDeleteLlmProfile() }
+    }
+
+    // ======== Prompt Preset Section Setup ========
+
+    private fun setupPromptPresetSection() {
+        tvPromptPresets.setOnClickListener { showPromptPresetSelectionDialog() }
+
         etLlmPromptTitle.addTextChangeListener { text ->
             viewModel.updateActivePromptPreset(prefs) { it.copy(title = text) }
         }
-
         etLlmPrompt.addTextChangeListener { text ->
             viewModel.updateActivePromptPreset(prefs) { it.copy(content = text) }
         }
 
-        // Button listeners
-        btnAddPromptPreset.setOnClickListener {
-            handleAddPromptPreset()
-        }
-
-        btnDeletePromptPreset.setOnClickListener {
-            handleDeletePromptPreset()
-        }
-
-        // Observe ViewModel state
-        observePromptPresetState()
-    }
-
-    /**
-     * Loads initial data from preferences into ViewModel
-     */
-    private fun loadInitialData() {
-        viewModel.loadData(prefs)
+        btnAddPromptPreset.setOnClickListener { handleAddPromptPreset() }
+        btnDeletePromptPreset.setOnClickListener { handleDeletePromptPreset() }
     }
 
     // ======== Observer Methods ========
 
-    /**
-     * Observes LLM profile state changes and updates UI
-     */
-    private fun observeLlmProfileState() {
+    private fun observeViewModelState() {
+        lifecycleScope.launch {
+            viewModel.selectedVendor.collectLatest { vendor ->
+                updateVendorUI(vendor)
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.builtinVendorConfig.collectLatest { config ->
+                updateBuiltinConfigUI(config)
+            }
+        }
         lifecycleScope.launch {
             viewModel.activeLlmProvider.collectLatest { provider ->
                 updateLlmProfileUI(provider)
             }
         }
-    }
-
-    /**
-     * Observes prompt preset state changes and updates UI
-     */
-    private fun observePromptPresetState() {
         lifecycleScope.launch {
             viewModel.activePromptPreset.collectLatest { preset ->
                 updatePromptPresetUI(preset)
@@ -332,34 +350,86 @@ class AiPostSettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadInitialData() {
+        viewModel.loadData(prefs)
+        updateSfFreeLlmModelDisplay()
+    }
+
     // ======== UI Update Methods ========
 
-    /**
-     * Updates LLM profile UI with the given provider
-     */
+    private fun updateVendorUI(vendor: LlmVendor) {
+        tvLlmVendor.text = getString(vendor.displayNameResId)
+
+        // Show/hide groups based on vendor type
+        groupSfFreeLlm.visibility = if (vendor == LlmVendor.SF_FREE) View.VISIBLE else View.GONE
+        groupBuiltinLlm.visibility = if (vendor != LlmVendor.SF_FREE && vendor != LlmVendor.CUSTOM) View.VISIBLE else View.GONE
+        groupCustomLlm.visibility = if (vendor == LlmVendor.CUSTOM) View.VISIBLE else View.GONE
+    }
+
+    private fun updateBuiltinConfigUI(config: AiPostSettingsViewModel.BuiltinVendorConfig) {
+        isUpdatingProgrammatically = true
+        etBuiltinApiKey.setTextIfDifferent(config.apiKey)
+        val vendor = viewModel.selectedVendor.value
+        val displayModel = config.model.ifBlank { vendor.defaultModel }
+        val isCustom = !vendor.models.contains(displayModel) && displayModel.isNotBlank()
+        tvBuiltinModel.text = if (isCustom) displayModel else displayModel
+        tilBuiltinCustomModelId.visibility = if (isCustom) View.VISIBLE else View.GONE
+        if (isCustom) {
+            etBuiltinCustomModelId.setTextIfDifferent(displayModel)
+        }
+        etBuiltinTemperature.setTextIfDifferent(config.temperature.toString())
+        isUpdatingProgrammatically = false
+    }
+
+    private fun updateSfFreePaidUI(isFreeMode: Boolean) {
+        tvSfFreeServiceDesc.visibility = if (isFreeMode) View.VISIBLE else View.GONE
+        tilSfApiKey.visibility = if (isFreeMode) View.GONE else View.VISIBLE
+        tilSfTemperature.visibility = if (isFreeMode) View.GONE else View.VISIBLE
+        // Update model display based on mode
+        updateSfFreeLlmModelDisplay()
+        if (!isFreeMode) {
+            updateSfTemperatureDisplay()
+        }
+    }
+
+    private fun updateSfFreeLlmModelDisplay() {
+        isUpdatingProgrammatically = true
+        val model = if (prefs.sfFreeLlmUsePaidKey) {
+            prefs.getLlmVendorModel(LlmVendor.SF_FREE).ifBlank { prefs.sfFreeLlmModel }
+        } else {
+            prefs.sfFreeLlmModel
+        }
+        // Check if it's a custom model (not in preset list)
+        val isCustom = !Prefs.SF_FREE_LLM_MODELS.contains(model) && model.isNotBlank()
+        tvSfFreeLlmModel.text = if (isCustom) model else model
+        tilSfCustomModelId.visibility = if (isCustom) View.VISIBLE else View.GONE
+        if (isCustom) {
+            etSfCustomModelId.setTextIfDifferent(model)
+        }
+        isUpdatingProgrammatically = false
+    }
+
+    private fun updateSfTemperatureDisplay() {
+        isUpdatingProgrammatically = true
+        val temperature = prefs.getLlmVendorTemperature(LlmVendor.SF_FREE)
+        etSfTemperature.setTextIfDifferent(temperature.toString())
+        isUpdatingProgrammatically = false
+    }
+
     private fun updateLlmProfileUI(provider: Prefs.LlmProvider?) {
         isUpdatingProgrammatically = true
-
         val displayName = (provider?.name ?: "").ifBlank { getString(R.string.untitled_profile) }
         tvLlmProfiles.text = displayName
-
         etLlmProfileName.setTextIfDifferent(provider?.name ?: "")
         etLlmEndpoint.setTextIfDifferent(provider?.endpoint ?: prefs.llmEndpoint)
         etLlmApiKey.setTextIfDifferent(provider?.apiKey ?: prefs.llmApiKey)
         etLlmModel.setTextIfDifferent(provider?.model ?: prefs.llmModel)
-        etLlmTemperature.setTextIfDifferent(
-            (provider?.temperature ?: prefs.llmTemperature).toString()
-        )
-
+        etLlmTemperature.setTextIfDifferent((provider?.temperature ?: prefs.llmTemperature).toString())
         isUpdatingProgrammatically = false
     }
 
-    /**
-     * Updates prompt preset UI with the given preset
-     */
     private fun updatePromptPresetUI(preset: PromptPreset?) {
         isUpdatingProgrammatically = true
-
         tvPromptPresets.text = (preset?.title ?: "").ifBlank { getString(R.string.untitled_preset) }
         etLlmPromptTitle.setTextIfDifferent(preset?.title ?: "")
         etLlmPrompt.setTextIfDifferent(preset?.content ?: "")
@@ -368,9 +438,97 @@ class AiPostSettingsActivity : AppCompatActivity() {
 
     // ======== Dialog Methods ========
 
-    /**
-     * Shows dialog to select LLM profile
-     */
+    private fun showVendorSelectionDialog() {
+        val vendors = LlmVendor.allVendors()
+        val titles = vendors.map { getString(it.displayNameResId) }.toTypedArray()
+        val currentVendor = viewModel.selectedVendor.value
+        val selectedIndex = vendors.indexOf(currentVendor).coerceAtLeast(0)
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.label_llm_vendor)
+            .setSingleChoiceItems(titles, selectedIndex) { dialog, which ->
+                val selected = vendors.getOrNull(which) ?: return@setSingleChoiceItems
+                viewModel.selectVendor(prefs, selected)
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
+    }
+
+    private fun showSfFreeLlmModelSelectionDialog() {
+        val customOption = getString(R.string.option_custom_model)
+        val presetModels = Prefs.SF_FREE_LLM_MODELS
+        val models = (presetModels + customOption).toTypedArray()
+
+        val currentModel = if (prefs.sfFreeLlmUsePaidKey) {
+            prefs.getLlmVendorModel(LlmVendor.SF_FREE).ifBlank { prefs.sfFreeLlmModel }
+        } else {
+            prefs.sfFreeLlmModel
+        }
+        val isCurrentCustom = !presetModels.contains(currentModel) && currentModel.isNotBlank()
+        val selectedIndex = if (isCurrentCustom) {
+            models.size - 1 // Custom option
+        } else {
+            presetModels.indexOf(currentModel).coerceAtLeast(0)
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.label_sf_free_llm_model)
+            .setSingleChoiceItems(models, selectedIndex) { dialog, which ->
+                if (which == models.size - 1) {
+                    // Custom option selected - show input field
+                    tilSfCustomModelId.visibility = View.VISIBLE
+                    etSfCustomModelId.requestFocus()
+                    tvSfFreeLlmModel.text = customOption
+                } else {
+                    val selected = presetModels.getOrNull(which) ?: return@setSingleChoiceItems
+                    if (prefs.sfFreeLlmUsePaidKey) {
+                        prefs.setLlmVendorModel(LlmVendor.SF_FREE, selected)
+                    } else {
+                        prefs.sfFreeLlmModel = selected
+                    }
+                    tilSfCustomModelId.visibility = View.GONE
+                    updateSfFreeLlmModelDisplay()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
+    }
+
+    private fun showBuiltinModelSelectionDialog() {
+        val vendor = viewModel.selectedVendor.value
+        val customOption = getString(R.string.option_custom_model)
+        val presetModels = vendor.models
+        val models = (presetModels + customOption).toTypedArray()
+
+        val currentModel = viewModel.builtinVendorConfig.value.model.ifBlank { vendor.defaultModel }
+        val isCurrentCustom = !presetModels.contains(currentModel) && currentModel.isNotBlank()
+        val selectedIndex = if (isCurrentCustom) {
+            models.size - 1 // Custom option
+        } else {
+            presetModels.indexOf(currentModel).coerceAtLeast(0)
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.label_llm_model_select)
+            .setSingleChoiceItems(models, selectedIndex) { dialog, which ->
+                if (which == models.size - 1) {
+                    // Custom option selected - show input field
+                    tilBuiltinCustomModelId.visibility = View.VISIBLE
+                    etBuiltinCustomModelId.requestFocus()
+                    tvBuiltinModel.text = customOption
+                } else {
+                    val selected = presetModels.getOrNull(which) ?: return@setSingleChoiceItems
+                    viewModel.updateBuiltinModel(prefs, selected)
+                    tilBuiltinCustomModelId.visibility = View.GONE
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
+    }
+
     private fun showLlmProfileSelectionDialog() {
         val profiles = viewModel.llmProfiles.value
         if (profiles.isEmpty()) return
@@ -391,9 +549,6 @@ class AiPostSettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    /**
-     * Shows dialog to select prompt preset
-     */
     private fun showPromptPresetSelectionDialog() {
         val presets = viewModel.promptPresets.value
         if (presets.isEmpty()) return
@@ -416,36 +571,19 @@ class AiPostSettingsActivity : AppCompatActivity() {
 
     // ======== Action Handlers ========
 
-    /**
-     * Handles adding a new LLM profile
-     */
     private fun handleAddLlmProfile() {
         val defaultName = getString(R.string.untitled_profile)
         if (viewModel.addLlmProvider(prefs, defaultName)) {
-            Toast.makeText(
-                this,
-                getString(R.string.toast_llm_profile_added),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, getString(R.string.toast_llm_profile_added), Toast.LENGTH_SHORT).show()
         }
     }
 
-    /**
-     * Handles deleting the active LLM profile
-     */
     private fun handleDeleteLlmProfile() {
         if (viewModel.deleteActiveLlmProvider(prefs)) {
-            Toast.makeText(
-                this,
-                getString(R.string.toast_llm_profile_deleted),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, getString(R.string.toast_llm_profile_deleted), Toast.LENGTH_SHORT).show()
         }
     }
 
-    /**
-     * 触发“测试 LLM 调用”并反馈结果
-     */
     private fun handleTestLlmCall() {
         val progressDialog = MaterialAlertDialogBuilder(this)
             .setMessage(R.string.llm_test_running)
@@ -493,39 +631,22 @@ class AiPostSettingsActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Handles adding a new prompt preset
-     */
     private fun handleAddPromptPreset() {
         val defaultTitle = getString(R.string.untitled_preset)
         val defaultContent = ""
         if (viewModel.addPromptPreset(prefs, defaultTitle, defaultContent)) {
-            Toast.makeText(
-                this,
-                getString(R.string.toast_preset_added),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, getString(R.string.toast_preset_added), Toast.LENGTH_SHORT).show()
         }
     }
 
-    /**
-     * Handles deleting the active prompt preset
-     */
     private fun handleDeletePromptPreset() {
         if (viewModel.deleteActivePromptPreset(prefs)) {
-            Toast.makeText(
-                this,
-                getString(R.string.toast_preset_deleted),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, getString(R.string.toast_preset_deleted), Toast.LENGTH_SHORT).show()
         }
     }
 
     // ======== Extension Functions ========
 
-    /**
-     * Extension function to add TextWatcher that respects programmatic update flag
-     */
     private fun EditText.addTextChangeListener(onChange: (String) -> Unit) {
         addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -537,10 +658,6 @@ class AiPostSettingsActivity : AppCompatActivity() {
         })
     }
 
-    /**
-     * Extension function to set text only if different from current value
-     * Prevents unnecessary cursor jumps and listener triggers
-     */
     private fun EditText.setTextIfDifferent(newText: String) {
         val currentText = this.text?.toString() ?: ""
         if (currentText != newText) {
@@ -548,18 +665,12 @@ class AiPostSettingsActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Performs haptic feedback if enabled in preferences
-     */
     private fun hapticTapIfEnabled(view: View?) {
         if (prefs.micHapticEnabled) {
             view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }
     }
 
-    /**
-     * Opens a URL safely in browser with error handling
-     */
     private fun openUrlSafely(url: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
