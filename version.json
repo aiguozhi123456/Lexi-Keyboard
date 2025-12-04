@@ -3,7 +3,7 @@
   "version_code": 127,
   "download_url": "https://github.com/BryceWG/LexiSharp-Keyboard/releases/tag/v3.8.3",
   "release_notes": "本次更新包含 3 个提交:\n- feat(ai): 新增多供应商深度思考模式支持\n- feat(ai): 重构 LLM 供应商架构，支持内置服务提供商\n- feat(ai): 重构 AI 后处理提示词管理系统",
-  "important_notice": "言犀键盘Pro版本已上架Play商店，可以直接搜索言犀键盘进行下载。商店价 4.49$；或可加入TG群组与作者取得联系以早鸟价 3.99$ 进行购买",
+  "important_notice": "",
   "notice_level": "info",
   "min_supported_version": "2.6.5",
   "update_time": "2025-12-04T14:02:29Z"

@@ -1,5 +1,24 @@
 # Changelog
 
+## v3.8.4 (2025-12-04)
+
+### New Features
+
+- **Smart Timeout Mechanism**: Introduced first-token timeout mechanism and independent connection timeout configuration, with automatic fallback to non-streaming mode when streaming fails
+
+### Improvements
+
+- **WebDAV Backup Compatibility**: Added compatibility support and fallback handling for WebDAV services like Jianguoyun (Nutstore), improving backup functionality stability
+- **Configuration Import/Export Extension**: Extended configuration import/export support for SiliconFlow ASR, DashScope regions, Soniox streaming, and other configuration items
+
+### UI Improvements
+
+- **Settings Page Style Optimization**: Unified settings page dropdown selector styles with consistent border and dropdown arrow design
+- **Keyboard Height Selector**: Keyboard height selection updated to use segmented button controls for enhanced user experience
+- **Layout Structure Simplification**: Removed redundant group title views, optimized layout spacing and border radius styles
+
+---
+
 ## v3.8.3 (2025-12-03)
 
 ### New Features
