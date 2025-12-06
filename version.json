@@ -3,6 +3,7 @@
   "version_code": 128,
   "download_url": "https://github.com/BryceWG/LexiSharp-Keyboard/releases/tag/v3.8.4",
   "release_notes": "本次更新包含 6 个提交:\n- fix(backup): 为 WebDAV 备份添加兼容性支持和降级处理\n- feat(asr): 为LLM后处理添加流式传输支持和超时优化\n- fix(config): 修复部分配置的导入导出\n- refactor(ui): 优化设置页面的下拉选择器样式\n- Modify important notice and update time in version.json\n- Update README for Pro version release details",
+  "release_notes_en": "",
   "important_notice": "",
   "notice_level": "info",
   "min_supported_version": "2.6.5",

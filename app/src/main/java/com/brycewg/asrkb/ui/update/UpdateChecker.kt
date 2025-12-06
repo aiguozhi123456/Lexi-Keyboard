@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
@@ -202,7 +203,19 @@ class UpdateChecker(private val context: Context) {
             )
 
             val updateTime = json.optString("update_time", "").ifBlank { null }
-            val releaseNotes = json.optString("release_notes", "").ifBlank { null }
+
+            // 根据语言选择 release_notes：仅简体中文用户看中文版，其他语言看英文版
+            val locale = Locale.getDefault()
+            val isSimplifiedChinese = locale.language == "zh" && locale.country == "CN"
+            val releaseNotes = if (isSimplifiedChinese) {
+                json.optString("release_notes", "").ifBlank { null }
+            } else {
+                // 优先使用英文版，如果为空则回退到中文版
+                json.optString("release_notes_en", "").ifBlank {
+                    json.optString("release_notes", "").ifBlank { null }
+                }
+            }
+
             val importantNotice = json.optString("important_notice", "").ifBlank { null }
             val noticeLevelStr = json.optString("notice_level", "info").lowercase()
             val noticeLevel = when (noticeLevelStr) {

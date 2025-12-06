@@ -24,7 +24,7 @@ jobs:
       - name: Checkout with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 获取完整历史以便生成 changelog
+          fetch-depth: 0 # 获取完整历史以便检测版本变化
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -135,15 +135,6 @@ jobs:
           echo "📌 上一版本: ${{ steps.version.outputs.prev_version_name }} (versionCode: ${{ steps.version.outputs.prev_version_code }})"
           echo "💡 提示: 只有当 versionCode 发生变化时才会触发构建和发布"
 
-      - name: Get previous tag
-        if: steps.version.outputs.changed == 'true'
-        id: prev_tag
-        run: |
-          # 获取上一个 tag
-          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          echo "prev_tag=$PREV_TAG" >> "$GITHUB_OUTPUT"
-          echo "上一个 tag: $PREV_TAG"
-
       - name: Compose current tag
         if: steps.version.outputs.changed == 'true'
         id: tag
@@ -155,61 +146,83 @@ jobs:
           echo "version_display=$V" >> "$GITHUB_OUTPUT"
           echo "当前 tag: v$V"
 
-      - name: Generate changelog between tags
+      - name: Extract changelog from CHANGELOG.md
         if: steps.version.outputs.changed == 'true'
         id: changelog
         run: |
-          PREV_TAG="${{ steps.prev_tag.outputs.prev_tag }}"
+          VERSION="${{ steps.version.outputs.version_name }}"
           CURRENT_TAG="${{ steps.tag.outputs.tag }}"
 
-          if [ -z "$PREV_TAG" ]; then
-            echo "## 📝 更新日志" > changelog.md
-            echo "" >> changelog.md
-            echo "这是首个发布版本。" >> changelog.md
-            echo "" >> changelog.md
-            echo "### 所有提交" >> changelog.md
-            # 过滤 chore/docs；提交哈希可点击；去掉时间；单行展示
-            REPO_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
-            git log --no-merges \
-              --grep='^chore' --grep='^docs' --invert-grep \
-              --pretty=format:"- %s | 提交:[%h]($REPO_URL/commit/%H) | 作者:%an" >> changelog.md
+          echo "📖 从 CHANGELOG.md 提取版本 $VERSION 的更新内容..."
 
-            # 生成简短版本用于 version.json
-            echo "首个发布版本" > release_notes_short.txt
-          else
-            echo "## 📝 更新日志 ($PREV_TAG → $CURRENT_TAG)" > changelog.md
-            echo "" >> changelog.md
+          # 使用 Python 提取 CHANGELOG.md 和 CHANGELOG_EN.md 中对应版本的内容
+          python3 - <<'PY'
+          import os
+          import re
 
-            echo "### 📋 本次更新内容" >> changelog.md
-            echo "" >> changelog.md
+          version = os.environ.get('VERSION', '')
+          current_tag = os.environ.get('CURRENT_TAG', '')
 
-            # 获取详细的 commit 信息（过滤 chore/docs；哈希可点击；去掉时间；单行展示）
-            REPO_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
-            git log $PREV_TAG..HEAD --no-merges \
-              --grep='^chore' --grep='^docs' --invert-grep \
-              --pretty=format:"- %s | 提交:[%h]($REPO_URL/commit/%H) | 作者:%an" >> changelog.md
+          def extract_version_notes(changelog_file, version):
+              """从 CHANGELOG 文件中提取指定版本的更新内容"""
+              try:
+                  with open(changelog_file, 'r', encoding='utf-8') as f:
+                      content = f.read()
+              except FileNotFoundError:
+                  print(f"⚠️ {changelog_file} 不存在")
+                  return ""
 
-            echo "" >> changelog.md
-            echo "" >> changelog.md
-            echo "### 📊 统计信息" >> changelog.md
-            # 统计同样基于过滤后的提交集
-            COMMIT_COUNT=$(git log $PREV_TAG..HEAD --no-merges --grep='^chore' --grep='^docs' --invert-grep --pretty=oneline | wc -l | tr -d ' ')
-            echo "- 提交数量: $COMMIT_COUNT" >> changelog.md
-            FILES_CHANGED=$(git diff --shortstat $PREV_TAG..HEAD | sed 's/^[[:space:]]*//')
-            if [ -n "$FILES_CHANGED" ]; then
-              echo "- 文件变更: $FILES_CHANGED" >> changelog.md
-            fi
+              if not content or not version:
+                  return ""
 
-            # 生成简短版本用于 version.json（只包含 commit 标题）
-            echo "本次更新包含 $COMMIT_COUNT 个提交:" > release_notes_short.txt
-            git log $PREV_TAG..HEAD --no-merges \
-              --grep='^chore' --grep='^docs' --invert-grep \
-              --pretty=format:"- %s" >> release_notes_short.txt
-          fi
+              # 匹配版本标题: ## vX.X.X (YYYY-MM-DD) 或 ## vX.X.X
+              # 提取从当前版本标题到下一个 --- 或下一个版本标题之间的内容
+              pattern = rf'(## v?{re.escape(version)}[^\n]*\n)(.*?)(?=\n---|\n## v|\Z)'
+              match = re.search(pattern, content, re.DOTALL)
 
-          # 不再通过 $GITHUB_OUTPUT 传递多行内容，以避免分隔符解析问题。
-          # 后续步骤直接读取 changelog.md 与 release_notes_short.txt 文件。
-          echo "✅ changelog 与简短更新说明已生成到工作区文件。"
+              if match:
+                  return match.group(2).strip()
+              return ""
+
+          # 提取中文版更新内容
+          release_notes = extract_version_notes('CHANGELOG.md', version)
+          if release_notes:
+              print(f"✅ 找到版本 {version} 的中文更新内容 ({len(release_notes)} 字符)")
+          else:
+              release_notes = f"版本 {version} 已发布"
+              print(f"ℹ️ 使用默认中文更新说明")
+
+          # 提取英文版更新内容
+          release_notes_en = extract_version_notes('CHANGELOG_EN.md', version)
+          if release_notes_en:
+              print(f"✅ 找到版本 {version} 的英文更新内容 ({len(release_notes_en)} 字符)")
+          else:
+              release_notes_en = f"Version {version} released"
+              print(f"ℹ️ 使用默认英文更新说明")
+
+          # 写入 release_notes_short.txt（中文）供 version.json 使用
+          with open('release_notes_short.txt', 'w', encoding='utf-8') as f:
+              f.write(release_notes)
+
+          # 写入 release_notes_en_short.txt（英文）供 version.json 使用
+          with open('release_notes_en_short.txt', 'w', encoding='utf-8') as f:
+              f.write(release_notes_en)
+
+          # 生成 changelog.md 用于 GitHub Release（包含中英文）
+          with open('changelog.md', 'w', encoding='utf-8') as f:
+              f.write(f"## 📝 更新日志 / Changelog ({current_tag})\n\n")
+              f.write("### 中文\n\n")
+              f.write(release_notes)
+              f.write("\n\n---\n\n")
+              f.write("### English\n\n")
+              f.write(release_notes_en)
+              f.write("\n")
+
+          print(f"✅ changelog.md、release_notes_short.txt、release_notes_en_short.txt 已生成")
+          PY
+        env:
+          VERSION: ${{ steps.version.outputs.version_name }}
+          CURRENT_TAG: ${{ steps.tag.outputs.tag }}
 
       - name: Set up Android SDK
         if: steps.version.outputs.changed == 'true'
@@ -330,14 +343,20 @@ jobs:
           version = os.environ.get('VERSION', '0.0.0')
           version_code = os.environ.get('VERSION_CODE', '0')
           tag = os.environ.get('TAG', 'v0.0.0')
-          # 优先使用 env 中的 RELEASE_NOTES；若为空，则读取文件 release_notes_short.txt
-          release_notes = os.environ.get('RELEASE_NOTES')
-          if not release_notes:
-              try:
-                  with open('release_notes_short.txt', 'r', encoding='utf-8') as f:
-                      release_notes = f.read().strip()
-              except FileNotFoundError:
-                  release_notes = f'版本 {version} 已发布'
+
+          # 从之前提取的 release_notes_short.txt 读取（来源于 CHANGELOG.md）
+          try:
+              with open('release_notes_short.txt', 'r', encoding='utf-8') as f:
+                  release_notes = f.read().strip()
+          except FileNotFoundError:
+              release_notes = f'版本 {version} 已发布'
+
+          # 从之前提取的 release_notes_en_short.txt 读取（来源于 CHANGELOG_EN.md）
+          try:
+              with open('release_notes_en_short.txt', 'r', encoding='utf-8') as f:
+                  release_notes_en = f.read().strip()
+          except FileNotFoundError:
+              release_notes_en = f'Version {version} released'
 
           # 使用 ISO 8601 格式的时间戳（UTC）
           current_timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -354,6 +373,7 @@ jobs:
           data['version_code'] = int(version_code) if version_code.isdigit() else 0
           data['download_url'] = f"https://github.com/BryceWG/LexiSharp-Keyboard/releases/tag/{tag}"
           data['release_notes'] = release_notes
+          data['release_notes_en'] = release_notes_en
           data['min_supported_version'] = data.get('min_supported_version', '2.6.5')
           data['update_time'] = current_timestamp
 
@@ -380,8 +400,6 @@ jobs:
           VERSION: ${{ steps.version.outputs.version_name }}
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           TAG: ${{ steps.tag.outputs.tag }}
-          # RELEASE_NOTES 通过文件回退，不再依赖多行 step 输出
-          RELEASE_NOTES: ""
 
       - name: Commit and push version.json
         if: steps.version.outputs.changed == 'true' && steps.update_version_json.outputs.version_changed == 'true'
@@ -402,7 +420,7 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
 
-            # 重新应用 version.json 更改
+            # 重新应用 version.json 更改（从 release_notes_short.txt 和 release_notes_en_short.txt 读取已提取的内容）
             python3 - <<'PY'
           import json
           import os
@@ -411,13 +429,20 @@ jobs:
           version = os.environ.get('VERSION', '0.0.0')
           version_code = os.environ.get('VERSION_CODE', '0')
           tag = os.environ.get('TAG', 'v0.0.0')
-          release_notes = os.environ.get('RELEASE_NOTES')
-          if not release_notes:
-              try:
-                  with open('release_notes_short.txt', 'r', encoding='utf-8') as f:
-                      release_notes = f.read().strip()
-              except FileNotFoundError:
-                  release_notes = f'版本 {version} 已发布'
+
+          # 从之前提取的 release_notes_short.txt 读取
+          try:
+              with open('release_notes_short.txt', 'r', encoding='utf-8') as f:
+                  release_notes = f.read().strip()
+          except FileNotFoundError:
+              release_notes = f'版本 {version} 已发布'
+
+          # 从之前提取的 release_notes_en_short.txt 读取
+          try:
+              with open('release_notes_en_short.txt', 'r', encoding='utf-8') as f:
+                  release_notes_en = f.read().strip()
+          except FileNotFoundError:
+              release_notes_en = f'Version {version} released'
 
           current_timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -431,6 +456,7 @@ jobs:
           data['version_code'] = int(version_code) if version_code.isdigit() else 0
           data['download_url'] = f"https://github.com/BryceWG/LexiSharp-Keyboard/releases/tag/{tag}"
           data['release_notes'] = release_notes
+          data['release_notes_en'] = release_notes_en
           data['min_supported_version'] = data.get('min_supported_version', '2.6.5')
           data['update_time'] = current_timestamp
 
@@ -468,7 +494,6 @@ jobs:
           VERSION: ${{ steps.version.outputs.version_name }}
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           TAG: ${{ steps.tag.outputs.tag }}
-          RELEASE_NOTES: ""
 
       - name: Create GitHub Release
         if: steps.version.outputs.changed == 'true'
