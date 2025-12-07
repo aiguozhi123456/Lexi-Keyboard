@@ -1281,6 +1281,35 @@ class Prefs(context: Context) {
         get() = sp.getString(KEY_PENDING_APK_PATH, "") ?: ""
         set(value) = sp.edit { putString(KEY_PENDING_APK_PATH, value.trim()) }
 
+    // ---- 翻译功能配置 ----
+    var translateVendor: com.brycewg.asrkb.translate.TranslateVendor
+        get() {
+            val vendorStr = sp.getString(KEY_TRANSLATE_VENDOR, "GOOGLE_FREE") ?: "GOOGLE_FREE"
+            return com.brycewg.asrkb.translate.TranslateVendor.fromString(vendorStr)
+                ?: com.brycewg.asrkb.translate.TranslateVendor.GOOGLE_FREE
+        }
+        set(value) = sp.edit { putString(KEY_TRANSLATE_VENDOR, value.name) }
+
+    var translateSourceLang: String by stringPref(KEY_TRANSLATE_SOURCE_LANG, "auto")
+    var translateTargetLang: String by stringPref(KEY_TRANSLATE_TARGET_LANG, "zh")
+
+    var translateImmeEndpoint: String by stringPref(KEY_TRANSLATE_IMME_ENDPOINT, "")
+    var translateImmeApiKey: String by stringPref(KEY_TRANSLATE_IMME_API_KEY, "")
+
+    var translateKissEndpoint: String by stringPref(KEY_TRANSLATE_KISS_ENDPOINT, "")
+    var translateKissApiKey: String by stringPref(KEY_TRANSLATE_KISS_API_KEY, "")
+
+    var translateDeepLEndpoint: String by stringPref(KEY_TRANSLATE_DEEPL_ENDPOINT, "")
+    var translateDeepLApiKey: String by stringPref(KEY_TRANSLATE_DEEPL_API_KEY, "")
+
+    var translateGoogleV2Endpoint: String by stringPref(KEY_TRANSLATE_GOOGLE_V2_ENDPOINT, "")
+    var translateGoogleV2ApiKey: String by stringPref(KEY_TRANSLATE_GOOGLE_V2_API_KEY, "")
+
+    var translateGoogleFreeEndpoint: String by stringPref(KEY_TRANSLATE_GOOGLE_FREE_ENDPOINT, "")
+
+    var translateHcfyEndpoint: String by stringPref(KEY_TRANSLATE_HCFY_ENDPOINT, "")
+    var translateHcfyApiKey: String by stringPref(KEY_TRANSLATE_HCFY_API_KEY, "")
+
     companion object {
         private const val TAG = "Prefs"
         @Volatile private var TOGGLE_LISTENER_REGISTERED: Boolean = false
@@ -1453,6 +1482,22 @@ class Prefs(context: Context) {
         private const val KEY_WD_USERNAME = "wd_username"
         private const val KEY_WD_PASSWORD = "wd_password"
         private const val KEY_PENDING_APK_PATH = "pending_apk_path"
+
+        // 翻译功能配置
+        private const val KEY_TRANSLATE_VENDOR = "translate_vendor"
+        private const val KEY_TRANSLATE_SOURCE_LANG = "translate_source_lang"
+        private const val KEY_TRANSLATE_TARGET_LANG = "translate_target_lang"
+        private const val KEY_TRANSLATE_IMME_ENDPOINT = "translate_imme_endpoint"
+        private const val KEY_TRANSLATE_IMME_API_KEY = "translate_imme_api_key"
+        private const val KEY_TRANSLATE_KISS_ENDPOINT = "translate_kiss_endpoint"
+        private const val KEY_TRANSLATE_KISS_API_KEY = "translate_kiss_api_key"
+        private const val KEY_TRANSLATE_DEEPL_ENDPOINT = "translate_deepl_endpoint"
+        private const val KEY_TRANSLATE_DEEPL_API_KEY = "translate_deepl_api_key"
+        private const val KEY_TRANSLATE_GOOGLE_V2_ENDPOINT = "translate_google_v2_endpoint"
+        private const val KEY_TRANSLATE_GOOGLE_V2_API_KEY = "translate_google_v2_api_key"
+        private const val KEY_TRANSLATE_GOOGLE_FREE_ENDPOINT = "translate_google_free_endpoint"
+        private const val KEY_TRANSLATE_HCFY_ENDPOINT = "translate_hcfy_endpoint"
+        private const val KEY_TRANSLATE_HCFY_API_KEY = "translate_hcfy_api_key"
 
         const val DEFAULT_ENDPOINT = "https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash"
         const val SF_ENDPOINT = "https://api.siliconflow.cn/v1/audio/transcriptions"
