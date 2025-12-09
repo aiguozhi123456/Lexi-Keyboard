@@ -1046,7 +1046,7 @@ class SettingsActivity : BaseActivity() {
             cardOnline.isChecked = true
         }
 
-        // 将 dialog 声明为 lateinit，以便跳过按钮能访问
+        // 将 dialog 声明为 lateinit，以便按钮能访问
         lateinit var dialog: AlertDialog
 
         // 跳过按钮点击事件
@@ -1055,66 +1055,62 @@ class SettingsActivity : BaseActivity() {
             dialog.dismiss()
         }
 
+        // 确认按钮点击事件
+        val btnConfirm = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnConfirmGuide)
+        btnConfirm.setOnClickListener {
+            // 根据选择执行不同的操作
+            when {
+                cardSfFree.isChecked -> {
+                    // 选择硅基流动免费服务：设置 vendor 和启用免费服务
+                    val prefs = Prefs(this)
+                    prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SiliconFlow
+                    prefs.sfFreeAsrEnabled = true
+                    prefs.sfFreeLlmEnabled = true
+                    dialog.dismiss()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.model_guide_sf_free_ready),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                cardLocal.isChecked -> {
+                    // 选择本地模型：先切换 vendor，然后显示镜像源选择
+                    val prefs = Prefs(this)
+                    prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SenseVoice
+                    prefs.svModelVariant = "small-full"
+                    prefs.sfFreeAsrEnabled = false
+                    prefs.sfFreeLlmEnabled = false
+
+                    dialog.dismiss()
+
+                    // 显示镜像源选择对话框
+                    showModelDownloadSourceDialog()
+                }
+                cardOnline.isChecked -> {
+                    // 选择在线模型：禁用免费服务，显示配置指南对话框
+                    val prefs = Prefs(this)
+                    prefs.sfFreeAsrEnabled = false
+                    prefs.sfFreeLlmEnabled = false
+                    dialog.dismiss()
+                    showOnlineModelConfigGuide()
+                }
+                else -> {
+                    // 未选择任何选项，提示用户
+                    Toast.makeText(
+                        this,
+                        "Please select a model type",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
         dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.model_guide_title)
             .setMessage(R.string.model_guide_message)
             .setView(dialogView)
             .setCancelable(false)
-            .setPositiveButton(R.string.btn_confirm, null) // 先设置为 null，稍后在 onShow 中设置真正的点击监听
             .create()
-
-        dialog.setOnShowListener {
-            // 防止点击空白区域关闭对话框
-            dialog.setCanceledOnTouchOutside(false)
-            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            positiveButton.setOnClickListener {
-                // 根据选择执行不同的操作
-                when {
-                    cardSfFree.isChecked -> {
-                        // 选择硅基流动免费服务：设置 vendor 和启用免费服务
-                        val prefs = Prefs(this)
-                        prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SiliconFlow
-                        prefs.sfFreeAsrEnabled = true
-                        prefs.sfFreeLlmEnabled = true
-                        dialog.dismiss()
-                        Toast.makeText(
-                            this,
-                            getString(R.string.model_guide_sf_free_ready),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    cardLocal.isChecked -> {
-                        // 选择本地模型：先切换 vendor，然后显示镜像源选择
-                        val prefs = Prefs(this)
-                        prefs.asrVendor = com.brycewg.asrkb.asr.AsrVendor.SenseVoice
-                        prefs.svModelVariant = "small-full"
-                        prefs.sfFreeAsrEnabled = false
-                        prefs.sfFreeLlmEnabled = false
-
-                        dialog.dismiss()
-
-                        // 显示镜像源选择对话框
-                        showModelDownloadSourceDialog()
-                    }
-                    cardOnline.isChecked -> {
-                        // 选择在线模型：禁用免费服务，显示配置指南对话框
-                        val prefs = Prefs(this)
-                        prefs.sfFreeAsrEnabled = false
-                        prefs.sfFreeLlmEnabled = false
-                        dialog.dismiss()
-                        showOnlineModelConfigGuide()
-                    }
-                    else -> {
-                        // 未选择任何选项，提示用户
-                        Toast.makeText(
-                            this,
-                            "Please select a model type",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        }
 
         dialog.show()
     }

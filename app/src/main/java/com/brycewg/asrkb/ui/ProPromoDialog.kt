@@ -84,6 +84,12 @@ object ProPromoDialog {
 
     private fun showInternal(context: Context, markAsShown: Boolean) {
         try {
+            // 立即标记已显示，避免返回桌面后再次出现弹窗
+            if (markAsShown) {
+                val prefs = Prefs(context)
+                prefs.proPromoShown = true
+            }
+
             val inflater = LayoutInflater.from(context)
             val customView = inflater.inflate(R.layout.dialog_pro_promo, null)
 
@@ -94,7 +100,7 @@ object ProPromoDialog {
 
             val dialog = MaterialAlertDialogBuilder(context)
                 .setView(customView)
-                .setCancelable(true)
+                .setCancelable(false) // 只能通过点击关闭按钮关闭，防止误触
                 .create()
 
             btnPlayStore.setOnClickListener {
@@ -111,14 +117,6 @@ object ProPromoDialog {
 
             btnClose.setOnClickListener {
                 dialog.dismiss()
-            }
-
-            // 标记已显示（在弹窗关闭时）
-            if (markAsShown) {
-                dialog.setOnDismissListener {
-                    val prefs = Prefs(context)
-                    prefs.proPromoShown = true
-                }
             }
 
             dialog.show()
