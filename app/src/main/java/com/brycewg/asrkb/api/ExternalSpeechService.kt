@@ -53,7 +53,7 @@ class ExternalSpeechService : Service() {
                         val sid = synchronized(this@ExternalSpeechService) { nextId++ }
                         safe { cb.onState(sid, STATE_RECORDING, "recording") }
                         safe { cb.onPartial(sid, "【联通测试中】……") }
-                        safe { cb.onFinal(sid, "言犀外部AIDL联通成功（mock）") }
+                        safe { cb.onFinal(sid, "说点啥外部AIDL联通成功（mock）") }
                         safe { cb.onState(sid, STATE_IDLE, "final") }
                         reply?.apply { writeNoException(); writeInt(sid) }
                         return true
@@ -233,8 +233,8 @@ class ExternalSpeechService : Service() {
                 AsrVendor.Paraformer, AsrVendor.Zipformer -> true
                 AsrVendor.SenseVoice, AsrVendor.Telespeech -> false
                 AsrVendor.ElevenLabs -> prefs.elevenStreamingEnabled
-                // 其他云厂商（OpenAI/Gemini/SiliconFlow）仅非流式
-                AsrVendor.OpenAI, AsrVendor.Gemini, AsrVendor.SiliconFlow -> false
+                // 其他云厂商（OpenAI/Gemini/SiliconFlow/Zhipu）仅非流式
+                AsrVendor.OpenAI, AsrVendor.Gemini, AsrVendor.SiliconFlow, AsrVendor.Zhipu -> false
             }
         }
 
@@ -302,6 +302,12 @@ class ExternalSpeechService : Service() {
                         }
                     )
                 }
+                AsrVendor.Zhipu -> ZhipuFileAsrEngine(
+                    context, scope, prefs, this,
+                    onRequestDuration = { ms: Long ->
+                        try { lastRequestDurationMs = ms } catch (t: Throwable) { Log.w(TAG, "set proc ms failed", t) }
+                    }
+                )
                 AsrVendor.SenseVoice -> SenseVoiceFileAsrEngine(
                     context, scope, prefs, this,
                     onRequestDuration = { ms: Long ->
@@ -410,6 +416,15 @@ class ExternalSpeechService : Service() {
                 AsrVendor.SiliconFlow -> com.brycewg.asrkb.asr.GenericPushFileAsrAdapter(
                     context, scope, prefs, this,
                     com.brycewg.asrkb.asr.SiliconFlowFileAsrEngine(
+                        context, scope, prefs, this,
+                        onRequestDuration = { ms: Long ->
+                            try { lastRequestDurationMs = ms } catch (t: Throwable) { Log.w(TAG, "set proc ms failed", t) }
+                        }
+                    )
+                )
+                AsrVendor.Zhipu -> com.brycewg.asrkb.asr.GenericPushFileAsrAdapter(
+                    context, scope, prefs, this,
+                    com.brycewg.asrkb.asr.ZhipuFileAsrEngine(
                         context, scope, prefs, this,
                         onRequestDuration = { ms: Long ->
                             try { lastRequestDurationMs = ms } catch (t: Throwable) { Log.w(TAG, "set proc ms failed", t) }

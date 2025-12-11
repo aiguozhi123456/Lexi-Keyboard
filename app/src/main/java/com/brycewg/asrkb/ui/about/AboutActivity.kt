@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.content.pm.PackageManager
 import com.brycewg.asrkb.R
+import com.brycewg.asrkb.ui.BaseActivity
 import com.brycewg.asrkb.UiColors
 import com.brycewg.asrkb.UiColorTokens
 import com.brycewg.asrkb.asr.AsrVendor
@@ -22,12 +23,13 @@ import com.brycewg.asrkb.ui.AsrAccessibilityService
 import android.provider.Settings
 import android.os.PowerManager
 import android.Manifest
+import com.brycewg.asrkb.ui.ProPromoDialog
 import java.text.NumberFormat
 import java.util.Locale
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : BaseActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_about)
@@ -68,6 +70,15 @@ class AboutActivity : AppCompatActivity() {
       } catch (e: Throwable) {
         Log.e(TAG, "Failed to open GitHub URL", e)
         Toast.makeText(this, R.string.error_open_browser, Toast.LENGTH_SHORT).show()
+      }
+    }
+
+    // 了解 Pro 按钮
+    findViewById<Button>(R.id.btnLearnPro)?.setOnClickListener {
+      try {
+        ProPromoDialog.showForce(this)
+      } catch (e: Throwable) {
+        Log.e(TAG, "Failed to show Pro promo dialog", e)
       }
     }
 

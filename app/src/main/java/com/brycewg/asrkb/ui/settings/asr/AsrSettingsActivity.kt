@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.brycewg.asrkb.ui.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.brycewg.asrkb.R
 import com.brycewg.asrkb.asr.AsrVendor
@@ -43,7 +44,7 @@ import java.io.FileOutputStream
  * 4. Added proper logging to all catch blocks
  * 5. Vendor-specific settings organized in separate methods
  */
-class AsrSettingsActivity : AppCompatActivity() {
+class AsrSettingsActivity : BaseActivity() {
 
     private lateinit var viewModel: AsrSettingsViewModel
     private lateinit var prefs: Prefs
@@ -80,6 +81,7 @@ class AsrSettingsActivity : AppCompatActivity() {
     private lateinit var groupDash: View
     private lateinit var groupGemini: View
     private lateinit var groupSoniox: View
+    private lateinit var groupZhipu: View
     private lateinit var groupSenseVoice: View
     private lateinit var groupTelespeech: View
     private lateinit var groupParaformer: View
@@ -140,6 +142,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         groupDash = findViewById(R.id.groupDashScope)
         groupGemini = findViewById(R.id.groupGemini)
         groupSoniox = findViewById(R.id.groupSoniox)
+        groupZhipu = findViewById(R.id.groupZhipu)
         groupSenseVoice = findViewById(R.id.groupSenseVoice)
         groupTelespeech = findViewById(R.id.groupTelespeech)
         groupParaformer = findViewById(R.id.groupParaformer)
@@ -219,6 +222,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         setupDashScopeSettings()
         setupGeminiSettings()
         setupSonioxSettings()
+        setupZhipuSettings()
         setupSenseVoiceSettings()
         setupTelespeechSettings()
         setupParaformerSettings()
@@ -262,6 +266,20 @@ class AsrSettingsActivity : AppCompatActivity() {
                 preferenceKey = "volc_file_standard_explained",
                 readPref = { prefs.volcFileStandardEnabled },
                 writePref = { v -> viewModel.updateVolcFileStandard(v) },
+                hapticFeedback = { hapticTapIfEnabled(it) }
+            )
+        }
+
+        findViewById<MaterialSwitch>(R.id.switchVolcModelV2).apply {
+            isChecked = prefs.volcModelV2Enabled
+            installExplainedSwitch(
+                context = this@AsrSettingsActivity,
+                titleRes = R.string.label_volc_model_v2,
+                offDescRes = R.string.feature_volc_model_v2_off_desc,
+                onDescRes = R.string.feature_volc_model_v2_on_desc,
+                preferenceKey = "volc_model_v2_explained",
+                readPref = { prefs.volcModelV2Enabled },
+                writePref = { v -> viewModel.updateVolcModelV2(v) },
                 hapticFeedback = { hapticTapIfEnabled(it) }
             )
         }
@@ -352,7 +370,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnVolcGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -449,7 +467,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // 免费服务配置教程按钮
         findViewById<MaterialButton>(R.id.btnSfFreeGuide).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
 
         // 自有 API Key 配置
@@ -503,7 +521,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSfGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -531,7 +549,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnElevenGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -601,7 +619,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnOpenAiGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -664,7 +682,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDashGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -753,7 +771,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnGeminiGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -782,7 +800,7 @@ class AsrSettingsActivity : AppCompatActivity() {
         // Key guide link
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSonioxGetKey).setOnClickListener { v ->
             hapticTapIfEnabled(v)
-            openUrlSafely("https://brycewg.notion.site/lexisharp-keyboard-providers-guide")
+            openUrlSafely("https://brycewg.notion.site/bibi-keyboard-providers-guide")
         }
     }
 
@@ -851,6 +869,34 @@ class AsrSettingsActivity : AppCompatActivity() {
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
             builder.show()
+        }
+    }
+
+    private fun setupZhipuSettings() {
+        findViewById<EditText>(R.id.etZhipuApiKey).apply {
+            setText(prefs.zhipuApiKey)
+            bindString { prefs.zhipuApiKey = it }
+        }
+
+        findViewById<Slider>(R.id.sliderZhipuTemperature).apply {
+            value = prefs.zhipuTemperature.coerceIn(0f, 1f)
+            addOnChangeListener { _, value, fromUser ->
+                if (fromUser) {
+                    prefs.zhipuTemperature = value.coerceIn(0f, 1f)
+                }
+            }
+        }
+
+        // Prompt for context
+        findViewById<EditText>(R.id.etZhipuPrompt).apply {
+            setText(prefs.zhipuPrompt)
+            bindString { prefs.zhipuPrompt = it }
+        }
+
+        // Key guide link
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btnZhipuGetKey).setOnClickListener { v ->
+            hapticTapIfEnabled(v)
+            openUrlSafely("https://bigmodel.cn/usercenter/proj-mgmt/apikeys")
         }
     }
 
@@ -1068,9 +1114,9 @@ class AsrSettingsActivity : AppCompatActivity() {
             val variant = prefs.pfModelVariant
             val isTri = variant.startsWith("trilingual")
             val urlOfficial = if (isTri) {
-                "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en.zip"
+                "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en.zip"
             } else {
-                "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-paraformer-bilingual-zh-en.zip"
+                "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-paraformer-bilingual-zh-en.zip"
             }
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle(R.string.download_source_title)
@@ -1293,12 +1339,12 @@ class AsrSettingsActivity : AppCompatActivity() {
             )
             val variant = prefs.zfModelVariant
             val urlOfficial = when (variant) {
-                "zh-xl-int8-20250630" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-xlarge-int8-2025-06-30.zip"
-                "zh-xl-fp16-20250630" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-xlarge-fp16-2025-06-30.zip"
-                "zh-int8-20250630" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30.zip"
-                "zh-fp16-20250630" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-fp16-2025-06-30.zip"
-                "bi-20230220-int8", "bi-20230220-fp32" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.zip"
-                else -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.zip"
+                "zh-xl-int8-20250630" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-xlarge-int8-2025-06-30.zip"
+                "zh-xl-fp16-20250630" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-xlarge-fp16-2025-06-30.zip"
+                "zh-int8-20250630" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30.zip"
+                "zh-fp16-20250630" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-zh-fp16-2025-06-30.zip"
+                "bi-20230220-int8", "bi-20230220-fp32" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.zip"
+                else -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.zip"
             }
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle(R.string.download_source_title)
@@ -1487,9 +1533,9 @@ class AsrSettingsActivity : AppCompatActivity() {
             )
             val variant = prefs.svModelVariant
             val urlOfficial = if (variant == "small-full") {
-                "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.zip"
+                "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17.zip"
             } else {
-                "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.zip"
+                "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.zip"
             }
 
             androidx.appcompat.app.AlertDialog.Builder(this)
@@ -1585,8 +1631,8 @@ class AsrSettingsActivity : AppCompatActivity() {
             val variant = prefs.tsModelVariant
             // TeleSpeech：int8/fp32 使用 GitHub 发布的官方 ZIP
             val urlOfficial = when (variant) {
-                "full" -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-telespeech-ctc-zh-2024-06-04.zip"
-                else -> "https://github.com/BryceWG/Lexi-Keyboard/releases/download/models/sherpa-onnx-telespeech-ctc-int8-zh-2024-06-04.zip"
+                "full" -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-telespeech-ctc-zh-2024-06-04.zip"
+                else -> "https://github.com/BryceWG/BiBi-Keyboard/releases/download/models/sherpa-onnx-telespeech-ctc-int8-zh-2024-06-04.zip"
             }
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle(R.string.download_source_title)
@@ -1877,6 +1923,11 @@ class AsrSettingsActivity : AppCompatActivity() {
                         sw.isChecked = state.volcFileStandardEnabled
                     }
                 }
+                findViewById<MaterialSwitch>(R.id.switchVolcModelV2).let { sw ->
+                    if (sw.isChecked != state.volcModelV2Enabled) {
+                        sw.isChecked = state.volcModelV2Enabled
+                    }
+                }
                 updateVolcStreamOptionsVisibility(state.volcStreamingEnabled)
                 updateVolcTwoPassVisibility(state.volcStreamingEnabled, state.volcBidiStreamingEnabled)
             }
@@ -1899,6 +1950,7 @@ class AsrSettingsActivity : AppCompatActivity() {
             AsrVendor.DashScope to groupDash,
             AsrVendor.Gemini to groupGemini,
             AsrVendor.Soniox to groupSoniox,
+            AsrVendor.Zhipu to groupZhipu,
             AsrVendor.SenseVoice to groupSenseVoice,
             AsrVendor.Telespeech to groupTelespeech,
             AsrVendor.Paraformer to groupParaformer,
