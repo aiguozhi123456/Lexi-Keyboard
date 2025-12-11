@@ -7,5 +7,5 @@
   "important_notice": "为规避风险，3.9.0已将应用名称更改“说点啥”（BiBi Keyboard）\nBiBi Keyboard Pro版本已上架，欢迎在3.8.6后版本-关于页面中了解详情。\n注意:3.8.5更新升级了火山引擎(豆包语音识别模型)到了2.0版本,请到控制台开通对应模型(https://console.volcengine.com/speech/service),或者可以在3.8.6版本中通过开关选择回退到1.0版本。",
   "notice_level": "info",
   "min_supported_version": "2.6.5",
-  "update_time": "2025-12-09T06:36:02Z"
+  "update_time": "2025-12-11T14:43:02Z"
 }
