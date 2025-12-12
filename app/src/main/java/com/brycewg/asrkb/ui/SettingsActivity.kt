@@ -92,6 +92,10 @@ class SettingsActivity : BaseActivity() {
     // 一键设置轮询任务（用于等待用户选择输入法）
     private var setupPollingRunnable: Runnable? = null
 
+    // 一键设置触发的 IME 选择器前台状态
+    private var setupImePickerShown = false
+    private var setupImePickerLostFocusOnce = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -148,6 +152,12 @@ class SettingsActivity : BaseActivity() {
         maybeShowDataCollectionConsentOnUpgrade()
     }
 
+    override fun onStop() {
+        super.onStop()
+        // 退出设置页时停止一键设置轮询，避免后台弹出不合时机的提示
+        stopSetupPolling()
+    }
+
     /**
      * 授予“未知来源应用安装”权限后，自动继续安装已下载的APK
      */
@@ -191,6 +201,9 @@ class SettingsActivity : BaseActivity() {
 
         // 处理自动弹出 IME 选择器（由 Intent Extra 触发）
         handleAutoShowImePicker(hasFocus)
+
+        // 处理一键设置流程中的 IME 选择器焦点变化
+        handleSetupImePickerFocus(hasFocus)
     }
 
     override fun onRequestPermissionsResult(
@@ -305,8 +318,13 @@ class SettingsActivity : BaseActivity() {
 
         when (newState) {
             is SetupState.SelectingIme -> {
-                // 启动轮询，等待用户选择输入法
-                if (newState.askedOnce) {
+                // 第一次进入该状态会唤起 IME 选择器；此时立即开始轮询
+                if (didExecute) {
+                    setupImePickerShown = true
+                    setupImePickerLostFocusOnce = false
+                    startSetupPolling()
+                } else if (newState.askedOnce) {
+                    // 返回后继续等待用户选择输入法
                     startSetupPolling()
                 }
             }
@@ -314,6 +332,8 @@ class SettingsActivity : BaseActivity() {
             is SetupState.Completed, is SetupState.Aborted -> {
                 // 设置完成或中止，停止轮询
                 stopSetupPolling()
+                setupImePickerShown = false
+                setupImePickerLostFocusOnce = false
             }
 
             is SetupState.RequestingPermissions -> {
@@ -395,11 +415,15 @@ class SettingsActivity : BaseActivity() {
                         // 超时或其他原因中止
                         Log.d(TAG, "Setup aborted during polling")
                         stopSetupPolling()
-                        Toast.makeText(
-                            this@SettingsActivity,
-                            getString(R.string.toast_setup_choose_keyboard),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        if (setupImePickerShown && !hasWindowFocus()) {
+                            Toast.makeText(
+                                this@SettingsActivity,
+                                getString(R.string.toast_setup_choose_keyboard),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Log.d(TAG, "Skip IME choose toast: picker not foreground")
+                        }
                     }
 
                     is SetupState.Completed -> {
@@ -425,6 +449,44 @@ class SettingsActivity : BaseActivity() {
     private fun stopSetupPolling() {
         setupPollingRunnable?.let { handler.removeCallbacks(it) }
         setupPollingRunnable = null
+    }
+
+    /**
+     * 一键设置中 IME 选择器焦点变化处理：
+     * - 选择器弹出：activity 失去焦点
+     * - 选择器关闭：activity 恢复焦点
+     *
+     * 若关闭时仍未选择本输入法，则静默结束一键设置流程，避免回到设置页后再提示。
+     */
+    private fun handleSetupImePickerFocus(hasFocus: Boolean) {
+        val selecting = setupStateMachine.currentState as? SetupState.SelectingIme
+        if (!setupImePickerShown || selecting == null) {
+            if (setupImePickerShown && selecting == null) {
+                setupImePickerShown = false
+                setupImePickerLostFocusOnce = false
+            }
+            return
+        }
+
+        if (!hasFocus) {
+            setupImePickerLostFocusOnce = true
+            Log.d(TAG, "One-click IME picker shown, activity lost focus")
+            return
+        }
+
+        if (setupImePickerLostFocusOnce) {
+            // 选择器关闭：根据是否已切换输入法决定下一步
+            stopSetupPolling()
+            if (setupStateMachine.isOurImeCurrentForUi()) {
+                Log.d(TAG, "One-click IME picker closed with selection, continue setup")
+                handler.post { advanceSetupStateMachine() }
+            } else {
+                Log.d(TAG, "One-click IME picker closed without selection, abort silently")
+                setupStateMachine.reset()
+            }
+            setupImePickerShown = false
+            setupImePickerLostFocusOnce = false
+        }
     }
 
     // ==================== 更新检查相关 ====================

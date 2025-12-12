@@ -400,6 +400,14 @@ class SetupStateMachine(private val context: Context) {
     }
 
     /**
+     * 提供给 UI 层用于判断当前输入法是否已切换为本应用。
+     * 仅暴露只读查询，不改变状态机状态。
+     */
+    fun isOurImeCurrentForUi(): Boolean {
+        return isOurImeCurrent()
+    }
+
+    /**
      * 获取当前状态对应的 RequestingPermissions，如果不是则返回 null
      * 用于从 Activity 的 onRequestPermissionsResult 回调中更新状态
      */
