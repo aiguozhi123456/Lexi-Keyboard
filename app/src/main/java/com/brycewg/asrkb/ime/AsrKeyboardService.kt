@@ -1981,12 +1981,10 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
         val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
         val thresholdPx = (24f * resources.displayMetrics.density).toInt().coerceAtLeast(touchSlop)
         var downY = 0f
-        var consumedAlt = false
         return View.OnTouchListener { v, ev ->
             when (ev.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     downY = ev.y
-                    consumedAlt = false
                     false
                 }
                 MotionEvent.ACTION_UP -> {
@@ -1995,16 +1993,13 @@ class AsrKeyboardService : InputMethodService(), KeyboardActionHandler.UiListene
                         // 上滑：输入次符号
                         performKeyHaptic(v)
                         actionHandler.commitText(currentInputConnection, secondary())
-                        consumedAlt = true
+                        v.isPressed = false
                         true
                     } else {
-                        // 非上滑：交给 onClick（输入主符号）
-                        if (!consumedAlt) v.performClick()
-                        consumedAlt = false
-                        true
+                        false
                     }
                 }
-                MotionEvent.ACTION_CANCEL -> { consumedAlt = false; false }
+                MotionEvent.ACTION_CANCEL -> false
                 else -> false
             }
         }
