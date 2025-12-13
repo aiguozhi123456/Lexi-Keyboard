@@ -46,20 +46,28 @@
           android:text="@string/label_ai_edit_default_use_last_asr" />
 
         <TextView
-          style="@style/SettingsSectionTitle"
+          style="@style/SettingsLabel"
+          android:layout_marginTop="16dp"
           android:text="@string/title_ai_skip_under" />
 
-        <com.google.android.material.textfield.TextInputLayout
-          style="@style/SettingsTextInputLayout"
-          android:hint="@string/label_ai_skip_under_chars"
-          app:helperText="@string/helper_ai_skip_under_chars">
+        <LinearLayout
+          style="@style/SettingsSliderContainer">
 
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSkipAiUnderChars"
-            style="@style/SettingsTextInput"
-            android:inputType="number"
-            android:maxLength="4" />
-        </com.google.android.material.textfield.TextInputLayout>
+          <com.google.android.material.slider.Slider
+            android:id="@+id/sliderSkipAiUnderChars"
+            style="@style/SettingsSlider.InRow"
+            android:valueFrom="0"
+            android:valueTo="100"
+            android:stepSize="5" />
+
+          <TextView
+            android:id="@+id/tvSkipAiUnderCharsValue"
+            style="@style/SettingsSliderValue" />
+        </LinearLayout>
+
+        <TextView
+          style="@style/SettingsHint"
+          android:text="@string/helper_ai_skip_under_chars" />
       </LinearLayout>
 
       <!-- Group 2: 后处理模型 (LLM 配置：供应商选择 + 内置/自定义) -->
@@ -152,18 +160,33 @@
               android:text="@string/hint_reasoning_mode" />
           </LinearLayout>
 
-          <!-- Temperature 输入（付费模式可见） -->
-          <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilSfTemperature"
-            style="@style/SettingsTextInputLayout"
-            android:hint="@string/label_llm_temperature"
+          <!-- Temperature 滑块（付费模式可见） -->
+          <LinearLayout
+            android:id="@+id/layoutSfTemperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/etSfTemperature"
-              style="@style/SettingsTextInput"
-              android:inputType="numberDecimal" />
-          </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+              style="@style/SettingsLabel"
+              android:text="@string/label_llm_temperature" />
+
+            <LinearLayout
+              style="@style/SettingsSliderContainer">
+
+              <com.google.android.material.slider.Slider
+                android:id="@+id/sliderSfTemperature"
+                style="@style/SettingsSlider.InRow"
+                android:valueFrom="0"
+                android:valueTo="2"
+                android:stepSize="0.1" />
+
+              <TextView
+                android:id="@+id/tvSfTemperatureValue"
+                style="@style/SettingsSliderValue" />
+            </LinearLayout>
+          </LinearLayout>
 
           <!-- Powered by SiliconFlow Logo -->
           <ImageView
@@ -254,16 +277,25 @@
               android:text="@string/hint_reasoning_mode" />
           </LinearLayout>
 
-          <!-- Temperature 输入 -->
-          <com.google.android.material.textfield.TextInputLayout
-            style="@style/SettingsTextInputLayout"
-            android:hint="@string/label_llm_temperature">
+          <!-- Temperature 滑块 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_llm_temperature" />
 
-            <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/etBuiltinTemperature"
-              style="@style/SettingsTextInput"
-              android:inputType="numberDecimal" />
-          </com.google.android.material.textfield.TextInputLayout>
+          <LinearLayout
+            style="@style/SettingsSliderContainer">
+
+            <com.google.android.material.slider.Slider
+              android:id="@+id/sliderBuiltinTemperature"
+              style="@style/SettingsSlider.InRow"
+              android:valueFrom="0"
+              android:valueTo="2"
+              android:stepSize="0.1" />
+
+            <TextView
+              android:id="@+id/tvBuiltinTemperatureValue"
+              style="@style/SettingsSliderValue" />
+          </LinearLayout>
 
           <!-- 按钮行：获取Key + 测试调用 -->
           <LinearLayout
@@ -361,15 +393,25 @@
               android:inputType="text" />
           </com.google.android.material.textfield.TextInputLayout>
 
-          <com.google.android.material.textfield.TextInputLayout
-            style="@style/SettingsTextInputLayout"
-            android:hint="@string/label_llm_temperature">
+          <!-- Temperature 滑块 -->
+          <TextView
+            style="@style/SettingsLabel"
+            android:text="@string/label_llm_temperature" />
 
-            <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/etLlmTemperature"
-              style="@style/SettingsTextInput"
-              android:inputType="numberDecimal" />
-          </com.google.android.material.textfield.TextInputLayout>
+          <LinearLayout
+            style="@style/SettingsSliderContainer">
+
+            <com.google.android.material.slider.Slider
+              android:id="@+id/sliderLlmTemperature"
+              style="@style/SettingsSlider.InRow"
+              android:valueFrom="0"
+              android:valueTo="2"
+              android:stepSize="0.1" />
+
+            <TextView
+              android:id="@+id/tvLlmTemperatureValue"
+              style="@style/SettingsSliderValue" />
+          </LinearLayout>
 
           <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLlmTestCall"

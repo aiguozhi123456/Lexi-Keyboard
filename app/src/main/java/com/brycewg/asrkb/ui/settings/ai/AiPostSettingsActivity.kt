@@ -27,6 +27,7 @@ import com.brycewg.asrkb.ui.installExplainedSwitch
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.slider.Slider
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -54,8 +55,9 @@ class AiPostSettingsActivity : BaseActivity() {
     private lateinit var layoutSfReasoningMode: View
     private lateinit var switchSfReasoningMode: MaterialSwitch
     private lateinit var tvSfReasoningModeHint: TextView
-    private lateinit var tilSfTemperature: View
-    private lateinit var etSfTemperature: EditText
+    private lateinit var layoutSfTemperature: View
+    private lateinit var sliderSfTemperature: Slider
+    private lateinit var tvSfTemperatureValue: TextView
 
     // Builtin LLM Views
     private lateinit var groupBuiltinLlm: View
@@ -66,7 +68,8 @@ class AiPostSettingsActivity : BaseActivity() {
     private lateinit var layoutBuiltinReasoningMode: View
     private lateinit var switchBuiltinReasoningMode: MaterialSwitch
     private lateinit var tvBuiltinReasoningModeHint: TextView
-    private lateinit var etBuiltinTemperature: EditText
+    private lateinit var sliderBuiltinTemperature: Slider
+    private lateinit var tvBuiltinTemperatureValue: TextView
     private lateinit var btnBuiltinRegister: Button
     private lateinit var btnBuiltinTestCall: Button
 
@@ -77,7 +80,8 @@ class AiPostSettingsActivity : BaseActivity() {
     private lateinit var etLlmEndpoint: EditText
     private lateinit var etLlmApiKey: EditText
     private lateinit var etLlmModel: EditText
-    private lateinit var etLlmTemperature: EditText
+    private lateinit var sliderLlmTemperature: Slider
+    private lateinit var tvLlmTemperatureValue: TextView
     private lateinit var btnLlmAddProfile: Button
     private lateinit var btnLlmDeleteProfile: Button
     private lateinit var btnLlmTestCall: Button
@@ -90,7 +94,8 @@ class AiPostSettingsActivity : BaseActivity() {
     private lateinit var btnDeletePromptPreset: Button
     private lateinit var switchPostProcessEnabled: MaterialSwitch
     private lateinit var switchAiEditPreferLastAsr: MaterialSwitch
-    private lateinit var etSkipAiUnderChars: EditText
+    private lateinit var sliderSkipAiUnderChars: Slider
+    private lateinit var tvSkipAiUnderCharsValue: TextView
 
     // Flag to prevent recursive updates during programmatic text changes
     private var isUpdatingProgrammatically = false
@@ -154,14 +159,21 @@ class AiPostSettingsActivity : BaseActivity() {
         )
 
         // 少于特定字数跳过 AI 后处理
-        etSkipAiUnderChars = findViewById(R.id.etSkipAiUnderChars)
-        etSkipAiUnderChars.setText(prefs.postprocSkipUnderChars.toString())
-        etSkipAiUnderChars.addTextChangeListener { text ->
-            if (text.isBlank()) return@addTextChangeListener
-            val num = text.toIntOrNull() ?: return@addTextChangeListener
-            val coerced = num.coerceIn(0, 1000)
-            prefs.postprocSkipUnderChars = coerced
+        sliderSkipAiUnderChars = findViewById(R.id.sliderSkipAiUnderChars)
+        tvSkipAiUnderCharsValue = findViewById(R.id.tvSkipAiUnderCharsValue)
+        sliderSkipAiUnderChars.value = prefs.postprocSkipUnderChars.coerceIn(0, 100).toFloat()
+        tvSkipAiUnderCharsValue.text = prefs.postprocSkipUnderChars.toString()
+        sliderSkipAiUnderChars.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                val intValue = value.toInt()
+                prefs.postprocSkipUnderChars = intValue
+                tvSkipAiUnderCharsValue.text = intValue.toString()
+            }
         }
+        sliderSkipAiUnderChars.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+            override fun onStopTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+        })
 
         // LLM Vendor Selection
         tvLlmVendor = findViewById(R.id.tvLlmVendor)
@@ -179,8 +191,9 @@ class AiPostSettingsActivity : BaseActivity() {
         layoutSfReasoningMode = findViewById(R.id.layoutSfReasoningMode)
         switchSfReasoningMode = findViewById(R.id.switchSfReasoningMode)
         tvSfReasoningModeHint = findViewById(R.id.tvSfReasoningModeHint)
-        tilSfTemperature = findViewById(R.id.tilSfTemperature)
-        etSfTemperature = findViewById(R.id.etSfTemperature)
+        layoutSfTemperature = findViewById(R.id.layoutSfTemperature)
+        sliderSfTemperature = findViewById(R.id.sliderSfTemperature)
+        tvSfTemperatureValue = findViewById(R.id.tvSfTemperatureValue)
 
         // Initialize SF free/paid toggle
         switchSfUseFreeService.isChecked = !prefs.sfFreeLlmUsePaidKey
@@ -211,18 +224,18 @@ class AiPostSettingsActivity : BaseActivity() {
             }
         }
 
-        etSfTemperature.addTextChangeListener { text ->
-            if (!prefs.sfFreeLlmUsePaidKey) return@addTextChangeListener
-            if (text.isBlank()) return@addTextChangeListener
-            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
-            val coerced = parsed.coerceIn(0f, 2f)
-            if (coerced != parsed) {
-                isUpdatingProgrammatically = true
-                etSfTemperature.setTextIfDifferent(coerced.toString())
-                isUpdatingProgrammatically = false
+        // SF temperature slider listener
+        sliderSfTemperature.addOnChangeListener { _, value, fromUser ->
+            if (fromUser && prefs.sfFreeLlmUsePaidKey) {
+                val coerced = value.coerceIn(0f, 2f)
+                prefs.setLlmVendorTemperature(LlmVendor.SF_FREE, coerced)
+                tvSfTemperatureValue.text = String.format("%.1f", coerced)
             }
-            prefs.setLlmVendorTemperature(LlmVendor.SF_FREE, coerced)
         }
+        sliderSfTemperature.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+            override fun onStopTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+        })
 
         // 根据深色模式设置 Powered by 图片
         val imgSfFreeLlmPoweredBy = findViewById<ImageView>(R.id.imgSfFreeLlmPoweredBy)
@@ -251,7 +264,8 @@ class AiPostSettingsActivity : BaseActivity() {
         layoutBuiltinReasoningMode = findViewById(R.id.layoutBuiltinReasoningMode)
         switchBuiltinReasoningMode = findViewById(R.id.switchBuiltinReasoningMode)
         tvBuiltinReasoningModeHint = findViewById(R.id.tvBuiltinReasoningModeHint)
-        etBuiltinTemperature = findViewById(R.id.etBuiltinTemperature)
+        sliderBuiltinTemperature = findViewById(R.id.sliderBuiltinTemperature)
+        tvBuiltinTemperatureValue = findViewById(R.id.tvBuiltinTemperatureValue)
         btnBuiltinRegister = findViewById(R.id.btnBuiltinRegister)
         btnBuiltinTestCall = findViewById(R.id.btnBuiltinTestCall)
 
@@ -262,7 +276,8 @@ class AiPostSettingsActivity : BaseActivity() {
         etLlmEndpoint = findViewById(R.id.etLlmEndpoint)
         etLlmApiKey = findViewById(R.id.etLlmApiKey)
         etLlmModel = findViewById(R.id.etLlmModel)
-        etLlmTemperature = findViewById(R.id.etLlmTemperature)
+        sliderLlmTemperature = findViewById(R.id.sliderLlmTemperature)
+        tvLlmTemperatureValue = findViewById(R.id.tvLlmTemperatureValue)
         btnLlmAddProfile = findViewById(R.id.btnLlmAddProfile)
         btnLlmDeleteProfile = findViewById(R.id.btnLlmDeleteProfile)
         btnLlmTestCall = findViewById(R.id.btnLlmTestCall)
@@ -283,12 +298,17 @@ class AiPostSettingsActivity : BaseActivity() {
             viewModel.updateBuiltinApiKey(prefs, text)
         }
 
-        // Builtin vendor temperature listener
-        etBuiltinTemperature.addTextChangeListener { text ->
-            if (text.isBlank()) return@addTextChangeListener
-            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
-            viewModel.updateBuiltinTemperature(prefs, parsed)
+        // Builtin vendor temperature slider listener
+        sliderBuiltinTemperature.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                viewModel.updateBuiltinTemperature(prefs, value)
+                tvBuiltinTemperatureValue.text = String.format("%.1f", value)
+            }
         }
+        sliderBuiltinTemperature.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+            override fun onStopTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+        })
 
         // Builtin model selection
         tvBuiltinModel.setOnClickListener { showBuiltinModelSelectionDialog() }
@@ -338,11 +358,18 @@ class AiPostSettingsActivity : BaseActivity() {
         etLlmModel.addTextChangeListener { text ->
             viewModel.updateActiveLlmProvider(prefs) { it.copy(model = text) }
         }
-        etLlmTemperature.addTextChangeListener { text ->
-            if (text.isBlank()) return@addTextChangeListener
-            val parsed = text.toFloatOrNull() ?: return@addTextChangeListener
-            viewModel.updateActiveLlmProvider(prefs) { it.copy(temperature = parsed.coerceIn(0f, 2f)) }
+        // Custom LLM temperature slider listener
+        sliderLlmTemperature.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                val coerced = value.coerceIn(0f, 2f)
+                viewModel.updateActiveLlmProvider(prefs) { it.copy(temperature = coerced) }
+                tvLlmTemperatureValue.text = String.format("%.1f", coerced)
+            }
         }
+        sliderLlmTemperature.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+            override fun onStopTrackingTouch(slider: Slider) = hapticTapIfEnabled(slider)
+        })
 
         btnLlmTestCall.setOnClickListener { handleTestLlmCall() }
         btnLlmAddProfile.setOnClickListener { handleAddLlmProfile() }
@@ -418,7 +445,12 @@ class AiPostSettingsActivity : BaseActivity() {
         if (isCustom) {
             etBuiltinCustomModelId.setTextIfDifferent(displayModel)
         }
-        etBuiltinTemperature.setTextIfDifferent(config.temperature.toString())
+        // Update slider range based on vendor temperature limits and set value
+        sliderBuiltinTemperature.valueFrom = vendor.temperatureMin
+        sliderBuiltinTemperature.valueTo = vendor.temperatureMax
+        val coercedTemp = config.temperature.coerceIn(vendor.temperatureMin, vendor.temperatureMax)
+        sliderBuiltinTemperature.value = coercedTemp
+        tvBuiltinTemperatureValue.text = String.format("%.1f", coercedTemp)
 
         // Update reasoning mode switch visibility and state
         val supportsReasoning = viewModel.supportsReasoningSwitch(vendor, displayModel)
@@ -432,7 +464,7 @@ class AiPostSettingsActivity : BaseActivity() {
     private fun updateSfFreePaidUI(isFreeMode: Boolean) {
         tvSfFreeServiceDesc.visibility = if (isFreeMode) View.VISIBLE else View.GONE
         tilSfApiKey.visibility = if (isFreeMode) View.GONE else View.VISIBLE
-        tilSfTemperature.visibility = if (isFreeMode) View.GONE else View.VISIBLE
+        layoutSfTemperature.visibility = if (isFreeMode) View.GONE else View.VISIBLE
         // Update model display based on mode
         updateSfFreeLlmModelDisplay()
         updateSfReasoningModeUI()
@@ -470,7 +502,9 @@ class AiPostSettingsActivity : BaseActivity() {
     private fun updateSfTemperatureDisplay() {
         isUpdatingProgrammatically = true
         val temperature = prefs.getLlmVendorTemperature(LlmVendor.SF_FREE)
-        etSfTemperature.setTextIfDifferent(temperature.toString())
+        val coerced = temperature.coerceIn(0f, 2f)
+        sliderSfTemperature.value = coerced
+        tvSfTemperatureValue.text = String.format("%.1f", coerced)
         isUpdatingProgrammatically = false
     }
 
@@ -497,7 +531,9 @@ class AiPostSettingsActivity : BaseActivity() {
         etLlmEndpoint.setTextIfDifferent(provider?.endpoint ?: prefs.llmEndpoint)
         etLlmApiKey.setTextIfDifferent(provider?.apiKey ?: prefs.llmApiKey)
         etLlmModel.setTextIfDifferent(provider?.model ?: prefs.llmModel)
-        etLlmTemperature.setTextIfDifferent((provider?.temperature ?: prefs.llmTemperature).toString())
+        val temperature = (provider?.temperature ?: prefs.llmTemperature).coerceIn(0f, 2f)
+        sliderLlmTemperature.value = temperature
+        tvLlmTemperatureValue.text = String.format("%.1f", temperature)
         isUpdatingProgrammatically = false
     }
 

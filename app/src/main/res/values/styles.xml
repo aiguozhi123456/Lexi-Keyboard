@@ -188,18 +188,32 @@
         <item name="shapeAppearanceOverlay">@style/AsrkbShapeOverlayCapsule</item>
     </style>
 
-    <!-- Slider 滑块 -->
+    <!-- Slider 滑块容器（水平布局，包含滑块和数值显示） -->
+    <style name="SettingsSliderContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <!-- Slider 滑块（独立使用，占满宽度） -->
     <style name="SettingsSlider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">2dp</item>
     </style>
 
+    <!-- Slider 滑块（在容器内使用，占满剩余宽度） -->
+    <style name="SettingsSlider.InRow" parent="SettingsSlider">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
     <!-- Slider 旁边的数值显示 -->
     <style name="SettingsSliderValue">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">40dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginStart">8dp</item>
         <item name="android:textAlignment">textEnd</item>
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
