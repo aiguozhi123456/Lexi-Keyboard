@@ -7,5 +7,5 @@
   "important_notice": "0. 3.13.0版本迎来大量重构，已经过初步测试，如果您有疑虑可以暂不更新\n1. 已支持通过同文输入法与说点啥进行联动，具体操作步骤见https://github.com/BryceWG/trime-bibi-keyboard/releases\n2. BiBi Keyboard Pro版本已上架，欢迎在3.8.6后版本-关于页面中了解详情。\n3. 官方网站和使用文档均已上线,网址分别为: bibi.brycewg.com bibidocs.brycewg.com",
   "notice_level": "info",
   "min_supported_version": "2.6.5",
-  "update_time": "2026-02-01T03:54:02Z"
+  "update_time": "2026-02-05T16:36:03Z"
 }
